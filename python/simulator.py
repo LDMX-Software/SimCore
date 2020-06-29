@@ -118,7 +118,7 @@ class simulator(Producer):
 
         # Dark Brem stuff
         from LDMX.SimCore import simcfg
-        self.dark_brem = DarkBrem()
+        self.dark_brem = simcfg.DarkBrem()
 
     def setDetector(self, det_name , include_scoring_planes = False ) :
         """Set the detector description with the option to include the scoring planes

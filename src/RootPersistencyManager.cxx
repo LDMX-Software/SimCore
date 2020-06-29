@@ -115,7 +115,7 @@ namespace ldmx {
             runHeader.setIntParameter(   "Biasing All"      , parameters_.getParameter<bool>(       "biasing_all" ));
             runHeader.setIntParameter(   "Biasing Incident" , parameters_.getParameter<bool>(       "biasing_incident" ));
             runHeader.setIntParameter(   "Biasing Disable EM",parameters_.getParameter<bool>(       "biasing_disableEMBiasing" ));
-            runHeader.setIntParameter(   "Biasing Factor"   , parameters_.getParameter<int>(        "biasing_factor" ));
+            runHeader.setFloatParameter( "Biasing Factor"   , parameters_.getParameter<double>(     "biasing_factor" ));
             runHeader.setFloatParameter( "Biasing Threshold", parameters_.getParameter<double>(     "biasing_threshold" ));
         }
 

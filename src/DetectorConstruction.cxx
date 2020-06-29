@@ -34,7 +34,7 @@ namespace ldmx {
             auto biasIncident{parameters_.getParameter< bool >("biasing_incident")}; 
             auto disableEMBiasing{parameters_.getParameter< bool >("biasing_disableEMBiasing")};
             auto biasThreshold{parameters_.getParameter< double >("biasing_threshold")}; 
-            auto biasFactor{parameters_.getParameter< int >("biasing_factor")}; 
+            auto biasFactor{parameters_.getParameter< double >("biasing_factor")}; 
 
             // Instantiate the biasing operator
             // TODO: At some point, this should be more generic i.e. operators should be
@@ -66,15 +66,20 @@ namespace ldmx {
             for (G4LogicalVolume* volume : *G4LogicalVolumeStore::GetInstance()) {
                 G4String volumeName = volume->GetName();
                 //std::cout << "[ DetectorConstruction ]: " << "Volume: " << volume->GetName() << std::endl;
-                if ((biasingVolume.compare("ecal") == 0) 
-                        && (volumeName.contains("Wthick") 
+                if (biasingVolume.compare("ecal") == 0) {
+                    if ((
+                               volumeName.contains("Wthick") 
                             || volumeName.contains("Si")
-                            || volumeName.contains("W")) 
-                        && volumeName.contains("volume")) {
-                    xsecBiasing->AttachTo(volume);
-                    std::cout << "[ DetectorConstruction ]: " << "Attaching biasing operator " 
-                              << xsecBiasing->GetName() << " to volume " 
-                              << volume->GetName() << std::endl;
+                            || volumeName.contains("W") 
+                            || volumeName.contains("PCB")
+                            || volumeName.contains("CFMix")
+                        ) && volumeName.contains("volume")
+                    ) {
+                        xsecBiasing->AttachTo(volume);
+                        std::cout << "[ DetectorConstruction ]: " << "Attaching biasing operator " 
+                                  << xsecBiasing->GetName() << " to volume " 
+                                  << volume->GetName() << std::endl;
+                    }
                 } else if (volumeName.contains(biasingVolume)) {
                     xsecBiasing->AttachTo(volume);
                     std::cout << "[ DetectorConstruction ]: " 
