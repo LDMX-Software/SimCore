@@ -60,7 +60,7 @@ namespace ldmx {
         }
 
         pList->RegisterPhysics(new GammaPhysics);
-        pList->RegisterPhysics(new APrimePhysics( parameters_ ));
+        pList->RegisterPhysics(new APrimePhysics( parameters_.getParameter<Parameters>("dark_brem") ));
        
         auto biasingEnabled{parameters_.getParameter< bool >("biasing_enabled")}; 
         if (biasingEnabled) {

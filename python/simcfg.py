@@ -89,3 +89,38 @@ class PrimaryGenerator:
         """
 
         return '%s of class %s' % (self.instance_name, self.class_name)
+
+class DarkBrem:
+    """Storage for parameters of dark brem process
+
+    Attributes
+    ----------
+    APrimeMass : float
+        Mass of A' in MeV
+    library_path : str
+        Path to directory of LHE files containing dark brem vertices
+    enable : bool
+        Should we use the custom Geant4 dark brem process?
+    method : int
+        Interpretation method for LHE files
+    threshold : float
+        Minimum energy that electron should have for dark brem to have nonzero xsec
+    epsilon : float
+        Epsilon for dark brem xsec calculation
+    """
+
+    def __init__(self) : 
+
+        self.APrimeMass   = 0.
+        self.library_path = ''
+        self.enable       = False #off by default
+        self.method       = 1
+        self.threshold    = 0.
+        self.epsilon      = 1.
+
+    def activate(self, apMass, lib_path ) :
+        """Activate the dark brem process with the input A' mass [MeV] and path to vertex library"""
+
+        self.enable       = True
+        self.APrimeMass   = apMass
+        self.library_path = lib_path

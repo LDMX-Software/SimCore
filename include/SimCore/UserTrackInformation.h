@@ -98,7 +98,18 @@ namespace ldmx {
             }
 
             std::string getVertexVolume() const { return vertexVolume_; }
-        
+
+            /**
+             * Set the generation of this track
+             *
+             * Primary = 1, child of primary = 2, etc
+             *
+             * Only updated if DarkBremFilter is used.
+             */
+            void setGeneration(const int gen) { generation_ = gen; }
+
+            int getGeneration() const { return generation_; } 
+
         private:
 
             /// Flag for saving the track as a Trajectory.
@@ -118,6 +129,9 @@ namespace ldmx {
 
             /// The initial momentum of the track.
             G4ThreeVector initialMomentum_;
+
+            /// The generation of this track
+            int generation_{0};
     };
 }
 

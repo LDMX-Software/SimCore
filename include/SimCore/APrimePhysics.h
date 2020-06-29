@@ -13,7 +13,6 @@
 
 // LDMX
 #include "Framework/Parameters.h"
-#include "SimCore/G4eDarkBremsstrahlung.h"
 
 namespace ldmx {
 
@@ -37,7 +36,7 @@ namespace ldmx {
              *
              * @param name The name of the physics.
              */
-            APrimePhysics(Parameters &params, const G4String& name = "APrime");
+            APrimePhysics(Parameters params, const G4String& name = "APrime");
 
             /**
              * Class destructor.
@@ -62,31 +61,10 @@ namespace ldmx {
 
         private:
 
-            /**
-             * Mass of A Prime
-             */
-            double aprimeMass_;
+            /// dark brem process parameters
+            Parameters parameters_;
 
-            /**
-             * Path to LHE file containing MadGraph simulated Dark Brems
-             *
-             * Mass of A' in this file has to match passed A'
-             */
-            std::string madGraphFilePath_;
-
-            /**
-             * Set mode of interpretation for MadGraph events
-             */
-            G4eDarkBremsstrahlungModel::DarkBremMethod bremMethod_;
-
-            /**
-             * Global Xsec Biasing factor for Dark Brem process
-             */
-            double globalXsecFactor_{1};
-
-            /**
-             * Definition of the APrime particle.
-             */
+            /// Definition of the APrime particle.
             G4ParticleDefinition* aprimeDef_;
     };
 
