@@ -39,10 +39,10 @@ namespace ldmx {
             //only bias the process that we want to DARKBREM_PROCESS
                         
             //only bias primary particle
-            if (track->GetParentID() != 0) return 0; 
+            if (not biasAll_ and track->GetParentID() != 0) return 0; 
     
             //only bias primary particles above the minimum energy
-            if (track->GetKineticEnergy() < XsecBiasingOperator::threshold_) return 0; 
+            if (track->GetKineticEnergy() < threshold_) return 0; 
 
             G4double interactionLength = callingProcess->GetWrappedProcess()->GetCurrentInteractionLength();
 
