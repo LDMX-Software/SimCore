@@ -119,12 +119,13 @@ namespace ldmx {
             runHeader.setFloatParameter( "Biasing Threshold", parameters_.getParameter<double>(     "biasing_threshold" ));
         }
 
-        auto apMass{parameters_.getParameter<double>("APrimeMass")};
-        if ( apMass > 0 ) {
-            runHeader.setFloatParameter(  "A' Mass [MeV]" , apMass );
-            runHeader.setFloatParameter(  "Dark Brem Global Bias" , parameters_.getParameter<double>("darkbrem_globalxsecfactor") );
-            runHeader.setStringParameter( "Dark Brem Vertex Library Path" , parameters_.getParameter<std::string>("darkbrem_madgraphfilepath") );
-            runHeader.setIntParameter(    "Dark Brem Interpretation Method" , parameters_.getParameter<int>("darkbrem_method") );
+        auto dark_brem{parameters_.getParameter<Parameters>("dark_brem")};
+        if ( dark_brem.getParameter<bool>("enable") ) {
+            runHeader.setFloatParameter(  "A' Mass [MeV]"             , dark_brem.getParameter<double>("APrimeMass") );
+            runHeader.setFloatParameter(  "Dark Brem Epsilon"         , dark_brem.getParameter<double>("epsilon") );
+            runHeader.setFloatParameter(  "Dark Brem Threshold [GeV]" , dark_brem.getParameter<double>("threshold") );
+            runHeader.setStringParameter( "Dark Brem Vertex Library Path" , dark_brem.getParameter<std::string>("library_path") );
+            runHeader.setIntParameter(    "Dark Brem Interpretation Method" , dark_brem.getParameter<int>("method") );
         }
 
         auto generators{parameters_.getParameter<std::vector<Parameters>>("generators")};

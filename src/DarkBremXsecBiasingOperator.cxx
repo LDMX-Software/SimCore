@@ -38,7 +38,7 @@ namespace ldmx {
         if (currentProcess.compare(this->getProcessToBias()) == 0) { 
             //only bias the process that we want to DARKBREM_PROCESS
                         
-            //only bias primary particle
+            //only bias primary particle if we don't want to bias all particles
             if (not biasAll_ and track->GetParentID() != 0) return 0; 
     
             //only bias primary particles above the minimum energy
