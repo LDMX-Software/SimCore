@@ -46,6 +46,14 @@ namespace ldmx {
             void StartRun();
 
             /** 
+             * This uses two protected member variables from XsecBiasingOperator:
+             *  - biasAll_ : If true, bias all particles connected to the dark brem process;
+             *      otherwise, only bias the primary particle (ParentID == 0)
+             *  - xsecFactor_ : Factor to multiply cross section by
+             *  - xsecOperator : Geant4 biasing operator to use
+             *
+             * @param[in] track const pointer to track to Bias
+             * @param[in] callingProcess process that might be biased by this operator
              * @return Method that returns the biasing operation that will be used
              *         to bias the occurence of events.
              */
