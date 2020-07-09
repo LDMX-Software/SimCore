@@ -117,6 +117,7 @@ class DarkBrem:
         self.method       = 1
         self.threshold    = 0.
         self.epsilon      = 1.
+        self.only_one_per_event = False
 
     def activate(self, apMass, lib_path ) :
         """Activate the dark brem process with the input A' mass [MeV] and path to vertex library"""

@@ -325,10 +325,8 @@ namespace ldmx {
              *
              * The dark brem process is _always_ re-activated in the RunManager::TerminateOneEvent method.
              * This reactivation has no effect when the process is already active.
-             *
-             * TODO make this configurable so the user can decide
              */
-            bool onlyOnePerEvent_{false};
+            bool onlyOnePerEvent_;
     
             /** 
              * Storage of data from mad graph 

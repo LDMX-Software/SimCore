@@ -64,6 +64,7 @@ namespace ldmx {
                 );
         
         epsilon_ = params.getParameter<double>("epsilon");
+        onlyOnePerEvent_ = params.getParameter<bool>("only_one_per_event");
     
         SetMadGraphDataLibrary( params.getParameter<std::string>("library_path") );
     }
