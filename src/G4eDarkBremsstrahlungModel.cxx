@@ -54,8 +54,13 @@ namespace ldmx {
                 method_ = DarkBremMethod::ForwardOnly; break;
             case 2:
                 method_ = DarkBremMethod::CMScaling; break;
+            case 3:
+                method_ = DarkBremMethod::Undefined; break;
             default:
-                method_ = DarkBremMethod::Undefined;
+                EXCEPTION_RAISE(
+                        "InvalidMethod",
+                        "Invallid dark brem simulation method " + std::to_string(method_) + "."
+                        );
         }
     
         threshold_ = std::max(
@@ -178,12 +183,13 @@ namespace ldmx {
             EAcc = E0;
             P = primary->GetTotalMomentum();
             Pt = sqrt(primary->Get4Momentum().px()*primary->Get4Momentum().px()+primary->Get4Momentum().py()*primary->Get4Momentum().py());
-        } else {
-            EXCEPTION_RAISE(
-                    "InvalidMethod",
-                    "Invallid dark brem simulation method " + std::to_string(method_) + "."
-                    );
         }
+
+        //What we need:
+        //  - EAcc
+        //  - P and Pt for ThetaAcc
+        //  - PhiAcc
+        //Basically we need the 3-momentum of the recoil electron
     
         EAcc = EAcc*CLHEP::GeV; //Change the energy back to MeV, the internal GEANT unit.
     

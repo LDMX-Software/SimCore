@@ -37,8 +37,8 @@ namespace ldmx {
              */
             enum DarkBremMethod{
                 ForwardOnly = 1, ///> Use actual electron energy and get pT from LHE (such that pT^2+me^2 < Eacc^2)
-                CMScaling, ///> Boost LHE vertex momenta to the actual electron energy
-                Undefined ///> Use LHE vertex as is
+                CMScaling   = 2, ///> Boost LHE vertex momenta to the actual electron energy
+                Undefined   = 3  ///> Use LHE vertex as is
             };
     
             /**
