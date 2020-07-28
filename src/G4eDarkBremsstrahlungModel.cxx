@@ -150,7 +150,7 @@ namespace ldmx {
         if ( method_ == DarkBremMethod::ForwardOnly ) { 
             unsigned int i = 0;
             while(Pt*Pt+Mel_*Mel_>EAcc*EAcc) {
-                //Skip events until the Pt is less than the energy.
+                //Skip events until the transverse energy is less than the total energy.
                 i++;
                 data = GetMadgraphData(incidentEnergy);
                 EAcc = (data.electron.E()-Mel_)*((incidentEnergy-Mel_-MA_)/(data.E-Mel_-MA_)) + Mel_;
