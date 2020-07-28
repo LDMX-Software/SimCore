@@ -220,7 +220,7 @@ namespace ldmx {
         // stop tracking and create new secondary instead of primary
         if(alwaysCreateNewElectron_ or finalKE < SecondaryThreshold()) {
             fParticleChange_->ProposeTrackStatus(fStopAndKill);
-            fParticleChange_->SetProposedKineticEnergy(0.0);
+            //fParticleChange_->SetProposedKineticEnergy(0.0);
             //TODO copy over all other particle information from track I am killing
             G4DynamicParticle* el = new G4DynamicParticle(
                                             const_cast<G4ParticleDefinition*>(particle_),
