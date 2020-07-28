@@ -23,6 +23,7 @@
 #include "G4ParticleChangeForLoss.hh"
 #include "G4ProcessTable.hh"
 #include "G4RunManager.hh" //for VerboseLevel
+#include "G4EventManager.hh" //for EventID number
 
 // Boost
 #include <boost/numeric/odeint.hpp>
@@ -127,19 +128,22 @@ namespace ldmx {
             G4String pname = "biasWrapper(eDBrem)";
             G4ProcessTable* ptable = G4ProcessTable::GetProcessTable();
             ptable->SetProcessActivation(pname,state);
-        
-            if ( G4RunManager::GetRunManager()->GetVerboseLevel() > 1 ) {
-                std::cout << "[ G4eDarkBremsstrahlungModel ] : A dark brem occurred!" << std::endl;
-            }
         }
+        
+        //if ( G4RunManager::GetRunManager()->GetVerboseLevel() > 1 ) {
+            std::cout << "[ G4eDarkBremsstrahlungModel ] : "
+                << "(" << G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetEventID() << ") "
+                << "A dark brem occurred!" 
+                << std::endl;
+        //}
     
-        G4double E0 = primary->GetTotalEnergy();
-        G4double tmax = std::min(maxEnergy, E0);
-        if(tmin >= tmax) { return; } // limits of the energy sampling
-        E0 = E0 / CLHEP::GeV; //Convert the energy to GeV, the units used in the LHE files.
-    
-        OutgoingKinematics data = GetMadgraphData(E0);
-        double EAcc   = (data.electron.E()-Mel_)/(data.E-Mel_-MA_)*(E0-Mel_-MA_); 
+        G4double incidentEnergy = primary->GetTotalEnergy();
+        G4double tmax = std::min(maxEnergy, incidentEnergy);
+        if(tmin >= tmax) { std::cout << "Limits of energy sampling!" << std::endl; return; } // limits of the energy sampling
+        incidentEnergy = incidentEnergy / CLHEP::GeV; //Convert the energy to GeV, the units used in the LHE files.
+
+        OutgoingKinematics data = GetMadgraphData(incidentEnergy);
+        double EAcc   = (data.electron.E()-Mel_)*((incidentEnergy-Mel_-MA_)/(data.E-Mel_-MA_)) + Mel_;
         double Pt     = data.electron.Pt();
         double P      = sqrt(EAcc*EAcc-Mel_*Mel_);
         double PhiAcc = data.electron.Phi();
@@ -148,8 +152,8 @@ namespace ldmx {
             while(Pt*Pt+Mel_*Mel_>EAcc*EAcc) {
                 //Skip events until the Pt is less than the energy.
                 i++;
-                data = GetMadgraphData(E0);
-                EAcc = (data.electron.E()-Mel_)/(data.E-Mel_-MA_)*(E0-Mel_-MA_);
+                data = GetMadgraphData(incidentEnergy);
+                EAcc = (data.electron.E()-Mel_)*((incidentEnergy-Mel_-MA_)/(data.E-Mel_-MA_)) + Mel_;
                 Pt = data.electron.Pt();
                 P = sqrt(EAcc*EAcc-Mel_*Mel_);
                 PhiAcc = data.electron.Phi();
@@ -161,28 +165,28 @@ namespace ldmx {
                         << std::endl;
                     std::cout << "                               : "
                         << "Consider expanding your libary of A' vertices to include a beam energy closer to "
-                        << E0 << " MeV."
+                        << incidentEnergy << " MeV."
                         << std::endl;
                     break;
                 }
             }
         } else if( method_ == DarkBremMethod::CMScaling ) {
             TLorentzVector el(data.electron.X(),data.electron.Y(),data.electron.Z(),data.electron.E());
-            double ediff = data.E-E0;
+            double ediff = data.E-incidentEnergy;
             TLorentzVector newcm(
                     data.centerMomentum.X(),data.centerMomentum.Y()
                     ,data.centerMomentum.Z()-ediff,data.centerMomentum.E()-ediff);
             el.Boost(-1.*data.centerMomentum.BoostVector());
             el.Boost(newcm.BoostVector());
-            double newE = (data.electron.E()-Mel_)/(data.E-Mel_-MA_)*(E0-Mel_-MA_);
+            double newE = (data.electron.E()-Mel_)*((incidentEnergy-Mel_-MA_)/(data.E-Mel_-MA_)) + Mel_;
             el.SetE(newE);
             EAcc = el.E();
             Pt = el.Pt();
             P = el.P();
         } else if ( method_ == DarkBremMethod::Undefined ) {
-            EAcc = E0;
-            P = primary->GetTotalMomentum();
-            Pt = sqrt(primary->Get4Momentum().px()*primary->Get4Momentum().px()+primary->Get4Momentum().py()*primary->Get4Momentum().py());
+            EAcc = data.electron.E();
+            P    = sqrt(EAcc*EAcc-Mel_*Mel_);
+            Pt   = data.electron.Pt();
         }
 
         //What we need:
@@ -193,16 +197,21 @@ namespace ldmx {
     
         EAcc = EAcc*CLHEP::GeV; //Change the energy back to MeV, the internal GEANT unit.
     
-        G4double momentum = sqrt(EAcc*EAcc-electron_mass_c2*electron_mass_c2); //Electron momentum in MeV.
-        G4ThreeVector newDirection;
+        G4double recoilElectronMomentumMag = sqrt(EAcc*EAcc-electron_mass_c2*electron_mass_c2); //Electron momentum in MeV.
+        G4ThreeVector recoilElectronMomentum;
         double ThetaAcc = std::asin(Pt/P);
-        newDirection.set(std::sin(ThetaAcc)*std::cos(PhiAcc),std::sin(ThetaAcc)*std::sin(PhiAcc), std::cos(ThetaAcc));
-        newDirection.rotateUz(primary->GetMomentumDirection());
-        newDirection.setMag(momentum);
+        recoilElectronMomentum.set(std::sin(ThetaAcc)*std::cos(PhiAcc),std::sin(ThetaAcc)*std::sin(PhiAcc), std::cos(ThetaAcc));
+        recoilElectronMomentum.rotateUz(primary->GetMomentumDirection());
+        recoilElectronMomentum.setMag(recoilElectronMomentumMag);
     
         // create g4dynamicparticle object for the dark photon.
-        G4ThreeVector direction = (primary->GetMomentum()- newDirection);
-        G4DynamicParticle* dphoton = new G4DynamicParticle(G4APrime::APrime(),direction);
+        // define its 3-momentum so we conserve 3-momentum with primary and recoil electron
+        // NOTE: does _not_ take nucleus recoil into account
+        G4ThreeVector darkPhotonMomentum = (primary->GetMomentum() - recoilElectronMomentum);
+        G4DynamicParticle* dphoton = new G4DynamicParticle(
+                                            G4APrime::APrime(),
+                                            darkPhotonMomentum
+                                         );
         secondaries->push_back(dphoton);
      
         // energy of primary
@@ -212,13 +221,16 @@ namespace ldmx {
         if(alwaysCreateNewElectron_ or finalKE < SecondaryThreshold()) {
             fParticleChange_->ProposeTrackStatus(fStopAndKill);
             fParticleChange_->SetProposedKineticEnergy(0.0);
-            G4DynamicParticle* el = new G4DynamicParticle(const_cast<G4ParticleDefinition*>(particle_),
-                                        newDirection.unit(), finalKE);
+            //TODO copy over all other particle information from track I am killing
+            G4DynamicParticle* el = new G4DynamicParticle(
+                                            const_cast<G4ParticleDefinition*>(particle_),
+                                            recoilElectronMomentum
+                                        );
             secondaries->push_back(el);
             // continue tracking
         } else {
             // just have primary lose energy (don't rename to different track ID)
-            fParticleChange_->SetProposedMomentumDirection(newDirection.unit());
+            fParticleChange_->SetProposedMomentumDirection(recoilElectronMomentum.unit());
             fParticleChange_->SetProposedKineticEnergy(finalKE);
         }
     } 
@@ -445,6 +457,7 @@ namespace ldmx {
     
         E0 = E0 / CLHEP::GeV; //Change energy to GeV.
     
+        //TODO move to first cut above
         if(E0 < threshold_) return 0.; //can't produce a prime
     
         //begin: chi-formfactor calculation
