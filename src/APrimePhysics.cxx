@@ -45,7 +45,7 @@ namespace ldmx {
                     new G4eDarkBremsstrahlung(parameters_) /*process to add - G4ProcessManager cleans up processes*/
                     , G4ProcessVectorOrdering::ordInActive /*activation when particle at rest*/
                     , 1 /*activation along step*/
-                    , 1 /*activation at end of step*/
+                    , G4ProcessVectorOrdering::ordInActive /*activation at end of step*/
                     );
         }
 
