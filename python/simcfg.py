@@ -125,3 +125,38 @@ class DarkBrem:
         self.enable       = True
         self.APrimeMass   = apMass
         self.library_path = lib_path
+
+    def __str__(self): 
+        """Stringify the DarkBrem configuration
+
+        Returns
+        -------
+        str
+            A human-readable version of all its attributes
+        """
+
+        string = "DarkBrem { "
+               + "Enabled: %d"%self.enable
+               + ", Mass: %f MeV"%self.APrimeMass
+               + ", Library: '%s'"%self.library_path
+               + ", Method: %d"%self.method
+               + ", Threshold: %f GeV"%self.threshold
+               + ", Epsilon: %f"%self.epsilon
+               + ", Only One Per Event: %d"%self.only_on_per_event
+               + " }"
+
+        return string
+
+    def __repr__(self):
+        """A shorter string representation of the DarkBrem configuration
+
+        Returns
+        -------
+        str
+            Just printing whether it is enabled and the A' mass
+        """
+
+        if self.enable :
+            return 'DB Activated with A\' Mass %f MeV'%self.APrimeMass
+        else :
+            return 'DB Not Activated'
