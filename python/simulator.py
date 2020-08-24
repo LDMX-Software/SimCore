@@ -31,6 +31,8 @@ class simulator(Producer):
         Full path to detector description gdml (suggested to use setDetector)
     validate_detector : bool, optional
         Should we have Geant4 validate that the gdml is correctly formatted?
+    ecalHexReadout : EcalHexReadout
+        Configuration for how to use EcalHexReadout class
     description : str
         Describe this run in a human-readable way
     scoringPlanes : str, optional
@@ -84,7 +86,7 @@ class simulator(Producer):
     """
 
     def __init__(self, instance_name ) :
-        super().__init__( instance_name , "ldmx::Simulator" )
+        super().__init__( instance_name , "ldmx::Simulator" , "SimCore" )
 
         #######################################################################
         # Required Parameters
@@ -94,6 +96,8 @@ class simulator(Producer):
 
         #######################################################################
         # Optional Parameters (with helpful defaults)
+        from LDMX.DetDescr import EcalHexReadout
+        self.ecalHexReadout = EcalHexReadout.EcalHexReadout()
         self.scoringPlanes = ''
         self.randomSeeds = [ ] 
         self.beamSpotSmear = [ ]
@@ -123,11 +127,6 @@ class simulator(Producer):
         self.darkbrem_madgraphfilepath = '' #required if want to use dark brem
         self.darkbrem_method = 0
         self.darkbrem_globalxsecfactor = 1.
-
-        # add necessary library to the list to load
-        #   requires a process object to have been defined
-        from LDMX.SimCore import include
-        include.library()
 
     def setDetector(self, det_name , include_scoring_planes = False ) :
         """Set the detector description with the option to include the scoring planes
