@@ -31,11 +31,11 @@ namespace ldmx {
         PrimaryGenerator( name , parameters )
         {
 
-        verbosity_ = parameters.getParameter< int >("verbosity");
+        verbosity_ = parameters.getParameter< int >("verbosity", 0);
 
         auto particleTable{G4ParticleTable::GetParticleTable()};
         
-        auto particle{parameters.getParameter< std::string >("particle")};
+        auto particle{parameters.getParameter< std::string >("particle", "e-")};
         if (auto particleDef{particleTable->FindParticle(particle)}; particleDef != 0) {
             if ( verbosity_ > 1 ) {
                 std::cout << "[ ParticleGun ] : Firing particle of type " << particle << std::endl; 
@@ -43,13 +43,13 @@ namespace ldmx {
             theGun_.SetParticleDefinition(particleDef); 
         }
 
-        auto energy{parameters.getParameter< double >("energy")};
+        auto energy{parameters.getParameter< double >("energy", 4.0)};
         if ( verbosity_ > 1 ) {
             std::cout << "[ ParticleGun ] : Setting energy to " << energy*GeV << std::endl;
         }
         theGun_.SetParticleEnergy(energy*GeV); 
 
-        auto position{parameters.getParameter< std::vector<double> >("position")};
+        auto position{parameters.getParameter< std::vector<double> >("position", {0, 0, 0})};
         if (!position.empty()) {
             G4ThreeVector pVec(position[0]*mm, position[1]*mm, position[2]*mm); 
             if ( verbosity_ > 1 ) {
@@ -58,14 +58,14 @@ namespace ldmx {
             theGun_.SetParticlePosition(pVec);
         }
 
-        auto time{parameters.getParameter< double >("time")}; 
+        auto time{parameters.getParameter< double >("time", 0.0)}; 
         if (time < 0) time = 0.0; 
         if ( verbosity_ > 1 ) {
             std::cout << "[ ParticleGun ] : Setting particle time  to " << time << std::endl;
         }
         theGun_.SetParticleTime(time*ns); 
 
-        auto direction{parameters.getParameter< std::vector<double > >("direction")};
+        auto direction{parameters.getParameter< std::vector<double > >("direction", {0, 0, 1})};
         if (!direction.empty()) { 
             G4ThreeVector dVec(direction[0], direction[1], direction[2]); 
             if ( verbosity_ > 1 ) {
