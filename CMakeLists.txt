@@ -30,7 +30,7 @@ set_target_properties(SimCore PROPERTIES
 add_executable(fire-interactive ${PROJECT_SOURCE_DIR}/src/fire_interactive.cxx)
 
 # Link to the Geant4 library
-target_link_libraries(fire-interactive PRIVATE Geant4::Interface)
+target_link_libraries(fire-interactive PRIVATE Geant4::Interface DARK::SimCore)
 
 # Install the fire executable
 install(TARGETS fire-interactive DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
