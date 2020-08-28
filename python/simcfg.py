@@ -135,28 +135,15 @@ class DarkBrem:
             A human-readable version of all its attributes
         """
 
-        string  = "DarkBrem { "
-        string += "Enabled: %d"%self.enable
-        string += ", Mass: %f MeV"%self.APrimeMass
-        string += ", Library: '%s'"%self.library_path
-        string += ", Method: %d"%self.method
-        string += ", Threshold: %f GeV"%self.threshold
-        string += ", Epsilon: %f"%self.epsilon
-        string += ", Only One Per Event: %d"%self.only_on_per_event
+        string  = "{ Enabled: %r"%self.enable
+        if self.enable :
+            string += ", Mass: %.1f MeV"%self.APrimeMass
+            string += ", Library: '%s'"%self.library_path
+            string += ", Method: %d"%self.method
+            string += ", Threshold: %.2f GeV"%self.threshold
+            string += ", Epsilon: %.2E"%self.epsilon
+            string += ", Only One Per Event: %r"%self.only_one_per_event
+
         string += " }"
 
         return string
-
-    def __repr__(self):
-        """A shorter string representation of the DarkBrem configuration
-
-        Returns
-        -------
-        str
-            Just printing whether it is enabled and the A' mass
-        """
-
-        if self.enable :
-            return 'DB Activated with A\' Mass %f MeV'%self.APrimeMass
-        else :
-            return 'DB Not Activated'
