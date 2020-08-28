@@ -188,5 +188,5 @@ class simulator(Producer):
         self.biasing_all = allPtl
         self.biasing_incident = incidentOnly
         self.biasing_disableEMBiasing = disableEMBiasing
-        self.biasing_threshold = threshold
-        self.biasing_factor = factor
+        self.biasing_threshold = float(threshold) #just in case someone forgets trailing decimal point
+        self.biasing_factor = float(factor) #just in case someone forgets trailing decimal point

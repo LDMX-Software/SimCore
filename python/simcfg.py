@@ -135,15 +135,15 @@ class DarkBrem:
             A human-readable version of all its attributes
         """
 
-        string = "DarkBrem { "
-               + "Enabled: %d"%self.enable
-               + ", Mass: %f MeV"%self.APrimeMass
-               + ", Library: '%s'"%self.library_path
-               + ", Method: %d"%self.method
-               + ", Threshold: %f GeV"%self.threshold
-               + ", Epsilon: %f"%self.epsilon
-               + ", Only One Per Event: %d"%self.only_on_per_event
-               + " }"
+        string  = "DarkBrem { "
+        string += "Enabled: %d"%self.enable
+        string += ", Mass: %f MeV"%self.APrimeMass
+        string += ", Library: '%s'"%self.library_path
+        string += ", Method: %d"%self.method
+        string += ", Threshold: %f GeV"%self.threshold
+        string += ", Epsilon: %f"%self.epsilon
+        string += ", Only One Per Event: %d"%self.only_on_per_event
+        string += " }"
 
         return string
 
