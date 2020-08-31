@@ -36,9 +36,12 @@ namespace ldmx {
              * Possible methods to use the dark brem vertices from the imported library inside of this model.
              */
             enum DarkBremMethod{
-                ForwardOnly = 1, ///> Use actual electron energy and get pT from LHE (such that pT^2+me^2 < Eacc^2)
-                CMScaling   = 2, ///> Boost LHE vertex momenta to the actual electron energy
-                Undefined   = 3  ///> Use LHE vertex as is
+                /// Use actual electron energy and get pT from LHE (such that pT^2+me^2 < Eacc^2)
+                ForwardOnly = 1,
+                /// Boost LHE vertex momenta to the actual electron energy
+                CMScaling   = 2, 
+                /// Use LHE vertex as is
+                Undefined   = 3  
             };
     
             /**
@@ -143,23 +146,28 @@ namespace ldmx {
              * \f[ \chi(t) = \left( \frac{Z^2a^4t^2}{(1+a^2t)^2(1+t/d)^2}+\frac{Za_p^4t^2}{(1+a_p^2t)^2(1+t/0.71)^8}\left(\frac{1+t(m_{up}^2-1)}{4m_p^2}\right)^2\right)\frac{t-m_A^4/(4E_0^2)}{t^2} \f]
              *
              * where
-             * \f$m_A\f$ = mass of A' in GeV
-             * \f$m_e\f$ = mass of electron in GeV
-             * \f$E_0\f$ = incoming energy of electron in GeV
-             * \f$A\f$ = atomic number of target atom
-             * \f$Z\f$ = atomic mass of target atom
+             * \f$m_A\f$ = mass of A' in GeV, 
+             * \f$m_e\f$ = mass of electron in GeV, 
+             * \f$E_0\f$ = incoming energy of electron in GeV, 
+             * \f$A\f$ = atomic number of target atom, 
+             * \f$Z\f$ = atomic mass of target atom, 
              * \f[a = \frac{111.0}{m_e Z^{1/3}}\f]
              * \f[a_p = \frac{773.0}{m_e Z^{2/3}}\f]
              * \f[d = \frac{0.164}{A^{2/3}}\f]
-             * \f$m_{up}\f$ = mass of up quark
+             * \f$m_{up}\f$ = mass of up quark, and
              * \f$m_{p}\f$ = mass of proton
              */
             struct Chi {
-                double A; ///> atomic number
-                double Z; ///> atomic mass
-                double E0; ///> incoming beam energy [GeV]
-                double MA; ///> A' mass [GeV]
-                double Mel; ///> electron mass [GeV]
+                /// atomic number
+                double A; 
+                /// atomic mass
+                double Z; 
+                /// incoming beam energy [GeV]
+                double E0;
+                /// A' mass [GeV]
+                double MA;
+                /// electron mass [GeV]
+                double Mel;
     
                 /**
                  * Access function in style required by boost::numeric::odeint
@@ -185,9 +193,12 @@ namespace ldmx {
              * \f$E_0\f$ = incoming energy of electron in GeV
              */
             struct DiffCross {
-                double E0; ///> incoming beam energy [GeV]
-                double MA; ///> A' mass [GeV]
-                double Mel; ///> electron mass [GeV]
+                /// incoming beam energy [GeV]
+                double E0; 
+                /// A' mass [GeV]
+                double MA; 
+                /// electron mass [GeV]
+                double Mel; 
     
                 /**
                  * Access function in style required by boost::numeric::odeint
@@ -203,9 +214,12 @@ namespace ldmx {
              * Data frame to store mad graph data read in from LHE files.
              */
             struct OutgoingKinematics {
-                TLorentzVector electron; ///> 4-momentum of electron in center of momentum frame for electron-A' system
-                TLorentzVector centerMomentum; ///> 4-vector pointing to center of momentum frame
-                G4double E; ///> energy of electron before brem (used as key in mad graph data map)
+                /// 4-momentum of electron in center of momentum frame for electron-A' system
+                TLorentzVector electron; 
+                /// 4-vector pointing to center of momentum frame
+                TLorentzVector centerMomentum; 
+                /// energy of electron before brem (used as key in mad graph data map)
+                G4double E; 
             };
     
             /**
@@ -255,7 +269,7 @@ namespace ldmx {
              *
              * Integrate Chi from \f$m_A^4/(4E_0^2)\f$ to \f$m_A^2\f$
              *
-             * Integrate diffcross from 0 to \f$min(1-m_e/E_0,1-m_A/E_0)\f$
+             * Integrate DiffCross from 0 to \f$min(1-m_e/E_0,1-m_A/E_0)\f$
              *
              * Total cross section is given by
              * \f[ \sigma = 4 \frac{pb}{GeV} \epsilon^2 \alpha_{EW}^3 \int \chi(t)dt \int \frac{d\sigma}{dx}(x)dx \f]
@@ -304,7 +318,7 @@ namespace ldmx {
             /** 
              * maximum number of iterations to check before giving up on an event 
              *
-             * TODO make configurable and/or optimize somehow
+             * @TODO make configurable and/or optimize somehow
              */
             unsigned int maxIterations_{10000};
     
@@ -340,7 +354,7 @@ namespace ldmx {
             /** 
              * should we always create a totally new electron when we dark brem? 
              *
-             * TODO make this configurable? I (Tom E) can't think of a reason NOT to have it...
+             * @TODO make this configurable? I (Tom E) can't think of a reason NOT to have it...
              * The alternative is to allow Geant4 to decide when to make a new particle
              * by checking if the resulting kinetic energy is below some threshold.
              */
