@@ -29,7 +29,7 @@ find_package(ROOT CONFIG REQUIRED)
 file(GLOB vertex_libraries data/*.tar.gz)
 
 # set installation location of dark brem vertex libraries
-#   also used when configuring the makePath.py.in module
+#   also used when configuring the makePath.py module
 set(DB_VERTEX_LIB_INSTALL ${CMAKE_INSTALL_PREFIX}/data/db_vertex_libraries)
 if(NOT EXISTS ${DB_VERTEX_LIB_INSTALL})
     #assume new build ==> unpack vertex libraries

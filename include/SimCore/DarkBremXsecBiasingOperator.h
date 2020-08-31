@@ -46,7 +46,7 @@ namespace ldmx {
             void StartRun();
 
             /** 
-             * This uses two protected member variables from XsecBiasingOperator:
+             * This the following protected member variables from XsecBiasingOperator:
              *  - biasAll_ : If true, bias all particles connected to the dark brem process;
              *      otherwise, only bias the primary particle (ParentID == 0)
              *  - xsecFactor_ : Factor to multiply cross section by
@@ -63,11 +63,12 @@ namespace ldmx {
         
         protected:
 
+            /// Return the name of the process this operator biases
             virtual std::string getProcessToBias() { return DARKBREM_PROCESS; }
 
         private: 
 
-            /** Geant4 photonuclear process name. */
+            /// Geant4 name of dark brem process
             static const std::string DARKBREM_PROCESS;
 
             /** Unbiased darkbrem xsec. */

@@ -43,19 +43,31 @@ namespace ldmx {
              *
              * Nothing right now.
              */
-            virtual ~APrimePhysics();
+            virtual ~APrimePhysics() { /* nothing on purpose */ }
 
             /**
-             * Construct particles.
+             * Construct particle.
              *
-             * Instatiates the APrime particle by calling the accessor method.
+             * Insert A' into the Geant4 particle table.
+             * Geant4 registers all instances derived from G4ParticleDefinition
+             * and deletes them at the end of processing.
+             *
+             * Uses the A' mass given by the parameter APrimeMass to 
+             * inform the G4APrime instance what mass to use.
+             *
+             * @sa G4APrime
              */
             void ConstructParticle();
 
             /**
              * Construct the process.
              *
-             * Links the dark brem processs to the electron through the process manager.
+             * Links the dark brem processs to the electron through the process manager
+             * only if the dark brem process is enabled ('enable' is True).
+             * G4ProcessManager registers and cleans up any created processes.
+             *
+             * Creates the G4eDarkBremmstrahlung process passing it the necessary parameters,
+             * and activates the process only at the end of the step.
              */
             void ConstructProcess();
 

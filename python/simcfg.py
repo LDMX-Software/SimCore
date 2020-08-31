@@ -107,6 +107,8 @@ class DarkBrem:
         Minimum energy that electron should have for dark brem to have nonzero xsec
     epsilon : float
         Epsilon for dark brem xsec calculation
+    only_one_per_event : bool
+        Should we deactivate the process after one dark brem or allow for more than one?
     """
 
     def __init__(self) : 

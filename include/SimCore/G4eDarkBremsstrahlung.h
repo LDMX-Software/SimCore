@@ -22,7 +22,9 @@ namespace ldmx {
      * @class G4eDarkBremsstrahlung
      *
      * Class that represents the dark brem process.
-     * A electron or positron is allowed to brem a dark photon
+     * An electron is allowed to brem a dark photon
+     *
+     * @TODO allow positrons to dark brem as well
      */
     class G4eDarkBremsstrahlung : public G4VEnergyLossProcess {
     
@@ -48,17 +50,34 @@ namespace ldmx {
             virtual G4bool IsApplicable(const G4ParticleDefinition& p);
       
             /**
-             * Reports the file name and the method (in string form)
+             * Reports the parameters to G4cout.
              *
-             * @TODO actually write this up in a helpful way
+             * @note Needs to match variable definitions in python configuration class.
              */
             virtual void PrintInfo();
      
         protected:
       
-            /** Setup this process to get ready for simulation */
-            virtual void InitialiseEnergyLossProcess(const G4ParticleDefinition*,
-                                                     const G4ParticleDefinition*);
+            /** Setup this process to get ready for simulation 
+             *
+             * If the model hasn't been initialized before, we create
+             * a new G4eDarkBremsstrahlungModel and pass parameters to it.
+             * This model is stored in the list of models for this process
+             * and in the list of all EM models. Geant4 cleans up the list
+             * of all EM models at the end of processing.
+             *
+             * The low energy limit of the model is set to  the minimum kinetic energy
+             * of this process (which I believe is zero), and the high energy limit
+             * is set to 4 GeV. The secondary threshold for the model is set to zero,
+             * and the LPM flag is set to false.
+             *
+             * @TODO make high energy limit for the model configurable
+             *
+             * @param p unused
+             * @param q unused
+             */
+            virtual void InitialiseEnergyLossProcess(const G4ParticleDefinition* p,
+                                                     const G4ParticleDefinition* q);
       
             /** Has this process been setup yet? */
             G4bool isInitialised;

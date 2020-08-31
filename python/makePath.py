@@ -29,5 +29,9 @@ def makeLHEPath( ap_mass ) :
     if os.path.isdir(vertex_library_full_path) :
         return vertex_library_full_path
     else :
+        print('Requested Vertex Library does not exist! Installed libraries:')
+        for d in os.listdir('${DB_VERTEX_LIB_INSTALL}') :
+            print(d)
+
         import sys
         sys.exit('Requested Vertex Library \'%s\' does not exist!\n%tb'%vertex_library_full_path)

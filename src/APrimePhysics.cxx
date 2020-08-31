@@ -22,9 +22,6 @@ namespace ldmx {
 
     }
 
-    APrimePhysics::~APrimePhysics() {
-    }
-
     void APrimePhysics::ConstructParticle() { 
         /**
          * Insert A-prime into the Geant4 particle table.

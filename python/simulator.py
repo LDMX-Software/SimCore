@@ -69,7 +69,7 @@ class simulator(Producer):
         Minimum energy [MeV] for a particle to be biased (only used by some biasing operators)
     biasing_factor : int, optional
         Factor to bias process by
-    dark_brem : DarkBrem, optional
+    dark_brem : DarkBrem
         Configuration options for dark brem process
     logging_prefix : str, optional
         Prefix to prepend any Geant4 logging files

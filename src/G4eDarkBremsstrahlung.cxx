@@ -34,7 +34,12 @@ namespace ldmx {
     }
     
     void G4eDarkBremsstrahlung::PrintInfo() {
-        //TODO write up a helpful printout
+        G4cout << " A' Mass [MeV]                    : " << parameters_.get<double>("APrimeMass") << G4endl;
+        G4cout << " Vertex Library                   : " << parameters_.get<std::string>("library_path") << G4endl;
+        G4cout << " Interpretation Method            : " << parameters_.get<int>("method") << G4endl;
+        G4cout << " Minimum Electron Threshold [MeV] : " << parameters_.get<int>("threshold") << G4endl;
+        G4cout << " Epsilon                          : " << parameters_.get<double>("epsilon") << G4endl;
+        G4cout << " Only One Per Event               : " << parameters_.get<bool>("only_one_per_event") << G4endl;
     }
     
     void G4eDarkBremsstrahlung::InitialiseEnergyLossProcess(const G4ParticleDefinition*,

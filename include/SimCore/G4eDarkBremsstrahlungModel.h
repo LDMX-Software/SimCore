@@ -42,7 +42,16 @@ namespace ldmx {
             };
     
             /**
-             * Set the particle definition that this model will represent.
+             * Constructor
+             * Set the parameters for this model.
+             *
+             * The method integer is converted to an enum through a hard-coded
+             * switch statement.
+             *
+             * The threshold is set to the maximum of the passed value or twice
+             * the A' mass (so that it kinematically makes sense).
+             *
+             * The library path is immediately passed to SetMadGraphDataLibrary.
              */
             G4eDarkBremsstrahlungModel(Parameters& params,
                                        const G4ParticleDefinition* p = 0,
@@ -56,7 +65,14 @@ namespace ldmx {
             virtual ~G4eDarkBremsstrahlungModel();
     
             /**
-             * Set the cuts using the particle definition and comput the partial sum sigma.
+             * Set the cuts using the particle definition and compute the partial sum sigma.
+             *
+             * Comput particleSumSigma using ComputeParticleSumSigma inputting the material,
+             * half the high energy limit, and the minimum of the cut table or a quarter
+             * of the high energy limit.
+             *
+             * @param p G4ParticleDefinition to compute partial sum sigma for
+             * @param cuts energy cuts depending on material or volume or region the calculation is in
              */
             virtual void Initialise(const G4ParticleDefinition* p, const G4DataVector& cuts);
     
@@ -64,10 +80,22 @@ namespace ldmx {
              * Simulates the emission of a dark photon + electron.
              *
              * Gets an energy fraction and Pt from madgraph files. 
+             * The scaling of this energy fraction and Pt depends on the input method.
+             *
+             * ## Forward Only
              * Scales the energy so that the fraction of kinectic energy is constant, keeps the Pt constant. 
              * If the Pt is larger than the new energy, that event is skipped, and a new one is taken from the file.
+             * Choses the Pz of the recoil electron to always be positive.
              *
-             * Deactivates the dark brem, ensuring only one dark brem per step and per event.
+             * ## CM Scaling
+             * Scale MadGraph vertex to actual energy of electron using Lorentz boosts, and then
+             * extract the momentum from that.
+             *
+             * ## Undefined
+             * Don't scale the MadGraph vertex to the actual energy of the electron.
+             *
+             * If only one per event is set, then we deactivate the dark brem process,
+             * ensuring only one dark brem per step and per event.
              * Needs to be reactived in the end of event action.
              *
              * @param secondaries vector of primary particle's offspring
@@ -288,7 +316,7 @@ namespace ldmx {
     
             /** Threshold for non-zero xsec [GeV] 
              *
-             * Configurable with 'darkbrem.threshold'
+             * Configurable with 'threshold'
              */
             double threshold_;
     
@@ -296,7 +324,7 @@ namespace ldmx {
              *
              * @sa ComputeCrossSectionPerAtom for how this is used
              *
-             * Configurable with 'darkbrem.epsilon'
+             * Configurable with 'epsilon'
              */
             double epsilon_;
     
@@ -305,7 +333,7 @@ namespace ldmx {
     
             /** method for this model 
              *
-             * Configurable with 'darkbrem.method'
+             * Configurable with 'method'
              */
             DarkBremMethod method_{DarkBremMethod::Undefined};
     
@@ -351,6 +379,15 @@ namespace ldmx {
             std::map< double , unsigned int > currentDataPoints_;
     
             
+            /**
+             * Not really sure what this physically represents
+             *
+             * This is calculated in ComputePartialSumSigma when
+             * the Initialise method is called. It is then used
+             * to help randomly choose whether a dark brem would
+             * occur given a specific material + electron energy
+             * calculation.
+             */
             std::vector<G4DataVector*> partialSumSigma_;
       
     };
