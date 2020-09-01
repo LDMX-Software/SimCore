@@ -48,7 +48,7 @@ namespace ldmx {
             Parameters parameters_;
 
             /// Process
-            std::unique_ptr< Process > process_{nullptr};  
+            std::unique_ptr< Process > process_;  
 
 
     }; 
