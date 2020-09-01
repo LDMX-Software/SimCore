@@ -11,6 +11,9 @@ project(SimCore VERSION 2.1.0
 # Configure the Geant4 target
 setup_geant4_target()
 
+# Search and configure ROOT
+find_package(ROOT CONFIG REQUIRED)
+
 # Setup the library 
 setup_library(name SimCore 
               dependencies Geant4::Interface 
@@ -35,5 +38,3 @@ target_link_libraries(fire-interactive PRIVATE Geant4::Interface DARK::SimCore)
 # Install the fire executable
 install(TARGETS fire-interactive DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 
-# Search and configure ROOT
-find_package(ROOT CONFIG REQUIRED)
