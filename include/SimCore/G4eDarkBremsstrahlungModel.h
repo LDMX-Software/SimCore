@@ -24,7 +24,25 @@ namespace ldmx {
      * Geant4 implementation of the model for a particle undergoing a dark brem.
      *
      * This is where all the heavy lifting in terms of calculating cross sections
-     * and actually having an electron do a dark brem occurs.
+     * and actually having an electron do a dark brem occurs. This model depends
+     * on six configurable parameters.
+     *
+     * - APrimeMass : the mass of the A' in MeV
+     * - library_path : the full path to the directory containing the LHE dark brem
+     *   vertices that will be read in to make the vertex library
+     * - epsilon : strength of the dark photon - photon mixing
+     * - threshold : minimum energy in GeV for the electron to have a non-zero
+     *   cross section for going dark brem
+     * - method : scaling method to use to scale the dark brem vertices from
+     *   the library to the actual electron energy when a dark brem occurs
+     * - only_one_per_event : deactiviate the dark brem process when it occurs to
+     *   limit the simulation to only one dark brem per event
+     *
+     * The required parameters are the A' mass (APrimeMass) and an associated vertex library
+     * generated in MadGraph (library_path). The other parameters have helpful defaults set
+     * in the python configuration class DarkBrem and are there for you to be able to tune
+     * this model's behavior. An example library for each of the major mass points is installed
+     * with SimCore and is compressed as stored in the data directory.
      */
     class G4eDarkBremsstrahlungModel : public G4VEmModel {
     
@@ -70,7 +88,7 @@ namespace ldmx {
             /**
              * Set the cuts using the particle definition and compute the partial sum sigma.
              *
-             * Comput particleSumSigma using ComputeParticleSumSigma inputting the material,
+             * Compute particleSumSigma using ComputeParticleSumSigma inputing the material,
              * half the high energy limit, and the minimum of the cut table or a quarter
              * of the high energy limit.
              *
@@ -83,7 +101,8 @@ namespace ldmx {
              * Simulates the emission of a dark photon + electron.
              *
              * Gets an energy fraction and Pt from madgraph files. 
-             * The scaling of this energy fraction and Pt depends on the input method.
+             * The scaling of this energy fraction and Pt to the actual electron
+             * energy depends on the input method.
              *
              * ## Forward Only
              * Scales the energy so that the fraction of kinectic energy is constant, keeps the Pt constant. 
