@@ -19,6 +19,7 @@
 /*   Framework   */
 /*~~~~~~~~~~~~~~~*/
 #include "Framework/Parameters.h" 
+#include "Framework/Logger.h"
 
 // Forward Declarations
 class G4Event; 
@@ -167,9 +168,11 @@ namespace ldmx {
             /// Name of the UserAction
             std::string name_{""};
 
-            
             /// The set of parameters used to configure this class
             Parameters parameters_; 
+
+            /// The log for this UserAction
+            logging::logger theLog_;
 
     }; // UserAction
 

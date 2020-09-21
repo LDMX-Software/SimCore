@@ -26,6 +26,7 @@
 /*   Framework   */
 /*~~~~~~~~~~~~~~~*/
 #include "Framework/Parameters.h" 
+#include "Framework/Logger.h"
 
 namespace ldmx {
 
@@ -87,6 +88,9 @@ namespace ldmx {
             
             /// The set of parameters used to configure this class
             Parameters parameters_; 
+
+            /// Enable logging for us
+            enableLogging("DetectorConstruction");
     };
 
 }

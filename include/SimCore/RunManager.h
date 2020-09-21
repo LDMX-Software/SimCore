@@ -24,6 +24,7 @@
 /*   Framework   */
 /*~~~~~~~~~~~~~~~*/
 #include "Framework/Parameters.h" 
+#include "Framework/Logger.h" 
 
 namespace ldmx {
 
@@ -86,6 +87,9 @@ namespace ldmx {
             bool useRootSeed() { return useRootSeed_; }
  
         private:
+
+            /// Enable logging for us
+            enableLogging("SimRunManager");
 
             /// The set of parameters used to configure the RunManager
             Parameters parameters_; 

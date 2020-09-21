@@ -13,12 +13,15 @@
 // Geant4
 #include "G4UIsession.hh"
 
+// LDMX
+#include "Framework/Logger.h"
+
 namespace ldmx {
 
     /**
      * @class LoggedSession
      *
-     * Log the output of Geant4 to files in current directory.
+     * Log the output of Geant4 to the central logger.
      */
     class LoggedSession : public G4UIsession {
         
@@ -26,17 +29,13 @@ namespace ldmx {
 
             /**
              * Constructor
-             *
-             * Sets up output file streams for the cout and cerr paths.
              */
-            LoggedSession( const std::string& coutFileName = "G4cout.log" , const std::string& cerrFileName = "G4cerr.log" );
+            LoggedSession() { }
 
             /**
              * Destructor
-             *
-             * Closes the output files streams
              */
-            ~LoggedSession();
+            ~LoggedSession() { }
 
             /**
              * Required hook for Geant4
@@ -57,11 +56,8 @@ namespace ldmx {
 
         private:
 
-            /** cout log file */
-            std::ofstream coutFile_;
-
-            /** cerr log file */
-            std::ofstream cerrFile_;
+            /// Use this class to log messages from Geant4
+            enableLogging("Geant4");
 
     }; //LoggedSession
 

@@ -40,7 +40,6 @@ namespace ldmx {
              * @param parameters Parameters used to configure the particle gun. 
              *
              * Parameters:
-             *  verbosity: > 1 means print configuration
              *  particle : name of particle to shoot (Geant4 naming)
              *  energy   : energy of particle (GeV)
              *  position : position to shoot from (mm three-vector)

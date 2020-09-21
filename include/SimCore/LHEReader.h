@@ -9,6 +9,7 @@
 
 // LDMX
 #include "SimCore/LHEEvent.h"
+#include "Framework/Logger.h"
 
 // STL
 #include <fstream>
@@ -46,6 +47,9 @@ namespace ldmx {
              * The input file stream.
              */
             std::ifstream ifs_;
+
+            /// Enable logging for this class
+            enableLogging("LHEReader");
     };
 
 }

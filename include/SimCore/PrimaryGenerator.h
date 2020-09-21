@@ -20,6 +20,7 @@
 /*   Framework   */
 /*~~~~~~~~~~~~~~~*/
 #include "Framework/Parameters.h" 
+#include "Framework/Logger.h"
 
 // Forward Declarations
 class G4Event; 
@@ -74,6 +75,9 @@ namespace ldmx {
 
             /// The set of parameters used to configure this class
             Parameters parameters_; 
+
+            /// The logger to be used for this primary generator
+            logging::logger theLog_;
 
     }; // PrimaryGenerator
 

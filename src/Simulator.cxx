@@ -59,18 +59,11 @@ namespace ldmx {
         // Set the verbosity level.  The default level  is 0.
         verbosity_ = parameters_.getParameter< int >("verbosity");
 
-        // If the verbosity level is set to 0, 
-        // If the verbosity level is > 1, log everything to a file. Otherwise,
-        // dump the output. If a prefix has been specified, append it ot the 
-        // log message. 
-        auto loggingPrefix = parameters_.getParameter< std::string >("logging_prefix");
+        // If the verbosity level is set to 0, completely ignore all messages from Geant4.
+        // If the verbosity level is >= 1, pass messages to our central logger.
         if ( verbosity_ == 0 ) sessionHandle_ = std::make_unique<BatchSession>();
-        else if ( verbosity_ > 1 ) {
-            
-            if ( loggingPrefix.empty() ) sessionHandle_ = std::make_unique<LoggedSession>();
-            else sessionHandle_ = std::make_unique<LoggedSession>( loggingPrefix + "_G4cout.log" , loggingPrefix + "_G4cerr.log" );
+        else sessionHandle_ = std::make_unique<LoggedSession>();
 
-        }
         if (sessionHandle_ != nullptr) uiManager_->SetCoutDestination( sessionHandle_.get() ); 
 
         // Instantiate the run manager.  
@@ -90,9 +83,7 @@ namespace ldmx {
         // Parse the detector geometry and validate if specified.
         auto detectorPath{parameters_.getParameter< std::string >("detector")};
         auto validateGeometry{parameters_.getParameter< bool >("validate_detector")}; 
-        if ( verbosity_ > 0 ) {
-            std::cout << "[ Simulator ] : Reading in geometry from '" << detectorPath << "'... " << std::flush;
-        }
+        ldmx_log(info) << "Reading in geometry from '" << detectorPath << "'.";
         G4GeometryManager::GetInstance()->OpenGeometry();
         parser->Read( detectorPath, validateGeometry );
         runManager_->DefineWorldVolume( parser->GetWorldVolume() );
@@ -100,6 +91,7 @@ namespace ldmx {
         auto preInitCommands = parameters_.getParameter< std::vector< std::string > >("preInitCommands" ,{} ); 
         for ( const std::string& cmd : preInitCommands ) {
             if ( allowed(cmd) ) {
+                ldmx_log(info) << "Running '"+cmd+"'";
                 int g4Ret = uiManager_->ApplyCommand( cmd );
                 if ( g4Ret > 0 ) {
                     EXCEPTION_RAISE(
@@ -142,6 +134,7 @@ namespace ldmx {
         
         if ( this->getLogFrequency() > 0 and event.getEventHeader().getEventNumber() % this->getLogFrequency() == 0 ) {
             //print according to log frequency and verbosity
+            //  this is meant to help debug the simulation during development
             if ( verbosity_ > 1 ) std::cout << "[ Simulator ] : Printing event contents:" << std::endl;
             event.Print( verbosity_ );
         }
@@ -168,6 +161,7 @@ namespace ldmx {
         auto postInitCommands = parameters_.getParameter< std::vector< std::string > >("postInitCommands",{});
         for ( const std::string& cmd : postInitCommands ) {
             if ( allowed(cmd) ) {
+                ldmx_log(info) << "Running '"+cmd+"'";
                 int g4Ret = uiManager_->ApplyCommand( cmd );
                 if ( g4Ret > 0 ) {
                     EXCEPTION_RAISE(
@@ -218,10 +212,9 @@ namespace ldmx {
 
     void Simulator::onProcessEnd() {
 
-        std::cout << "[ Simulator ] : "
-            << "Started " << numEventsBegan_ << " events to produce "
-            << numEventsCompleted_ << " events."
-            << std::endl;
+        ldmx_log(info) << "Started " 
+            << numEventsBegan_ << " events to produce "
+            << numEventsCompleted_ << " events.";
         
         // Delete Run Manager
         // From Geant4 Basic Example B01:

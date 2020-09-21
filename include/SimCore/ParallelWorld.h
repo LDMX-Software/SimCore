@@ -21,6 +21,7 @@
 //   ldmx-sw   //
 //-------------//
 #include "SimCore/AuxInfoReader.h"
+#include "Framework/Logger.h"
 
 namespace ldmx { 
 
@@ -41,6 +42,9 @@ namespace ldmx {
             void ConstructSD();
 
         private:
+
+            /// Enable logging for us
+            enableLogging("ParallelWorld");
 
             /** GDML parser */
             G4GDMLParser* parser_{nullptr};
