@@ -34,12 +34,12 @@ namespace ldmx {
     }
     
     void G4eDarkBremsstrahlung::PrintInfo() {
-        G4cout << " A' Mass [MeV]                    : " << parameters_.get<double>("APrimeMass") << G4endl;
-        G4cout << " Vertex Library                   : " << parameters_.get<std::string>("library_path") << G4endl;
-        G4cout << " Interpretation Method            : " << parameters_.get<int>("method") << G4endl;
-        G4cout << " Minimum Electron Threshold [MeV] : " << parameters_.get<int>("threshold") << G4endl;
-        G4cout << " Epsilon                          : " << parameters_.get<double>("epsilon") << G4endl;
-        G4cout << " Only One Per Event               : " << parameters_.get<bool>("only_one_per_event") << G4endl;
+        G4cout << " A' Mass [MeV]                    : " << parameters_.getParameter<double>("APrimeMass") << G4endl;
+        G4cout << " Vertex Library                   : " << parameters_.getParameter<std::string>("library_path") << G4endl;
+        G4cout << " Interpretation Method            : " << parameters_.getParameter<int>("method") << G4endl;
+        G4cout << " Minimum Electron Threshold [MeV] : " << parameters_.getParameter<double>("threshold") << G4endl;
+        G4cout << " Epsilon                          : " << parameters_.getParameter<double>("epsilon") << G4endl;
+        G4cout << " Only One Per Event               : " << parameters_.getParameter<bool>("only_one_per_event") << G4endl;
     }
     
     void G4eDarkBremsstrahlung::InitialiseEnergyLossProcess(const G4ParticleDefinition*,
