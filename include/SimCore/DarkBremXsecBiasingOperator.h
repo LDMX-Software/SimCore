@@ -60,8 +60,31 @@ namespace ldmx {
             G4VBiasingOperation* ProposeOccurenceBiasingOperation(const G4Track* track,
                     const G4BiasingProcessInterface* callingProcess);
 
-        
         protected:
+
+            /** DEBUG FUNCTION
+             * This function is called by the biasing interface class during PostStepDoIt.
+             * You can observe the particle change that was produced by the process
+             * and the weight that will be multiplied into this particle change.
+             *
+             * This is called inside G4VBiasingOperator::ReportOperationApplied
+             * which is called inside G4BiasingProcessInterface::PostStepDoIt
+            void OperationApplied(const G4BiasingProcessInterface* callingProcess,
+                    G4BiasingAppliedCase biasingCase,
+                    G4VBiasingOperation* operationApplied,
+                    G4double weight,
+                    G4VBiasingOperation* finalStateOpApplied,
+                    const G4VParticleChange* particleChangeProduced 
+                    ) {
+                std::string currentProcess = callingProcess->GetWrappedProcess()->GetProcessName(); 
+                if (currentProcess.compare(this->getProcessToBias()) == 0) { 
+                    std::cout << "DB Final State Biasing Operator Applied: " 
+                        << callingProcess->GetProcessName()
+                        << " -> " << weight*particleChangeProduced->GetWeight()
+                        << std::endl;
+                }
+            }
+             */
 
             /// Return the name of the process this operator biases
             virtual std::string getProcessToBias() { return DARKBREM_PROCESS; }
@@ -70,12 +93,6 @@ namespace ldmx {
 
             /// Geant4 name of dark brem process
             static const std::string DARKBREM_PROCESS;
-
-            /** Unbiased darkbrem xsec. */
-            double dbXsecUnbiased_{0};
-
-            /** Biased darkbrem xsec. */
-            double dbXsecBiased_{0};  
 
     };  // DarkBremXsecBiasingOperator
 }
