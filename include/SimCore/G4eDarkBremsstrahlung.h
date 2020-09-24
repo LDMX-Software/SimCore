@@ -55,6 +55,24 @@ namespace ldmx {
              * @note Needs to match variable definitions in python configuration class.
              */
             virtual void PrintInfo();
+
+            /** 
+             * DEBUG FUNCTION
+             * 
+             * This is the function actually called by Geant4 that does the dark brem
+             * interaction. Here we wrap the parent process's PostStepDoIt with some
+             * debugging comments.
+            virtual G4VParticleChange* PostStepDoIt(const G4Track & t, const G4Step & s) {
+                std::cout << "G4eDarkBremsstrahlung::PostStepDoIt ("
+                   << "integral: " << this->IsIntegral()
+                   << ", active model: " << this->EmModel(0)->IsActive(t.GetKineticEnergy())
+                   << ", track KE: " << t.GetKineticEnergy()
+                   << ") weight: " << t.GetWeight() << " -> ";
+                auto particle_change{G4VEnergyLossProcess::PostStepDoIt(t,s)};
+                std::cout << t.GetWeight() << " (" << particle_change->GetWeight() << ")" << std::endl;
+                return particle_change;
+            }
+             */
      
         protected:
       
