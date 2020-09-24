@@ -35,17 +35,27 @@ namespace ldmx {
     }
 
     void APrimePhysics::ConstructProcess() {
-
         //add process to electron if LHE file has been provided
         if ( parameters_.getParameter<bool>("enable") ) {
-        	G4Electron::ElectronDefinition()->GetProcessManager()->AddProcess(
+            /*
+             * In G4 speak, a "discrete" process is one that only happens at the end of steps.
+             * we want the DB to be discrete because it is not a "slow braking" like ionization, 
+             * the electron suddenly has the interaction and loses a lot of its energy.
+             *
+             * The first argument to this function is the process we are adding.
+             *      The process manager handles cleaning up the processes, 
+             *      so we just give it a new pointer.
+             * The second argument is the "ordering" index.
+             *      This index determines when the process is called w.r.t. the other processes
+             *      that could be called at the end of the step. Not providing the second argument
+             *      means that the ordering index is given a default value of 1000 which
+             *      seems to be safely above all the internal/default processes.
+             */
+        	G4Electron::ElectronDefinition()->GetProcessManager()->AddDiscreteProcess(
                     new G4eDarkBremsstrahlung(parameters_) /*process to add - G4ProcessManager cleans up processes*/
-                    , G4ProcessVectorOrdering::ordInActive /*activation when particle at rest*/
-                    , G4ProcessVectorOrdering::ordInActive /*activation along step*/
-                    , 1 /*activation at end of step*/
                     );
-        }
 
+        }
     }
 
 }
