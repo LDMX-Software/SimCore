@@ -23,10 +23,11 @@ namespace ldmx {
         parameters_(params),
         isInitialised(false) {  
     
-        G4int subtype = 63;   
+        G4int subtype = 63;
         SetProcessSubType(subtype);
         SetSecondaryParticle(G4APrime::APrime());
-        SetIonisation(false);
+        SetIonisation(false); //we are not an ionizing process
+        SetIntegral(false); //we are not a continuous process
     }
     
     G4bool G4eDarkBremsstrahlung::IsApplicable(const G4ParticleDefinition& p) {
