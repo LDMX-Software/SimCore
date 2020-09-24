@@ -130,12 +130,12 @@ namespace ldmx {
             ptable->SetProcessActivation(pname,state);
         }
         
-        //if ( G4RunManager::GetRunManager()->GetVerboseLevel() > 1 ) {
+        if ( G4RunManager::GetRunManager()->GetVerboseLevel() > 1 ) {
             std::cout << "[ G4eDarkBremsstrahlungModel ] : "
                 << "(" << G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetEventID() << ") "
-                << "A dark brem occurred!" 
+                << "A dark brem occurred! "
                 << std::endl;
-        //}
+        }
     
         G4double incidentEnergy = primary->GetTotalEnergy();
         G4double tmax = std::min(maxEnergy, incidentEnergy);
