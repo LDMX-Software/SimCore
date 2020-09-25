@@ -23,6 +23,7 @@
 #include "SimCore/RunManager.h"
 #include "SimCore/UserEventInformation.h" 
 #include "SimCore/UserTrackingAction.h" 
+#include "SimCore/G4eDarkBremsstrahlung.h"
 
 /*~~~~~~~~~~~~*/
 /*   Geant4   */
@@ -121,11 +122,15 @@ namespace ldmx {
 
         auto dark_brem{parameters_.getParameter<Parameters>("dark_brem")};
         if ( dark_brem.getParameter<bool>("enable") ) {
-            runHeader.setFloatParameter(  "A' Mass [MeV]"             , dark_brem.getParameter<double>("APrimeMass") );
-            runHeader.setFloatParameter(  "Dark Brem Epsilon"         , dark_brem.getParameter<double>("epsilon") );
-            runHeader.setFloatParameter(  "Dark Brem Threshold [GeV]" , dark_brem.getParameter<double>("threshold") );
-            runHeader.setStringParameter( "Dark Brem Vertex Library Path" , dark_brem.getParameter<std::string>("library_path") );
-            runHeader.setIntParameter(    "Dark Brem Interpretation Method" , dark_brem.getParameter<int>("method") );
+            //the dark brem process is enabled, find it and then record its configuration
+            G4ProcessVector* electron_processes = G4Electron::Electron()->GetProcessManager()->GetProcessList();
+            int n_electron_processes = electron_processes->size();
+            for ( int i_process = 0; i_process < n_electron_processes; i_process++ ) {
+                G4VProcess* process = (*electron_processes)[i_process];
+                if (process->GetProcessName() == G4eDarkBremsstrahlung::PROCESS_NAME.c_str()) {
+                    dynamic_cast<G4eDarkBremsstrahlung*>(process)->RecordConfig(runHeader);
+                }
+            }
         }
 
         auto generators{parameters_.getParameter<std::vector<Parameters>>("generators")};

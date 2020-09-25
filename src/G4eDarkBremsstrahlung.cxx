@@ -7,27 +7,35 @@
 
 #include "SimCore/G4eDarkBremsstrahlung.h"
 #include "SimCore/G4APrime.h"
-#include "SimCore/G4eDarkBremsstrahlungModel.h"
+#include "SimCore/DarkBremVertexLibraryModel.h"
 
-#include "G4DynamicParticle.hh"
-#include "G4Electron.hh"
-#include "G4Positron.hh"
-#include "G4SystemOfUnits.hh"
-#include "G4UnitsTable.hh"
-#include "G4ProcessType.hh"
+#include "Event/RunHeader.h"
+
+#include "G4Electron.hh" //for electron definition
+#include "G4ProcessTable.hh" //for deactivating dark brem process
+#include "G4ProcessType.hh" //for type of process
+#include "G4RunManager.hh" //for VerboseLevel
+#include "G4EventManager.hh" //for EventID number
 
 namespace ldmx {
 
-    G4eDarkBremsstrahlung::G4eDarkBremsstrahlung(Parameters& params, const G4String& name):
-        G4VEnergyLossProcess(name),
-        parameters_(params),
-        isInitialised(false) {  
+    const std::string G4eDarkBremsstrahlung::PROCESS_NAME = "eDarkBrem";
+
+    G4eDarkBremsstrahlung::G4eDarkBremsstrahlung(const Parameters& params)
+        : G4VDiscreteProcess(G4eDarkBremsstrahlung::PROCESS_NAME,fUserDefined) {  
+        SetProcessSubType(63); //don't know what this number means or does
+        aParticleChange.SetSecondaryWeightByProcess(true); //turn on weighting through this process
     
-        G4int subtype = 63;
-        SetProcessSubType(subtype);
-        SetSecondaryParticle(G4APrime::APrime());
-        SetIonisation(false); //we are not an ionizing process
-        SetIntegral(false); //we are not a continuous process
+        onlyOnePerEvent_ = params.getParameter<bool>("only_one_per_event");
+        ap_mass_         = params.getParameter<double>("ap_mass");
+
+        auto model{params.getParameter<Parameters>("model")};
+        auto model_name{model.getParameter<std::string>("name")};
+        if ( model_name == "vertex_library" ) {
+            theModel_ = std::make_unique<DarkBremVertexLibraryModel>(model);
+        } else {
+            EXCEPTION_RAISE("DarkBremModel","Model named '"+model_name+"' is not known.");
+        }
     }
     
     G4bool G4eDarkBremsstrahlung::IsApplicable(const G4ParticleDefinition& p) {
@@ -35,36 +43,76 @@ namespace ldmx {
     }
     
     void G4eDarkBremsstrahlung::PrintInfo() {
-        G4cout << " A' Mass [MeV]                    : " << parameters_.getParameter<double>("APrimeMass") << G4endl;
-        G4cout << " Vertex Library                   : " << parameters_.getParameter<std::string>("library_path") << G4endl;
-        G4cout << " Interpretation Method            : " << parameters_.getParameter<int>("method") << G4endl;
-        G4cout << " Minimum Electron Threshold [MeV] : " << parameters_.getParameter<double>("threshold") << G4endl;
-        G4cout << " Epsilon                          : " << parameters_.getParameter<double>("epsilon") << G4endl;
-        G4cout << " Only One Per Event               : " << parameters_.getParameter<bool>("only_one_per_event") << G4endl;
+        G4cout << " Only One Per Event               : " << onlyOnePerEvent_ << G4endl;
+        G4cout << " A' Mass [MeV]                    : " << ap_mass_ << G4endl;
+        theModel_->PrintInfo();
+    }
+
+    void G4eDarkBremsstrahlung::RecordConfig(RunHeader& h) const {
+        h.setIntParameter( "Only One DB Per Event" , onlyOnePerEvent_ );
+        h.setFloatParameter( "A' Mass [MeV]" , ap_mass_ );
+        theModel_->RecordConfig(h);
     }
     
-    void G4eDarkBremsstrahlung::InitialiseEnergyLossProcess(const G4ParticleDefinition*,
-                                                            const G4ParticleDefinition*) {
-        if(!isInitialised) {
-    
-            this->SetEmModel(new G4eDarkBremsstrahlungModel(parameters_),0); //adds model to vector stored in process
-    
-            //TODO: could make this depend on maximum beam energy passed through LHE files?
-            G4double energyLimit = 4*GeV;
-    
-            this->EmModel(0)->SetLowEnergyLimit(MinKinEnergy());
-            this->EmModel(0)->SetHighEnergyLimit(energyLimit);
-            
-            G4VEmFluctuationModel* fm = 0;
-            //adds model to ModelManager which handles initialisation procedures and cleaning up pointers
-            this->AddEmModel(0, EmModel(0), fm); 
-    
-            isInitialised = true;
+    G4VParticleChange* G4eDarkBremsstrahlung::PostStepDoIt(const G4Track& track, const G4Step& step) {
+
+        // Debugging Purposes: Check if track we get is an electron
+        if (not IsApplicable(*track.GetParticleDefinition()))
+            EXCEPTION_RAISE("DBBadTrack","Dark brem process receieved a track that isn't applicable.");
+
+        /*
+         * Geant4 has decided that it is our time to interact,
+         * so we are going to change the particle
+         */
+        //if ( G4RunManager::GetRunManager()->GetVerboseLevel() > 1 ) {
+            std::cout << "[ G4eDarkBremsstrahlung ] : "
+                << "(" << G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetEventID() << ") "
+                << "A dark brem occurred! "
+                << std::endl;
+        //}
+
+        if ( onlyOnePerEvent_ ) {
+            //Deactivate the process after one dark brem. Needs to be reactivated in the end of event action. 
+            //If this is in the stepping action instead, more than one brem can occur within each step.
+            G4bool state = false;
+            G4String pname = "biasWrapper("+PROCESS_NAME+")";
+            G4ProcessTable* ptable = G4ProcessTable::GetProcessTable();
+            ptable->SetProcessActivation(pname,state);
         }
-    
-        G4double eth = 0*MeV;
-        this->EmModel(0)->SetSecondaryThreshold(eth);
-        this->EmModel(0)->SetLPMFlag(false);
+
+        aParticleChange.Initialize(track);
+
+        theModel_->GenerateChange( aParticleChange , track , step );
+
+        /* 
+         * Parent class has some internal counters that need to be reset,
+         * so we call it before returning. It will return our shared
+         * protected member variable aParticleChange that we have been modifying
+         */
+        return G4VDiscreteProcess::PostStepDoIt(track,step);
     }
-    
+
+    G4double G4eDarkBremsstrahlung::GetMeanFreePath(const G4Track& track, G4double, G4ForceCondition*) {
+
+        //won't happen if it isn't applicable
+        if (not IsApplicable(*track.GetParticleDefinition())) return DBL_MAX;
+
+        G4Material* materialWeAreIn = track.GetMaterial();
+        const G4ElementVector* theElementVector = materialWeAreIn->GetElementVector();
+        const G4double* NbOfAtomsPerVolume = materialWeAreIn->GetVecNbOfAtomsPerVolume();
+     
+        G4double SIGMA = 0;
+        for ( size_t i=0 ; i < materialWeAreIn->GetNumberOfElements() ; i++ ) {
+            G4double AtomicZ = (*theElementVector)[i]->GetZ();
+            G4double AtomicA = (*theElementVector)[i]->GetA()/(g/mole);
+            SIGMA += NbOfAtomsPerVolume[i] *
+                theModel_->ComputeCrossSectionPerAtom(
+                        track.GetDynamicParticle()->GetKineticEnergy(),
+                        AtomicA,
+                        AtomicZ
+                        );
+        }
+
+        return SIGMA > DBL_MIN ? 1./SIGMA : DBL_MAX;
+    }
 }

@@ -13,6 +13,7 @@
 //   LDMX   //
 //----------//
 #include "SimCore/XsecBiasingOperator.h"
+#include "SimCore/G4eDarkBremsstrahlung.h"
 
 class G4Track;
 class G4BiasingProcessInterface;
@@ -87,12 +88,7 @@ namespace ldmx {
              */
 
             /// Return the name of the process this operator biases
-            virtual std::string getProcessToBias() { return DARKBREM_PROCESS; }
-
-        private: 
-
-            /// Geant4 name of dark brem process
-            static const std::string DARKBREM_PROCESS;
+            virtual std::string getProcessToBias() { return G4eDarkBremsstrahlung::PROCESS_NAME; }
 
     };  // DarkBremXsecBiasingOperator
 }

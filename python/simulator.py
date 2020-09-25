@@ -117,8 +117,8 @@ class simulator(Producer):
         self.biasing_factor = 1
 
         # Dark Brem stuff
-        from LDMX.SimCore import simcfg
-        self.dark_brem = simcfg.DarkBrem()
+        from LDMX.SimCore import dark_brem
+        self.dark_brem = dark_brem.DarkBrem()
 
     def setDetector(self, det_name , include_scoring_planes = False ) :
         """Set the detector description with the option to include the scoring planes
@@ -177,7 +177,7 @@ class simulator(Producer):
         """
 
         processToParticle = {
-            'eDBrem'          : 'e-',
+            'eDarkBrem'       : 'e-',
             'photonNuclear'   : 'gamma',
             'electronNuclear' : 'e-'
             }

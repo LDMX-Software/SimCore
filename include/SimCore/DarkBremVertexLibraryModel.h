@@ -1,17 +1,9 @@
-/**
- * @file G4eDarkBremsstrahlungModel.h
- * @brief Class provided to simulate the dark brem cross section and interaction.
- * @author Michael Revering, University of Minnesota
- * @author Tom Eichlersmith, University of Minnesota
- */
-
-#ifndef SIMCORE_G4EDARKBREMSSTRAHLUNGMODEL_H_
-#define SIMCORE_G4EDARKBREMSSTRAHLUNGMODEL_H_
+#ifndef SIMCORE_DARKBREMVERTEXLIBRARYMODLE_H_
+#define SIMCORE_DARKBREMVERTEXLIBRARYMODLE_H_
 
 #include "Framework/Parameters.h"
 
-// Geant
-#include "G4VEmModel.hh"
+#include "SimCore/G4eDarkBremsstrahlung.h"
 
 // ROOT
 #include "TLorentzVector.h"
@@ -19,15 +11,15 @@
 namespace ldmx {
     
     /**
-     * @class G4eDarkBremsstrahlungModel
+     * @class DarkBremVertexLibraryModel
      *
-     * Geant4 implementation of the model for a particle undergoing a dark brem.
+     * Geant4 implementation of the model for a particle undergoing a dark brem
+     * where we use an imported vertex library to decide the outgoing kinematics.
      *
      * This is where all the heavy lifting in terms of calculating cross sections
      * and actually having an electron do a dark brem occurs. This model depends
-     * on six configurable parameters.
+     * on severl configurable parameters.
      *
-     * - APrimeMass : the mass of the A' in MeV
      * - library_path : the full path to the directory containing the LHE dark brem
      *   vertices that will be read in to make the vertex library
      * - epsilon : strength of the dark photon - photon mixing
@@ -35,68 +27,66 @@ namespace ldmx {
      *   cross section for going dark brem
      * - method : scaling method to use to scale the dark brem vertices from
      *   the library to the actual electron energy when a dark brem occurs
-     * - only_one_per_event : deactiviate the dark brem process when it occurs to
-     *   limit the simulation to only one dark brem per event
      *
-     * The required parameters are the A' mass (APrimeMass) and an associated vertex library
-     * generated in MadGraph (library_path). The other parameters have helpful defaults set
-     * in the python configuration class DarkBrem and are there for you to be able to tune
-     * this model's behavior. An example library for each of the major mass points is installed
+     * The required parameter is a vertex library generated in MadGraph (library_path). 
+     * The other parameters have helpful defaults set in the python configuration class DarkBrem 
+     * and are there for you to be able to tune this model's behavior. 
+     * An example library for each of the major mass points is installed
      * with SimCore and is compressed as stored in the data directory.
      */
-    class G4eDarkBremsstrahlungModel : public G4VEmModel {
+    class DarkBremVertexLibraryModel : public G4eDarkBremsstrahlungModel {
     
         public:
-    
-            /**
-             * @enum DarkBremMethod
-             *
-             * Possible methods to use the dark brem vertices from the imported library inside of this model.
-             */
-            enum DarkBremMethod{
-                /// Use actual electron energy and get pT from LHE (such that pT^2+me^2 < Eacc^2)
-                ForwardOnly = 1,
-                /// Boost LHE vertex momenta to the actual electron energy
-                CMScaling   = 2, 
-                /// Use LHE vertex as is
-                Undefined   = 3  
-            };
     
             /**
              * Constructor
              * Set the parameters for this model.
              *
-             * The method integer is converted to an enum through a hard-coded
-             * switch statement.
+             * The method name is converted to an enum through a hard-coded switch statement.
              *
              * The threshold is set to the maximum of the passed value or twice
              * the A' mass (so that it kinematically makes sense).
              *
              * The library path is immediately passed to SetMadGraphDataLibrary.
              */
-            G4eDarkBremsstrahlungModel(Parameters& params,
-                                       const G4ParticleDefinition* p = 0,
-                                       const G4String& theName = "eDBrem");
+            DarkBremVertexLibraryModel(Parameters& params);
     
             /**
              * Destructor
-             *
-             * Attempt to cleanup hanging pointers and leftover memory.
              */
-            virtual ~G4eDarkBremsstrahlungModel();
+            virtual ~DarkBremVertexLibraryModel() { }
+
+            /**
+             * Print the configuration of this model
+             */
+            virtual void PrintInfo() const;
+
+            /**
+             * Record the configuration of this model into the RunHeader
+             */
+            virtual void RecordConfig(RunHeader& h) const;
     
             /**
-             * Set the cuts using the particle definition and compute the partial sum sigma.
+             * Calculates the cross section per atom in GEANT4 internal units.
+             * Uses WW approximation to find the total cross section, performing numerical integrals over x and theta.
              *
-             * Compute particleSumSigma using ComputeParticleSumSigma inputing the material,
-             * half the high energy limit, and the minimum of the cut table or a quarter
-             * of the high energy limit.
+             * Numerical integrals are done using boost::numeric::odeint.
              *
-             * @param p G4ParticleDefinition to compute partial sum sigma for
-             * @param cuts energy cuts depending on material or volume or region the calculation is in
+             * Integrate Chi from \f$m_A^4/(4E_0^2)\f$ to \f$m_A^2\f$
+             *
+             * Integrate DiffCross from 0 to \f$min(1-m_e/E_0,1-m_A/E_0)\f$
+             *
+             * Total cross section is given by
+             * \f[ \sigma = 4 \frac{pb}{GeV} \epsilon^2 \alpha_{EW}^3 \int \chi(t)dt \int \frac{d\sigma}{dx}(x)dx \f]
+             *
+             * @param E0 energy of beam (incoming particle)
+             * @param Z atomic number of atom
+             * @param A atomic mass of atom
+             * @param cut minimum energy cut to calculate cross section
+             * @return cross section (0. if outside energy cuts)
              */
-            virtual void Initialise(const G4ParticleDefinition* p, const G4DataVector& cuts);
-    
+            virtual G4double ComputeCrossSectionPerAtom(G4double electronKE, G4double atomicA, G4double atomicZ);
+
             /**
              * Simulates the emission of a dark photon + electron.
              *
@@ -116,32 +106,11 @@ namespace ldmx {
              * ## Undefined
              * Don't scale the MadGraph vertex to the actual energy of the electron.
              *
-             * If only one per event is set, then we deactivate the dark brem process,
-             * ensuring only one dark brem per step and per event.
-             * Needs to be reactived in the end of event action.
-             *
-             * @param secondaries vector of primary particle's offspring
-             * @param primary particle that could go dark brem
-             * @param tmin minimum energy possible for sampling
-             * @param maxEnergy maximum energy possible for sampling
+             * @param[in,out] particleChange structure holding changes to make to particle track
+             * @param[in] track current track being processesed
+             * @param[in] step current step of the track
              */
-            virtual void SampleSecondaries(std::vector<G4DynamicParticle*>* secondaries,
-                                          const G4MaterialCutsCouple* ,
-                                          const G4DynamicParticle* primary,
-                                          G4double tmin,
-                                          G4double maxEnergy);
-    
-        protected:
-    
-            /**
-             * Selects random element out of the material information given.
-             *
-             * Uses weights for materials calculated before and stored in partialSumSigma
-             *
-             * @param couple G4 package containing material and other relevant information
-             * @return the chosen G4Element
-             */
-            const G4Element* SelectRandomAtom(const G4MaterialCutsCouple* couple);
+            virtual void GenerateChange(G4ParticleChange& particleChange, const G4Track& track, const G4Step& step);
     
         private:
             
@@ -240,11 +209,6 @@ namespace ldmx {
                 /// energy of electron before brem (used as key in mad graph data map)
                 G4double E; 
             };
-    
-            /**
-             * Sets the particle being looked at and checks whether it is an electron or not.
-             */
-            void SetParticle(const G4ParticleDefinition* p);
           
             /*
              * Parse an LHE File
@@ -276,61 +240,7 @@ namespace ldmx {
              * @param E0 energy of particle undergoing dark brem [GeV]
              * @return total energy and transverse momentum of particle [GeV]
              */
-            G4eDarkBremsstrahlungModel::OutgoingKinematics GetMadgraphData(double E0);
-    
-            /**
-             * Calculates the cross section per atom in GEANT4 internal units.
-             * Uses WW approximation to find the total cross section, performing numerical integrals over x and theta.
-             *
-             * Non named parameters are not used.
-             *
-             * Numerical integrals are done using boost::numeric::odeint.
-             *
-             * Integrate Chi from \f$m_A^4/(4E_0^2)\f$ to \f$m_A^2\f$
-             *
-             * Integrate DiffCross from 0 to \f$min(1-m_e/E_0,1-m_A/E_0)\f$
-             *
-             * Total cross section is given by
-             * \f[ \sigma = 4 \frac{pb}{GeV} \epsilon^2 \alpha_{EW}^3 \int \chi(t)dt \int \frac{d\sigma}{dx}(x)dx \f]
-             *
-             * @param E0 energy of beam (incoming particle)
-             * @param Z atomic number of atom
-             * @param A atomic mass of atom
-             * @param cut minimum energy cut to calculate cross section
-             * @return cross section (0. if outside energy cuts)
-             */
-            virtual G4double ComputeCrossSectionPerAtom(const G4ParticleDefinition*,
-                                                       G4double E0, 
-                                                       G4double Z,   G4double A,
-                                                       G4double cut, G4double);
-    
-            /** 
-             * Build the table of cross section per element. 
-             *
-             * The table is built for MATERIALS. 
-             * This table is used by DoIt to select randomly an element in the material.
-             *
-             * @param material Material to build cross section table for
-             * @param kineticEnergy kinetic energy of incoming particle
-             * @param cut minimum energy cut on cross section
-             * @return G4DataVector of elements to cross sections for the input material. 
-             */
-            G4DataVector* ComputePartialSumSigma(const G4Material* material,
-                                                G4double kineticEnergy, G4double cut);
-    
-            /** Hide assignment operator */
-            G4eDarkBremsstrahlungModel & operator=(const  G4eDarkBremsstrahlungModel &right);
-    
-            /** Hide copy constructor */
-            G4eDarkBremsstrahlungModel(const  G4eDarkBremsstrahlungModel&);
-    
-        protected:
-    
-            /** definition of particle */
-            const G4ParticleDefinition* particle_;
-    
-            /** loss in particle energy */
-            G4ParticleChangeForLoss* fParticleChange_;
+            OutgoingKinematics GetMadgraphData(double E0);
     
         private:
     
@@ -340,12 +250,6 @@ namespace ldmx {
              * @TODO make configurable and/or optimize somehow
              */
             unsigned int maxIterations_{10000};
-    
-            /** mass of the A Prime [GeV] 
-             *
-             * Configurable with 'APrimeMass'
-             */
-            double MA_;
     
             /** Threshold for non-zero xsec [GeV] 
              *
@@ -361,14 +265,35 @@ namespace ldmx {
              */
             double epsilon_;
     
-            /** mass of an electron [GeV] */
-            double Mel_;
-    
+            /**
+             * @enum DarkBremMethod
+             *
+             * Possible methods to use the dark brem vertices from the imported library inside of this model.
+             */
+            enum DarkBremMethod {
+                /// Use actual electron energy and get pT from LHE (such that pT^2+me^2 < Eacc^2)
+                ForwardOnly = 1,
+                /// Boost LHE vertex momenta to the actual electron energy
+                CMScaling   = 2, 
+                /// Use LHE vertex as is
+                Undefined   = 3  
+            };
+
             /** method for this model 
              *
              * Configurable with 'method'
              */
             DarkBremMethod method_{DarkBremMethod::Undefined};
+
+            /**
+             * Name of method for persisting into the RunHeader
+             */
+            std::string method_name_;
+
+            /**
+             * Full path to the vertex library used for persisting into the RunHeader
+             */
+            std::string library_path_;
     
             /** 
              * should we always create a totally new electron when we dark brem? 
@@ -378,16 +303,6 @@ namespace ldmx {
              * by checking if the resulting kinetic energy is below some threshold.
              */
             bool alwaysCreateNewElectron_{true};
-    
-            /**
-             * Only allow the dark brem to happen once per event.
-             *
-             * This allows for the dark brem process to be de-activated when SampleSecondaries is called.
-             *
-             * The dark brem process is _always_ re-activated in the RunManager::TerminateOneEvent method.
-             * This reactivation has no effect when the process is already active.
-             */
-            bool onlyOnePerEvent_;
     
             /** 
              * Storage of data from mad graph 
@@ -411,19 +326,7 @@ namespace ldmx {
              */
             std::map< double , unsigned int > currentDataPoints_;
     
-            
-            /**
-             * Not really sure what this physically represents
-             *
-             * This is calculated in ComputePartialSumSigma when
-             * the Initialise method is called. It is then used
-             * to help randomly choose whether a dark brem would
-             * occur given a specific material + electron energy
-             * calculation.
-             */
-            std::vector<G4DataVector*> partialSumSigma_;
-      
     };
 }
 
-#endif // SIMCORE_G4EDARKBREMSSTRAHLUNGMODEL_H_
+#endif // SIMCORE_DARKBREMVERTEXLIBRARYMODLE_H_

@@ -20,12 +20,15 @@ namespace ldmx {
      * @class APrimePhysics
      * @brief Defines basic APrime physics
      *
-     * It constructs the APrime particle and links the dark brem process
-     * to the electron.
+     * It constructs the APrime particle and links the dark brem process to the electron.
+     *
+     * @see G4APrime
+     * @see G4eDarkBremsstrahlung
      *
      * @note
-     * This class basically does not do anything except define
-     * a dummy particle so that event generation works properly.
+     * This class basically does not do anything except
+     * register the custom particle (G4APrime) and custom
+     * process (G4eDarkBremsstrahlung).
      */
     class APrimePhysics : public G4VPhysicsConstructor {
 
@@ -55,7 +58,7 @@ namespace ldmx {
              * Uses the A' mass given by the parameter APrimeMass to 
              * inform the G4APrime instance what mass to use.
              *
-             * @sa G4APrime
+             * @see G4APrime
              */
             void ConstructParticle();
 
@@ -64,10 +67,15 @@ namespace ldmx {
              *
              * Links the dark brem processs to the electron through the process manager
              * only if the dark brem process is enabled ('enable' is True).
-             * G4ProcessManager registers and cleans up any created processes.
              *
-             * Creates the G4eDarkBremmstrahlung process passing it the necessary parameters,
-             * and activates the process only at the end of the step.
+             * G4ProcessManager registers and cleans up any created processes,
+             * so we can forget about it after giving them to it.
+             *
+             * We also add a biasing interface for the custom process.
+             * This is required for our biasing framework to work with
+             * this new process.
+             *
+             * @see G4eDarkBremsstrahlung
              */
             void ConstructProcess();
 
@@ -75,9 +83,6 @@ namespace ldmx {
 
             /// dark brem process parameters
             Parameters parameters_;
-
-            /// Definition of the APrime particle.
-            G4ParticleDefinition* aprimeDef_;
     };
 
 }

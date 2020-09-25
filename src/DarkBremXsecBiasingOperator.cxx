@@ -18,8 +18,6 @@
 
 namespace ldmx { 
 
-    const std::string DarkBremXsecBiasingOperator::DARKBREM_PROCESS = "eDBrem"; 
-    
     DarkBremXsecBiasingOperator::DarkBremXsecBiasingOperator(std::string name) :
         XsecBiasingOperator(name) {
     }

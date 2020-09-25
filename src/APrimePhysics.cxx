@@ -14,13 +14,12 @@
 // Geant4
 #include "G4Electron.hh"
 #include "G4ProcessManager.hh"
+#include "G4BiasingProcessInterface.hh"
 
 namespace ldmx {
 
-    APrimePhysics::APrimePhysics(Parameters params, const G4String& name) :
-            G4VPhysicsConstructor(name), parameters_(params), aprimeDef_(nullptr) { 
-
-    }
+    APrimePhysics::APrimePhysics(Parameters params, const G4String& name) 
+        : G4VPhysicsConstructor(name), parameters_(params){ }
 
     void APrimePhysics::ConstructParticle() { 
         /**
@@ -30,8 +29,7 @@ namespace ldmx {
          * Geant4 registers all instances derived from G4ParticleDefinition and 
          * deletes them at the end of the run.
          */
-        auto aprimeMass{parameters_.getParameter<double>("APrimeMass")};
-        aprimeDef_ = G4APrime::APrime(aprimeMass);
+        G4APrime::APrime(parameters_.getParameter<double>("ap_mass"));
     }
 
     void APrimePhysics::ConstructProcess() {
@@ -50,11 +48,16 @@ namespace ldmx {
              *      that could be called at the end of the step. Not providing the second argument
              *      means that the ordering index is given a default value of 1000 which
              *      seems to be safely above all the internal/default processes.
+             *
+             * Since we are importing a custom process here, we also need to provide
+             * a interface for the G4 biasing framework to work with. This simply
+             * wraps the process we have already added to the manager.
              */
-        	G4Electron::ElectronDefinition()->GetProcessManager()->AddDiscreteProcess(
-                    new G4eDarkBremsstrahlung(parameters_) /*process to add - G4ProcessManager cleans up processes*/
+            auto actual_db_process = new G4eDarkBremsstrahlung(parameters_);
+        	G4Electron::ElectronDefinition()->GetProcessManager()->AddDiscreteProcess(actual_db_process);
+            G4Electron::ElectronDefinition()->GetProcessManager()->AddDiscreteProcess(
+                    new G4BiasingProcessInterface(actual_db_process,false,false,true)
                     );
-
         }
     }
 
