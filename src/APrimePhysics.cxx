@@ -48,15 +48,9 @@ namespace ldmx {
              *      that could be called at the end of the step. Not providing the second argument
              *      means that the ordering index is given a default value of 1000 which
              *      seems to be safely above all the internal/default processes.
-             *
-             * Since we are importing a custom process here, we also need to provide
-             * a interface for the G4 biasing framework to work with. This simply
-             * wraps the process we have already added to the manager.
              */
-            auto actual_db_process = new G4eDarkBremsstrahlung(parameters_);
-        	G4Electron::ElectronDefinition()->GetProcessManager()->AddDiscreteProcess(actual_db_process);
-            G4Electron::ElectronDefinition()->GetProcessManager()->AddDiscreteProcess(
-                    new G4BiasingProcessInterface(actual_db_process,false,false,true)
+        	G4Electron::ElectronDefinition()->GetProcessManager()->AddDiscreteProcess(
+                    new G4eDarkBremsstrahlung(parameters_)
                     );
         }
     }
