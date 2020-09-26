@@ -1,5 +1,7 @@
 #include "SimCore/DetectorConstruction.h"
 
+#include "SimCore/G4eDarkBremsstrahlung.h"
+
 /*~~~~~~~~~~~~~~~*/
 /*   Framework   */
 /*~~~~~~~~~~~~~~~*/
@@ -46,7 +48,7 @@ namespace ldmx {
                 xsecBiasing = new GammaToMuPairXsecBiasingOperator("GammaToMuPairXsecBiasingOperator");
             } else if (biasingProcess.compare("electronNuclear") == 0) { 
                 xsecBiasing = new ElectroNuclearXsecBiasingOperator("ElectroNuclearXsecBiasingOperator");
-            } else if (biasingProcess.compare("eDBrem") == 0) { 
+            } else if (biasingProcess.compare(G4eDarkBremsstrahlung::PROCESS_NAME) == 0) { 
                 xsecBiasing = new DarkBremXsecBiasingOperator("DarkBremXsecBiasingOperator");
             } else {
                 EXCEPTION_RAISE("BiasingException", "Invalid process name '" + biasingProcess + "'." ); 
