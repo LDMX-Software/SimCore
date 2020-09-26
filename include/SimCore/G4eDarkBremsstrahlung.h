@@ -102,7 +102,12 @@ namespace ldmx {
             /**
              * Constructor
              *
-             * Sets this process up
+             * Configures this process by doing three main things:
+             *  1. Registers this process with Geant4 as a 'fElectromagnetic' process
+             *     - Needed for Geant4 Biasing Framework to recognize this process as "bias-able"
+             *  2. Defines the EM subtype as one different from all other EM processes
+             *     - Needed so we don't replace another EM process
+             *  3. Configures the process and passes the model parameters to the model
              */
             G4eDarkBremsstrahlung(const Parameters& params);
       
@@ -121,13 +126,14 @@ namespace ldmx {
             /**
              * Reports the parameters to G4cout.
              *
-             * @note Needs to match variable definitions in python configuration class.
+             * @see G4eDarkBremsstrahlungModel::PrintInfo
              */
             virtual void PrintInfo();
 
             /**
              * Records the configuration of this process into the RunHeader
              *
+             * @see G4eDarkBremsstrahlungModel::RecordConfig
              * @param[in,out] h RunHeader to write to
              */
             void RecordConfig(RunHeader &h) const;
@@ -144,6 +150,7 @@ namespace ldmx {
              * ensuring only one dark brem per step and per event.
              * Needs to be reactived in the end of event action.
              *
+             * @see G4eDarkBremsstrahlungModel::GenerateChange
              * @param[in] track current G4Track that is being stepped
              * @param[in] step current step that just finished
              * @returns G4VParticleChange detailing how this process changes the track
@@ -155,6 +162,16 @@ namespace ldmx {
             /**
              * Calculate the mean free path given the input conditions
              *
+             * We maintain a cache for the cross sections calculated by the model
+             * so that later in the run it is less likely that the model will
+             * need to be called to calculate the cross section. This is done
+             * in order to attempt to improve speed of simulation and avoid
+             * repetition of the same, deterministic calculations.
+             *
+             * If you want to turn off the cache-ing behavior, set 'cache_xsec' to false in 
+             * the python configuratin for the dark brem process.
+             *
+             * @see G4eDarkBremsstrahlungModel::ComputeCrossSectionPerAtom
              * @param[in] track G4Track that is being stepped
              * @param[in] prevStepSize G4double measuring previous step size, unused
              * @param[in] condition G4ForceCondition, always NotForced for G4VDiscreteProcess, unused
@@ -184,6 +201,11 @@ namespace ldmx {
              * The mass of the A' during this run [MeV]
              */
             double ap_mass_;
+
+            /**
+             * Should we have a cache for the computed cross sections?
+             */
+            bool cache_xsec_;
 
             /**
              * The model that we are using in this run.
