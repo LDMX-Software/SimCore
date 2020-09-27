@@ -96,7 +96,20 @@ namespace ldmx {
     
         public:
 
-            /// The name of this process in Geant4
+            /**
+             * The name of this process in Geant4
+             *
+             * @note This process name should be used in all places that
+             * can depend on this file. (For example RunManager and DetectorConstruction).
+             * There are other places that _can't_ use this constant
+             * directly, so if this name is changed you also need to change
+             * the following places.
+             *  - Python: Biasing.filters.TrackProcessFilter.dark_brem
+             *  - Python: Biasing.ecal.dark_brem
+             *  - Python: Biasing.target.dark_brem
+             *  - Python: SimCore.simulator.biasingConfigure
+             *  - C++: Event/SimParticle::createProcessMap
+             */
             static const std::string PROCESS_NAME;
       
             /**
