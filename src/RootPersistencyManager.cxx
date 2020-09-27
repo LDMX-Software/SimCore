@@ -127,11 +127,15 @@ namespace ldmx {
             int n_electron_processes = electron_processes->size();
             for ( int i_process = 0; i_process < n_electron_processes; i_process++ ) {
                 G4VProcess* process = (*electron_processes)[i_process];
-                if (process->GetProcessName() == G4eDarkBremsstrahlung::PROCESS_NAME.c_str()) {
+                if (process->GetProcessName().contains(G4eDarkBremsstrahlung::PROCESS_NAME)) {
+                    //reset process to wrapped process if it is biased
+                    if (dynamic_cast<G4BiasingProcessInterface*>(process)) 
+                        process = dynamic_cast<G4BiasingProcessInterface*>(process)->GetWrappedProcess();
+                    //record the process configuration to the run header
                     dynamic_cast<G4eDarkBremsstrahlung*>(process)->RecordConfig(runHeader);
-                }
-            }
-        }
+                } //this process is the dark brem process
+            } //loop through electron processes
+        } //dark brem has been enabled
 
         auto generators{parameters_.getParameter<std::vector<Parameters>>("generators")};
         int counter = 0;
