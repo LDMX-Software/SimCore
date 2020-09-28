@@ -133,6 +133,7 @@ namespace ldmx {
                         process = dynamic_cast<G4BiasingProcessInterface*>(process)->GetWrappedProcess();
                     //record the process configuration to the run header
                     dynamic_cast<G4eDarkBremsstrahlung*>(process)->RecordConfig(runHeader);
+                    break;
                 } //this process is the dark brem process
             } //loop through electron processes
         } //dark brem has been enabled

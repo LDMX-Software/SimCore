@@ -36,7 +36,7 @@ class VertexLibraryModel(DarkBremModel) :
     method : str
         Interpretation method for LHE files
     threshold : float
-        Minimum energy that electron should have for dark brem to have nonzero xsec
+        Minimum energy [GeV] that electron should have for dark brem to have nonzero xsec
     epsilon : float
         Epsilon for dark brem xsec calculation
     """
@@ -45,8 +45,8 @@ class VertexLibraryModel(DarkBremModel) :
         super().__init__('vertex_library')
         self.library_path = library_path
         self.method       = 'forward_only'
-        self.threshold    = 0.
-        self.epsilon      = 1.
+        self.threshold    = 2.0 #GeV
+        self.epsilon      = 0.01
 
 class DarkBrem:
     """Storage for parameters of dark brem process
