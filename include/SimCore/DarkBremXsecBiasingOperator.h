@@ -15,10 +15,6 @@
 #include "SimCore/XsecBiasingOperator.h"
 #include "SimCore/G4eDarkBremsstrahlung.h"
 
-class G4Track;
-class G4BiasingProcessInterface;
-class G4VBiasingOperation;
-
 namespace ldmx { 
 
     class DarkBremXsecBiasingOperator : public XsecBiasingOperator { 
@@ -30,21 +26,14 @@ namespace ldmx {
              *
              * Calls base class constructor.
              */
-            DarkBremXsecBiasingOperator(std::string name);
+            DarkBremXsecBiasingOperator(std::string name) : XsecBiasingOperator(name) { }
 
             /** 
              * Destructor 
              *
              * Blank right now
              */
-            ~DarkBremXsecBiasingOperator();
-
-            /** 
-             * Method called at the beginning of a run. 
-             *
-             * @sa XsecBiasingOperator::StartRun()
-             */
-            void StartRun();
+            ~DarkBremXsecBiasingOperator() { /*nothing on purpose*/ }
 
             /** 
              * This the following protected member variables from XsecBiasingOperator:
@@ -63,7 +52,8 @@ namespace ldmx {
 
         protected:
 
-            /** DEBUG FUNCTION
+            /** 
+             * DEBUG FUNCTION
              * This function is called by the biasing interface class during PostStepDoIt.
              * You can observe the particle change that was produced by the process
              * and the weight that will be multiplied into this particle change.
