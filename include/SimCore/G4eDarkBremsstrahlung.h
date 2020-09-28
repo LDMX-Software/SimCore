@@ -9,6 +9,7 @@
 #define SIMCORE_G4EDARKBREMSSTRAHLUNG_H_
 
 #include "Framework/Parameters.h"
+#include "Framework/Logger.h"
 #include "Event/RunHeader.h"
 
 // Geant
@@ -37,8 +38,12 @@ namespace ldmx {
              * Constructor
              *
              * Configures the model based on the passed parameters
+             *
+             * Names the logger after the name for this model.
              */
-            G4eDarkBremsstrahlungModel(const Parameters& p) { }
+            G4eDarkBremsstrahlungModel(const Parameters& p) { 
+                theLog_=logging::makeLogger(p.getParameter<std::string>("name"));
+            }
 
             /// Destructor
             virtual ~G4eDarkBremsstrahlungModel() { /*Nothing on purpose*/ }
@@ -65,9 +70,9 @@ namespace ldmx {
              * @param[in] electronKE current electron kinetic energy
              * @param[in] atomicA atomic-mass number for the element the electron is in
              * @param[in] atomicZ atomic-number for the element the electron is in
-             * @returns cross section
+             * @returns cross section with units incorporated as a G4double
              */
-            virtual G4double ComputeCrossSectionPerAtom(G4double electronKE, G4double atomicA, G4double atomicZ)=0;
+            virtual G4double ComputeCrossSectionPerAtom(G4double electronKE, G4double atomicA, G4double atomicZ) = 0;
 
             /**
              * Generate the change in the particle now that we can assume the interaction is occuring
@@ -80,7 +85,12 @@ namespace ldmx {
              * @param[in] track current track that needs the change
              * @param[in] step current step of the track
              */
-            virtual void GenerateChange(G4ParticleChange& particleChange, const G4Track& track, const G4Step& step)=0;
+            virtual void GenerateChange(G4ParticleChange& particleChange, const G4Track& track, const G4Step& step) = 0;
+
+        protected:
+
+            ///The logging apparatus for this model
+            logging::logger theLog_;
         
     }; //G4eDarkBremsstrahlungModel
     
@@ -153,16 +163,16 @@ namespace ldmx {
 
             /** 
              * This is the function actually called by Geant4 that does the dark brem
-             * interaction. Here we wrap the parent process's PostStepDoIt with some
-             * debugging comments.
+             * interaction.
              *
              * aParticleChange is a protected member variable of G4VDiscreteProcess
              * that we should edit here.
              *
              * If only one per event is set, then we deactivate the dark brem process,
              * ensuring only one dark brem per step and per event.
-             * Needs to be reactived in the end of event action.
+             * Reactivated in RunManager::TerminateOneEvent.
              *
+             * @see RunManager::TerminateOneEvent
              * @see G4eDarkBremsstrahlungModel::GenerateChange
              * @param[in] track current G4Track that is being stepped
              * @param[in] step current step that just finished
@@ -208,7 +218,7 @@ namespace ldmx {
              * The dark brem process is _always_ re-activated in the RunManager::TerminateOneEvent method.
              * This reactivation has no effect when the process is already active.
              */
-            bool onlyOnePerEvent_;
+            bool only_one_per_event_;
 
             /**
              * The mass of the A' during this run [MeV]
@@ -224,6 +234,9 @@ namespace ldmx {
              * The model that we are using in this run.
              */
             std::unique_ptr<G4eDarkBremsstrahlungModel> theModel_;
+
+            /// Enable logging for this process
+            enableLogging("DarkBremProcess")
 
     }; //G4eDarkBremsstrahlung
 

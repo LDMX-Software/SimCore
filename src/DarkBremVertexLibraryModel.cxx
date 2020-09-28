@@ -3,6 +3,7 @@
 
 #include "SimCore/G4APrime.h"
 #include "Framework/Exception.h"
+#include "Framework/Logger.h"
 
 // Geant4
 #include "G4PhysicalConstants.hh"
@@ -160,14 +161,11 @@ namespace ldmx {
                 PhiAcc = data.electron.Phi();
     
                 if(i > maxIterations_) {
-                    std::cout << "[ DarkBremVertexLibraryModel ] : "
+                    ldmx_log(warn)
                         << "Could not produce a realistic vertex with library energy " 
-                        << data.electron.E() << " MeV."
-                        << std::endl;
-                    std::cout << "                               : "
+                        << data.electron.E() << " MeV.\n"
                         << "Consider expanding your libary of A' vertices to include a beam energy closer to "
-                        << incidentEnergy << " MeV."
-                        << std::endl;
+                        << incidentEnergy << " MeV.";
                     break;
                 }
             }
@@ -270,13 +268,11 @@ namespace ldmx {
     
         MakePlaceholders(); //Setup the placeholder offsets for getting data.
     
-        if ( G4RunManager::GetRunManager()->GetVerboseLevel() > 0 ) {
-            std::cout << "[ DarkBremVertexLibraryModel ] : MadGraph Library of Dark Brem Vertices: " << std::endl;
-            for ( const auto &kV : madGraphData_ ) {
-                std::cout << "                               : "
-                    << std::setw(8) << kV.first << " GeV Beam -> "
-                    << std::setw(6) << kV.second.size() << " Events" << std::endl;
-            }
+        ldmx_log(info) << "MadGraph Library of Dark Brem Vertices:\n";
+        for ( const auto &kV : madGraphData_ ) {
+            ldmx_log(info) << "\t"
+                << std::setw(8) << kV.first << " GeV Beam -> "
+                << std::setw(6) << kV.second.size() << " Events";
         }
     
         return;
@@ -318,9 +314,8 @@ namespace ldmx {
         static const double MA = G4APrime::APrime()->GetPDGMass()/CLHEP::GeV; //mass A' in GeV
 
         //TODO: use already written LHE parser?
-        if ( G4RunManager::GetRunManager()->GetVerboseLevel() > 0 ) {
-            std::cout << "[ DarkBremVertexLibraryModel ] : Parsing LHE file '" << fname << "'... ";
-        }
+        ldmx_log(info) << "Parsing LHE file '" << fname << "'... ";
+
         std::ifstream ifile;
         ifile.open(fname.c_str());
         if(!ifile) {
@@ -370,9 +365,7 @@ namespace ldmx {
         }//while getting lines
         //Add the energy to the list, with a random offset between 0 and the total number of entries.
         ifile.close();
-        if ( G4RunManager::GetRunManager()->GetVerboseLevel() > 0 ) {
-            std::cout << "done" << std::endl;
-        }
+        ldmx_log(info) << "done parsing.";
     }
     
     void DarkBremVertexLibraryModel::MakePlaceholders() {

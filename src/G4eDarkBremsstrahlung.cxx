@@ -26,9 +26,9 @@ namespace ldmx {
         // we need to pretend to be an EM process so the biasing framework recognizes us
         SetProcessSubType(63); //needs to be different from the other Em Subtypes
     
-        onlyOnePerEvent_ = params.getParameter<bool>("only_one_per_event");
-        cache_xsec_      = params.getParameter<bool>("cache_xsec");
-        ap_mass_         = params.getParameter<double>("ap_mass");
+        only_one_per_event_ = params.getParameter<bool>("only_one_per_event");
+        cache_xsec_         = params.getParameter<bool>("cache_xsec");
+        ap_mass_            = params.getParameter<double>("ap_mass");
 
         auto model{params.getParameter<Parameters>("model")};
         auto model_name{model.getParameter<std::string>("name")};
@@ -44,13 +44,13 @@ namespace ldmx {
     }
     
     void G4eDarkBremsstrahlung::PrintInfo() {
-        G4cout << " Only One Per Event               : " << onlyOnePerEvent_ << G4endl;
+        G4cout << " Only One Per Event               : " << only_one_per_event_ << G4endl;
         G4cout << " A' Mass [MeV]                    : " << ap_mass_ << G4endl;
         theModel_->PrintInfo();
     }
 
     void G4eDarkBremsstrahlung::RecordConfig(RunHeader& h) const {
-        h.setIntParameter( "Only One DB Per Event" , onlyOnePerEvent_ );
+        h.setIntParameter( "Only One DB Per Event" , only_one_per_event_ );
         h.setFloatParameter( "A' Mass [MeV]" , ap_mass_ );
         theModel_->RecordConfig(h);
     }
@@ -65,20 +65,25 @@ namespace ldmx {
          * Geant4 has decided that it is our time to interact,
          * so we are going to change the particle
          */
-        //if ( G4RunManager::GetRunManager()->GetVerboseLevel() > 1 ) {
-            std::cout << "[ G4eDarkBremsstrahlung ] : "
-                << "(" << G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetEventID() << ") "
-                << "A dark brem occurred! "
-                << std::endl;
-        //}
+        ldmx_log(info)
+            << "(" << G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetEventID() << ") "
+            << "A dark brem occurred!";
 
-        if ( onlyOnePerEvent_ ) {
-            //Deactivate the process after one dark brem. Needs to be reactivated in the end of event action. 
+        if ( only_one_per_event_ ) {
+            //Deactivate the process after one dark brem if we restrict ourselves to only one per event.
             //If this is in the stepping action instead, more than one brem can occur within each step.
-            G4bool state = false;
-            G4String pname = "biasWrapper("+PROCESS_NAME+")";
+            //Reactivated in RunManager::TerminateOneEvent
+            //Both biased and unbiased process could be in the run (but not at the same time),
+            //  so we turn off both while silencing the warnings from the process table.
+            std::vector<G4String> db_process_name_options = {
+                    "biasWrapper("+PROCESS_NAME+")",
+                    PROCESS_NAME
+            };
             G4ProcessTable* ptable = G4ProcessTable::GetProcessTable();
-            ptable->SetProcessActivation(pname,state);
+            G4int verbosity = ptable->GetVerboseLevel();
+            ptable->SetVerboseLevel(0);
+            for ( auto const& name : db_process_name_options ) ptable->SetProcessActivation(name,false);
+            ptable->SetVerboseLevel(verbosity);
         }
 
         aParticleChange.Initialize(track);
@@ -148,7 +153,7 @@ namespace ldmx {
 
             if (need_to_calculate_xsec) {
                 //xsec hasn't been set yet -> either no caching or not found in cache
-                //calculate it
+                // ==> calculate it
                 element_xsec = theModel_->ComputeCrossSectionPerAtom(energy,AtomicA,AtomicZ);
                 //put it into the cache
                 if (cache_xsec_) cache_element_xsec[cache_key] = element_xsec;
