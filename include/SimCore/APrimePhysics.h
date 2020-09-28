@@ -35,11 +35,20 @@ namespace ldmx {
         public:
 
             /**
+             * The name of this physics constructor.
+             *
+             * Passed into Geant4 to register this physics,
+             * should not conflict with any other Geant4
+             * physics.
+             */
+            static const std::string NAME;
+
+            /**
              * Class constructor.
              *
-             * @param name The name of the physics.
+             * @param params Parameters to configure the dark brem process
              */
-            APrimePhysics(Parameters params, const G4String& name = "APrime");
+            APrimePhysics(Parameters params);
 
             /**
              * Class destructor.
@@ -69,11 +78,7 @@ namespace ldmx {
              * only if the dark brem process is enabled ('enable' is True).
              *
              * G4ProcessManager registers and cleans up any created processes,
-             * so we can forget about it after giving them to it.
-             *
-             * We also add a biasing interface for the custom process.
-             * This is required for our biasing framework to work with
-             * this new process.
+             * so we can forget about it after creating it.
              *
              * @see G4eDarkBremsstrahlung
              */

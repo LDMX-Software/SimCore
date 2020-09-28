@@ -14,12 +14,13 @@
 // Geant4
 #include "G4Electron.hh"
 #include "G4ProcessManager.hh"
-#include "G4BiasingProcessInterface.hh"
 
 namespace ldmx {
 
-    APrimePhysics::APrimePhysics(Parameters params, const G4String& name) 
-        : G4VPhysicsConstructor(name), parameters_(params){ }
+    const std::string APrimePhysics::NAME = "APrime";
+
+    APrimePhysics::APrimePhysics(Parameters params) 
+        : G4VPhysicsConstructor(APrimePhysics::NAME), parameters_(params) { }
 
     void APrimePhysics::ConstructParticle() { 
         /**
