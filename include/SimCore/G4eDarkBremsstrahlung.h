@@ -149,11 +149,14 @@ namespace ldmx {
 
         private:
 
+            /// The type for the key we use in the cache
+            typedef unsigned long int key_t;
+
             /// The maximum value of A
-            static const int MAX_A{1000};
+            static const key_t MAX_A{1000};
 
             /// The maximum value for energy
-            static const int MAX_E{30000};
+            static const key_t MAX_E{30000};
 
             /**
              * Compute a key for the cache map
@@ -170,12 +173,12 @@ namespace ldmx {
              * @param[in] Z atomic number of element [num protons]
              * @returns unsigned integer cache key for these three inputs
              */
-            unsigned int computeKey(G4double energy, G4double A, G4double Z) const;
+            key_t computeKey(G4double energy, G4double A, G4double Z) const;
 
         private:
 
             /// the actual map from cache keys to calculated cross sections
-            std::map<unsigned int,G4double> the_cache_;
+            std::map<key_t,G4double> the_cache_;
 
             /// shared pointer to the model for calculating cross sections
             std::shared_ptr<G4eDarkBremsstrahlungModel> model_;
