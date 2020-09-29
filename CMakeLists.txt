@@ -55,3 +55,14 @@ set_target_properties(SimCore PROPERTIES
     CXX_STANDARD_REQUIRED YES
     CXX_EXTENSIONS NO
 )
+
+# Configure the executable so it knows the installation path of the db vertex libraries
+configure_file(${PROJECT_SOURCE_DIR}/src/print_dark_brem_xsec_table.cxx ${CMAKE_CURRENT_BINARY_DIR}/bin/db_configured_printing.cxx)
+add_executable(print-dark-brem-xsec-table ${CMAKE_CURRENT_BINARY_DIR}/bin/db_configured_printing.cxx)
+
+# Link to the Framework library
+target_link_libraries(print-dark-brem-xsec-table PRIVATE Geant4::Interface DARK::SimCore DARK::Framework)
+
+# Install the fire executable
+install(TARGETS print-dark-brem-xsec-table DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+

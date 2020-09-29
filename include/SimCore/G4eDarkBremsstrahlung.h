@@ -95,6 +95,94 @@ namespace ldmx {
     }; //G4eDarkBremsstrahlungModel
     
     /**
+     * The cache of already computed cross sections
+     * 
+     * We make a specific class for the cache in order
+     * to keep the key encoding/decoding process in a central
+     * location.
+     */
+    class ElementXsecCache {
+        public:
+
+            /**
+             * Default constructor
+             *
+             * Does nothing interesting, but no model for calculating cross section has been set.
+             */
+            ElementXsecCache() = default;
+
+            /**
+             * Constructor with a model to calculate the cross section.
+             */
+            ElementXsecCache(std::shared_ptr<G4eDarkBremsstrahlungModel> model) : model_{model} { }
+
+            /**
+             * Get the value of the cross section for the input key
+             * and calculate the cross section if it wasn't calculated before.
+             *
+             * @raises Exception if no model is available for calculating cross sections
+             * @param[in] energy Energy of incident electron [MeV]
+             * @param[in] A atomic mass of element [atomic mass units]
+             * @param[in] Z atomic number of element [num protons]
+             * @returns cross section corresponding to the input parameters (including units Geant4 style)
+             */
+            G4double get(G4double energy, G4double A, G4double Z);
+
+            /**
+             * Stream the entire table into the output stream.
+             *
+             * @param[in,out] o ostream to write to
+             */
+            void stream(std::ostream& o) const;
+
+            /**
+             * Overload the streaming operator for ease
+             *
+             * @param[in] o ostream to write to
+             * @param[in] c cache to write out
+             * @returns modified ostream
+             */
+            friend std::ostream& operator<<(std::ostream& o,const ElementXsecCache c) {
+                c.stream(o);
+                return o;
+            }
+
+        private:
+
+            /// The maximum value of A
+            static const int MAX_A{1000};
+
+            /// The maximum value for energy
+            static const int MAX_E{30000};
+
+            /**
+             * Compute a key for the cache map
+             * Generating a unique key _after_ making the energy [MeV] an integer.
+             * The atomic mass (A) and charge (Z) are given by Geant4 as doubles as well,
+             * so I cast them to integers before computing the key.
+             *
+             * This is what you would edit if you want a more/less find-grained cache
+             * of Xsecs. Right now, since the internal unit of energy in Geant4 is MeV,
+             * the cache is binned at the 1MeV scale.
+             *
+             * @param[in] energy Energy of incident electron [MeV]
+             * @param[in] A atomic mass of element [atomic mass units]
+             * @param[in] Z atomic number of element [num protons]
+             * @returns unsigned integer cache key for these three inputs
+             */
+            unsigned int computeKey(G4double energy, G4double A, G4double Z) const;
+
+        private:
+
+            /// the actual map from cache keys to calculated cross sections
+            std::map<unsigned int,G4double> the_cache_;
+
+            /// shared pointer to the model for calculating cross sections
+            std::shared_ptr<G4eDarkBremsstrahlungModel> model_;
+
+    }; //ElementXsecCache
+
+    /**
      * @class G4eDarkBremsstrahlung
      *
      * Class that represents the dark brem process.
@@ -131,6 +219,11 @@ namespace ldmx {
              *  2. Defines the EM subtype as one different from all other EM processes
              *     - Needed so we don't replace another EM process
              *  3. Configures the process and passes the model parameters to the model
+             *
+             * If caching the cross section is enabled, we calculate several
+             * common cross sections immediately to help even out the time
+             * it takes to simulate events.
+             * @see CalculateCommonXsec
              */
             G4eDarkBremsstrahlung(const Parameters& params);
       
@@ -179,7 +272,23 @@ namespace ldmx {
              * @returns G4VParticleChange detailing how this process changes the track
              */
             virtual G4VParticleChange* PostStepDoIt(const G4Track& track, const G4Step& step);
-     
+
+            /**
+             * Calculate common cross sections for the cache using the already-created model.
+             *
+             * This method is public so that we can access it for writing a short executable
+             * to print the cache to a file.
+             */
+            void CalculateCommonXsec();
+
+            /**
+             * Get a const reference to the cross section cache.
+             *
+             * Again, this method is public only to be available to the executable
+             * that generates a cross section table.
+             */
+            const ElementXsecCache& getCache() const { return element_xsec_cache_; }
+
         protected:
 
             /**
@@ -232,8 +341,13 @@ namespace ldmx {
 
             /**
              * The model that we are using in this run.
+             *
+             * Shared with the chaching class.
              */
-            std::unique_ptr<G4eDarkBremsstrahlungModel> theModel_;
+            std::shared_ptr<G4eDarkBremsstrahlungModel> model_;
+
+            /// Our instance of a cross section cache
+            ElementXsecCache element_xsec_cache_;
 
             /// Enable logging for this process
             enableLogging("DarkBremProcess")
