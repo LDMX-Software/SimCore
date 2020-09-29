@@ -30,7 +30,7 @@ namespace ldmx {
          * Geant4 registers all instances derived from G4ParticleDefinition and 
          * deletes them at the end of the run.
          */
-        G4APrime::APrime(parameters_.getParameter<double>("ap_mass"));
+        G4APrime::APrime(parameters_.getParameter<double>("ap_mass")*MeV);
     }
 
     void APrimePhysics::ConstructProcess() {
