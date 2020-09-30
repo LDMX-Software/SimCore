@@ -164,10 +164,13 @@ TEST_CASE( "Custom Geant4 Dark Brem Process" , "[SimCore][signal][functionality]
 
             /**
              * List of incident electron momentum magnitudes [MeV]
-             * that we want to check
+             * that we want to check, toss in a few odd
+             * values to make sure they are different from 
+             * the values in the library
              */
             std::vector<double> incident_total_momenta = {
-                4000.,3800.,3500.,3000.,2500.,2100. };
+                4000.,3947.,3800.,3777.,3681.,3500.,3001.,3000.,2500.,2100. 
+            };
 
             /**
              * List of angles we want to test as well.
