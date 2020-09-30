@@ -101,9 +101,7 @@ namespace ldmx {
          * Geant4 has decided that it is our time to interact,
          * so we are going to change the particle
          */
-        ldmx_log(info)
-            << "(" << G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetEventID() << ") "
-            << "A dark brem occurred!";
+        ldmx_log(info) << "A dark brem occurred!";
 
         if ( only_one_per_event_ ) {
             //Deactivate the process after one dark brem if we restrict ourselves to only one per event.

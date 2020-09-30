@@ -1,5 +1,7 @@
 #include "catch.hpp"
 
+#include "G4Electron.hh"
+
 //----------//
 //   LDMX   //
 //----------//
@@ -22,7 +24,7 @@ namespace SimCore {
  * @param[in] element atomic mass [amu]
  * @param[in] element atomic number
  */
-void test_calculation( ldmx::ElementXsecCache& the_cache, std::map<double,double> energy_to_xsec, double A, double Z ) {
+void xsec_calculation( ldmx::ElementXsecCache& the_cache, std::map<double,double> energy_to_xsec, double A, double Z ) {
     for ( auto const& [ energy , xsec ] : energy_to_xsec ) {
         G4double actual_xsec;
         REQUIRE_NOTHROW( actual_xsec = the_cache.get( energy*MeV , A , Z ) );
@@ -30,13 +32,69 @@ void test_calculation( ldmx::ElementXsecCache& the_cache, std::map<double,double
     }
 }
 
+/**
+ * @func Test Momentum Conservation of Secondary Generation
+ *
+ * Takes the input incident electron 3-momentum,
+ * sets up the generation,
+ * and gets secondaries from the process.
+ *
+ * Then tests that these secondaries conserve momentum.
+ *
+ * @param[in] process dark brem process to generate secondaries
+ * @param[in] incident_momentum 3-momentum of incident electron to generate secondaries
+ */
+void secondary_generation(ldmx::G4eDarkBremsstrahlung& process, const G4ThreeVector& incident_momentum) {
+
+    //maximum momentum allowed to be leftover in units of MeV
+    static const double max_leftover_momentum{1e-6};
+
+    static const G4ThreeVector origin(0.,0.,0.);
+    static const G4double Mel{G4Electron::Electron()->GetPDGMass()};
+
+    //owned and cleaned by track
+    G4DynamicParticle *incident_electron = new G4DynamicParticle(G4Electron::Electron(),incident_momentum);
+
+    G4Track incident_track(incident_electron,0.,origin);
+
+    G4StepPoint* post_step_point = new G4StepPoint; //owned and clenaed by step
+    post_step_point->SetPosition(origin);
+    post_step_point->SetMomentumDirection(incident_momentum.unit());
+    post_step_point->SetMass(Mel);
+    post_step_point->SetKineticEnergy(sqrt(incident_momentum.mag2()+Mel*Mel)-Mel);
+
+    G4StepPoint* pre_step_point = new G4StepPoint; //owned and cleaned by step
+
+    G4Step incident_step;
+    incident_step.SetTrack( &incident_track );
+    incident_track.SetStep( &incident_step  );
+    incident_step.SetPostStepPoint( post_step_point );
+    incident_step.SetPreStepPoint( pre_step_point );
+
+    G4VParticleChange* particle_change = process.PostStepDoIt( incident_track , incident_step );
+
+    G4ThreeVector total_momentum = incident_momentum;
+    for ( unsigned int iSecondary{0}; iSecondary < particle_change->GetNumberOfSecondaries(); iSecondary++ ) {
+        G4ThreeVector secondary_momentum = particle_change->GetSecondary(iSecondary)->GetMomentum();
+        total_momentum -= secondary_momentum;
+    }
+    particle_change->Clear(); //reset particle change for next time
+
+    //consider the total momentum 0 if it is less than an eV
+    CHECK(total_momentum.mag() <= 1e-6);
+}
+
 } //SimCore
 } //test
 } //ldmx
 
 /**
- * The executable main for printing out the table.
+ * Test that the dark brem process is functioning properly.
+ * Does _not_ check physical realness.
  *
+ * Checks:
+ *  - Xsec calculation correct for a few energy points and elements
+ *  - Secondaries are produced and conserve momentum
  */
 TEST_CASE( "Custom Geant4 Dark Brem Process" , "[SimCore][signal][functionality]" ) {
 
@@ -89,7 +147,7 @@ TEST_CASE( "Custom Geant4 Dark Brem Process" , "[SimCore][signal][functionality]
                 { 1000. , 0.                } //below threshold should be zero
             };
 
-            ldmx::test::SimCore::test_calculation( the_cache , correct_xsec_10MeVap_silicon , 28.085 , 14. );
+            ldmx::test::SimCore::xsec_calculation( the_cache , correct_xsec_10MeVap_silicon , 28.085 , 14. );
 
             std::map<double,double> correct_xsec_10MeVap_tungsten = {
                 { 4000. , 61899940.025823   }, 
@@ -99,17 +157,51 @@ TEST_CASE( "Custom Geant4 Dark Brem Process" , "[SimCore][signal][functionality]
                 { 1000. , 0.                } //below threshold should be zero
             };
 
-            ldmx::test::SimCore::test_calculation( the_cache , correct_xsec_10MeVap_tungsten , 183.84 , 74. );
+            ldmx::test::SimCore::xsec_calculation( the_cache , correct_xsec_10MeVap_tungsten , 183.84 , 74. );
         }
     
         SECTION( "Creating Secondaries" ) {
 
-            //particle_change = db_process.PostStepDoIt( track , step );
-    
-        }
+            /**
+             * List of incident electron momentum magnitudes [MeV]
+             * that we want to check
+             */
+            std::vector<double> incident_total_momenta = {
+                4000.,3800.,3500.,3000.,2500.,2100. };
 
-    }
+            /**
+             * List of angles we want to test as well.
+             *
+             * The pair is
+             *  1. azimuthal angle phi
+             *  2. polar angle theta
+             * Both in radians.
+             */
+            std::vector<std::pair<double,double>> angles = {
+                std::make_pair( M_PI/4  , M_PI/4  ),
+                std::make_pair( M_PI/4  , M_PI/8  ),
+                std::make_pair( M_PI/4  , M_PI/12 ),
+                std::make_pair( M_PI/8  , M_PI/4  ),
+                std::make_pair( M_PI/8  , M_PI/8  ),
+                std::make_pair( M_PI/8  , M_PI/12 ),
+                std::make_pair( M_PI/12 , M_PI/4  ),
+                std::make_pair( M_PI/12 , M_PI/8  ),
+                std::make_pair( M_PI/12 , M_PI/12 )
+            };
+
+            for ( auto const &incident_total_momentum : incident_total_momenta ) {
+                G4ThreeVector three_momentum(0.,0.,incident_total_momentum*MeV);
+                ldmx::test::SimCore::secondary_generation( db_process , three_momentum );
+                for ( auto const& [ phi , theta ] : angles ) {
+                    three_momentum.setRThetaPhi( three_momentum.mag() , theta , phi );
+                    ldmx::test::SimCore::secondary_generation( db_process , three_momentum );
+                } //loop over angles
+            } //loop over momentum mags
+    
+        } //secondary creation test
+
+    } //specific dark brem vertex library model test
 
     ldmx::logging::close();
-}
+} //dark brem process test
 
