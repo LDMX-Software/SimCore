@@ -11,3 +11,5 @@
 /data
 /build*
 /install*
+# text file generated from the corresponding .in file
+test/DarkBremProcessTest.cxx

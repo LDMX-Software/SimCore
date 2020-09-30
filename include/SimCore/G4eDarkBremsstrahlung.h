@@ -117,7 +117,7 @@ namespace ldmx {
             ElementXsecCache(std::shared_ptr<G4eDarkBremsstrahlungModel> model) : model_{model} { }
 
             /**
-             * Get the value of the cross section for the input key
+             * Get the value of the cross section for the input variables
              * and calculate the cross section if it wasn't calculated before.
              *
              * @raises Exception if no model is available for calculating cross sections
@@ -285,12 +285,13 @@ namespace ldmx {
             void CalculateCommonXsec();
 
             /**
-             * Get a const reference to the cross section cache.
+             * Get a reference to the cross section cache.
              *
              * Again, this method is public only to be available to the executable
-             * that generates a cross section table.
+             * that generates a cross section table and testing.
+             * Do not use this unless you really know what you are doing.
              */
-            const ElementXsecCache& getCache() const { return element_xsec_cache_; }
+            ElementXsecCache& getCache() { return element_xsec_cache_; }
 
         protected:
 

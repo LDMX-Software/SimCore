@@ -56,9 +56,13 @@ set_target_properties(SimCore PROPERTIES
     CXX_EXTENSIONS NO
 )
 
+# Add compiled tests
+configure_file(${PROJECT_SOURCE_DIR}/test/DarkBremProcessTest.cxx.in ${PROJECT_SOURCE_DIR}/test/DarkBremProcessTest.cxx)
+setup_test(dependencies DARK::SimCore Geant4::Interface)
+
 # Configure the executable so it knows the installation path of the db vertex libraries
-configure_file(${PROJECT_SOURCE_DIR}/src/print_dark_brem_xsec_table.cxx ${CMAKE_CURRENT_BINARY_DIR}/bin/db_configured_printing.cxx)
-add_executable(print-dark-brem-xsec-table ${CMAKE_CURRENT_BINARY_DIR}/bin/db_configured_printing.cxx)
+configure_file(${PROJECT_SOURCE_DIR}/src/print_dark_brem_xsec_table.cxx ${CMAKE_CURRENT_BINARY_DIR}/bin/print_dark_brem_xsec_table.cxx)
+add_executable(print-dark-brem-xsec-table ${CMAKE_CURRENT_BINARY_DIR}/bin/print_dark_brem_xsec_table.cxx)
 
 # Link to the Framework library
 target_link_libraries(print-dark-brem-xsec-table PRIVATE Geant4::Interface DARK::SimCore DARK::Framework)
