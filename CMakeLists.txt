@@ -32,18 +32,21 @@ if(BUILD_EVENT_ONLY)
                   
 endif()
 
-
 # Configure Geant4
 setup_geant4_target()
 
+file(GLOB GEO_SRC_FILES ${PROJECT_SOURCE_DIR}/src/SimCore/Geo/*.cxx)
+file(GLOB SRC_FILES ${PROJECT_SOURCE_DIR}/src/SimCore/*.cxx)
+set(SRC_FILES ${GEO_SRC_FILES} ${SRC_FILES})
+message(STATUS ${registered_targets})
 
 # Setup the library 
 setup_library(name SimCore 
               dependencies Geant4::Interface 
                            ROOT::Physics
-                           Framework::Configure DetDescr::DetDescr 
+                           Framework::Configure DetDescr::DetDescr
                            "${registered_targets}"
-              python_install_path ${PYTHON_INSTALL_PREFIX})
+                           sources  ${SRC_FILES})
 
 # Set some target properties
 set_target_properties(SimCore PROPERTIES 
