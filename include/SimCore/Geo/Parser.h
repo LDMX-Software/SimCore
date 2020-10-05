@@ -1,13 +1,22 @@
 #ifndef SIMCORE_GEO_GEOPARSER_H_
 #define SIMCORE_GEO_GEOPARSER_H_
 
+/*~~~~~~~~~~~~~~~~*/
+/*   C++ StdLib   */
+/*~~~~~~~~~~~~~~~~*/
+#include <functional>
+
+/*~~~~~~~~~~~~~~~*/
+/*   Framework   */
+/*~~~~~~~~~~~~~~~*/
+#include "Framework/Configure/Parameters.h"
+
 /*~~~~~~~~~~~~*/
 /*   Geant4   */
 /*~~~~~~~~~~~~*/
 #include "G4VPhysicalVolume.hh"
 
 namespace simcore {
-
 namespace geo {
 
 /**
@@ -18,7 +27,7 @@ namespace geo {
  */
 class Parser {
 
- public:
+public:
   /**
    * Pure virtual method used to retrieve the G4VPhysicalVolume associated with
    * the most top-level (world) volume.
@@ -26,7 +35,25 @@ class Parser {
    * @return The world volume.
    */
   virtual G4VPhysicalVolume *GetWorldVolume() = 0;
+
+  /**
+   * Get the name of the parsed detector.
+   *
+   * This name is typically extracted from the file containing the detector
+   * description.
+   *
+   * @return The name of the detector.
+   */
+  virtual std::string getDetectorName() = 0;
+
+  /**
+   * Parse the detector geometry and read it into memory.
+   */
+  virtual void read() = 0;
+
 }; // Parser
+
+using createFunc = std::function<Parser *(ldmx::Parameters &parameters)>;
 
 } // namespace geo
 } // namespace simcore
