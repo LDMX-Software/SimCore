@@ -72,7 +72,7 @@ namespace ldmx {
         // Create the run header.
         RunHeader runHeader( 
                 run_,
-                detector->getDetectorHeader()->getName(), 
+                detector->getDetectorName(), 
                 parameters_.getParameter<std::string>("description")
                 );
 

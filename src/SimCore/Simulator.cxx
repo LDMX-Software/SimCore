@@ -19,6 +19,7 @@
 #include "SimCore/RootPersistencyManager.h" 
 #include "SimCore/RunManager.h"
 #include "SimCore/G4Session.h"
+#include "SimCore/Geo/ParserFactory.h"
 
 /*~~~~~~~~~~~~~~*/
 /*    Geant4    */
@@ -77,7 +78,9 @@ namespace ldmx {
 
         // Instantiate the GDML parser and corresponding messenger owned and
         // managed by DetectorConstruction
-        G4GDMLParser *parser = new G4GDMLParser;
+        //G4GDMLParser *parser = new G4GDMLParser;
+        auto parser_factory{simcore::geo::ParserFactory::getInstance()}; 
+        auto parser{parser_factory->createParser("gdml", parameters)}; 
 
         // Instantiate the class so cascade parameters can be set.
         G4CascadeParameters::Instance();
@@ -87,13 +90,14 @@ namespace ldmx {
         runManager_->SetUserInitialization( new DetectorConstruction( parser , parameters ) );
 
         // Parse the detector geometry and validate if specified.
-        auto detectorPath{parameters_.getParameter< std::string >("detector")};
-        auto validateGeometry{parameters_.getParameter< bool >("validate_detector")}; 
-        if ( verbosity_ > 0 ) {
-            std::cout << "[ Simulator ] : Reading in geometry from '" << detectorPath << "'... " << std::flush;
-        }
+        //auto detectorPath{parameters_.getParameter< std::string >("detector")};
+        //auto validateGeometry{parameters_.getParameter< bool >("validate_detector")}; 
+        //if ( verbosity_ > 0 ) {
+        //    std::cout << "[ Simulator ] : Reading in geometry from '" << detectorPath << "'... " << std::flush;
+        //}
         G4GeometryManager::GetInstance()->OpenGeometry();
-        parser->Read( detectorPath, validateGeometry );
+        //parser->Read( detectorPath, validateGeometry );
+        parser->read(); 
         runManager_->DefineWorldVolume( parser->GetWorldVolume() );
 
         auto preInitCommands = parameters_.getParameter< std::vector< std::string > >("preInitCommands" ,{} ); 

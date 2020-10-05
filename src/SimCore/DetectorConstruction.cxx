@@ -7,18 +7,18 @@
 
 namespace ldmx {
 
-DetectorConstruction::DetectorConstruction(G4GDMLParser *theParser,
+DetectorConstruction::DetectorConstruction(simcore::geo::Parser *parser,
                                            Parameters &parameters)
-    : parser_(theParser),
-      auxInfoReader_(new AuxInfoReader(theParser, parameters)) {
+    : parser_(parser) {
+      //auxInfoReader_(new AuxInfoReader(parser, parameters)) {
   parameters_ = parameters;
 }
 
-DetectorConstruction::~DetectorConstruction() { delete auxInfoReader_; }
+DetectorConstruction::~DetectorConstruction() {}//delete auxInfoReader_; }
 
 G4VPhysicalVolume *DetectorConstruction::Construct() {
-  auxInfoReader_->readGlobalAuxInfo();
-  auxInfoReader_->assignAuxInfoToVolumes();
+  //auxInfoReader_->readGlobalAuxInfo();
+  //auxInfoReader_->assignAuxInfoToVolumes();
   return parser_->GetWorldVolume();
 }
 

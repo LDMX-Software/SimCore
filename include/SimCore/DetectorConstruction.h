@@ -8,7 +8,7 @@
 #define SIMCORE_DETECTORCONSTRUCTION_H_
 
 // LDMX
-#include "AuxInfoReader.h"
+//#include "AuxInfoReader.h"
 
 // Biasing
 #include "SimCore/DarkBremXsecBiasingOperator.h"
@@ -17,7 +17,6 @@
 #include "SimCore/PhotoNuclearXsecBiasingOperator.h"
 
 // Geant4
-#include "G4GDMLParser.hh"
 #include "G4LogicalVolume.hh"
 #include "G4LogicalVolumeStore.hh"
 #include "G4VUserDetectorConstruction.hh"
@@ -26,6 +25,23 @@
 /*   Framework   */
 /*~~~~~~~~~~~~~~~*/
 #include "Framework/Configure/Parameters.h"
+
+/*~~~~~~~~~~~~~~*/
+/*   DetDescr   */
+/*~~~~~~~~~~~~~~*/
+//#include "DetDescr/DetectorHeader.h" 
+
+/*~~~~~~~~~~~~~*/
+/*   SimCore   */
+/*~~~~~~~~~~~~~*/
+#include "SimCore/Geo/Parser.h" 
+
+// Forward declaration
+namespace simcore {
+namespace geo { 
+class Parser; 
+}
+}
 
 namespace ldmx {
 
@@ -45,9 +61,9 @@ class DetectorConstruction : public G4VUserDetectorConstruction {
 public:
   /**
    * Class constructor.
-   * @param theParser GDML parser defining the geometry.
+   * @param parser The parser used to parse the geometry. 
    */
-  DetectorConstruction(G4GDMLParser *theParser, Parameters &parameters);
+  DetectorConstruction(simcore::geo::Parser *parser, Parameters &parameters);
 
   /**
    * Class destructor.
@@ -65,23 +81,25 @@ public:
   void ConstructSDandField();
 
   /**
-   * Get the detector header.
-   * @return The detector header.
+   * Get the name of this detector. 
+   *
+   * This is typicall set in the detector description file used to build this
+   * detector.
+   *
+   * @return The detector name.
    */
-  ldmx::DetectorHeader *getDetectorHeader() {
-    return auxInfoReader_->getDetectorHeader();
-  }
+  std::string getDetectorName() { return parser_->getDetectorName(); }
 
 private:
   /**
    * The GDML parser defining the detector.
    */
-  G4GDMLParser *parser_;
+  simcore::geo::Parser *parser_;
 
   /**
    * The auxiliary GDML info reader.
    */
-  AuxInfoReader *auxInfoReader_;
+  //AuxInfoReader *auxInfoReader_;
 
   /// The set of parameters used to configure this class
   Parameters parameters_;
