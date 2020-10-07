@@ -50,7 +50,7 @@ public:
    *
    * @return The name of the detector.
    */
-  std::string getDetectorName() final override;
+  std::string getDetectorName() final override { return detector_name_; };
 
   /**
    * Parse the detector geometry and read it into memory.
@@ -73,6 +73,9 @@ private:
 
   /// The parameters used to configure this parser
   ldmx::Parameters parameters_;
+
+  /// The name of the parsed detector
+  std::string detector_name_{""}; 
 
 }; // GDMLParser
 } // namespace geo

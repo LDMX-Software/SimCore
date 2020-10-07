@@ -34,7 +34,7 @@ public:
 
 private:
   /// Static instance of this class
-  static ParserFactory *instance;
+  static ParserFactory *instance_;
 
   /// Default constructor
   ParserFactory();
