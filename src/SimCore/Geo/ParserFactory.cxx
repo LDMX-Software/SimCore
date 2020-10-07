@@ -9,10 +9,12 @@
 namespace simcore {
 namespace geo {
 
+ParserFactory* ParserFactory::instance_ = nullptr;  
+
 ParserFactory *ParserFactory::getInstance() {
-  if (!instance)
-    instance = new ParserFactory;
-  return instance;
+  if (!instance_)
+    instance_ = new ParserFactory;
+  return instance_;
 }
 
 ParserFactory::ParserFactory() { registerParser("gdml", &GDMLParser::create); }

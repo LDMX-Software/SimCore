@@ -10,18 +10,15 @@ GDMLParser::GDMLParser(ldmx::Parameters &parameters) {
 }
 
 G4VPhysicalVolume *GDMLParser::GetWorldVolume() {
-  info_->readGlobalAuxInfo();
-  info_->assignAuxInfoToVolumes();
   return parser_->GetWorldVolume();
 }
 
 void GDMLParser::read() {
   parser_->Read(parameters_.getParameter<std::string>("detector"),
                 parameters_.getParameter<bool>("validate_detector"));
-}
-
-std::string GDMLParser::getDetectorName() {
-  info_->getDetectorHeader()->getName();
+  info_->readGlobalAuxInfo();
+  info_->assignAuxInfoToVolumes();
+  detector_name_ = info_->getDetectorHeader()->getName(); 
 }
 
 } // namespace geo
