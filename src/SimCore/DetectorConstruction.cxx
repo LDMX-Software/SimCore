@@ -10,15 +10,13 @@ namespace ldmx {
 DetectorConstruction::DetectorConstruction(simcore::geo::Parser *parser,
                                            Parameters &parameters)
     : parser_(parser) {
-      //auxInfoReader_(new AuxInfoReader(parser, parameters)) {
   parameters_ = parameters;
 }
 
-DetectorConstruction::~DetectorConstruction() {}//delete auxInfoReader_; }
+DetectorConstruction::~DetectorConstruction() {}
 
 G4VPhysicalVolume *DetectorConstruction::Construct() {
-  //auxInfoReader_->readGlobalAuxInfo();
-  //auxInfoReader_->assignAuxInfoToVolumes();
+  detector_name_ = parser_->getDetectorName();
   return parser_->GetWorldVolume();
 }
 
