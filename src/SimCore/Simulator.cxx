@@ -76,11 +76,11 @@ namespace ldmx {
         // Instantiate the run manager.  
         runManager_ = std::make_unique<RunManager>(parameters);
 
-        // Instantiate the GDML parser and corresponding messenger owned and
-        // managed by DetectorConstruction
-        //G4GDMLParser *parser = new G4GDMLParser;
-        auto parser_factory{simcore::geo::ParserFactory::getInstance()}; 
-        auto parser{parser_factory->createParser("gdml", parameters)}; 
+        // Create a parser of the given type.  The type is specified by the
+        // user via a parameter.
+        auto parser_type{parameters_.getParameter<std::string>("parser", "gdml")};
+        auto parser_factory{simcore::geo::ParserFactory::getInstance()};
+        auto parser{parser_factory->createParser(parser_type, parameters)}; 
 
         // Instantiate the class so cascade parameters can be set.
         G4CascadeParameters::Instance();
@@ -90,14 +90,10 @@ namespace ldmx {
         runManager_->SetUserInitialization( new DetectorConstruction( parser , parameters ) );
 
         // Parse the detector geometry and validate if specified.
-        //auto detectorPath{parameters_.getParameter< std::string >("detector")};
-        //auto validateGeometry{parameters_.getParameter< bool >("validate_detector")}; 
-        //if ( verbosity_ > 0 ) {
-        //    std::cout << "[ Simulator ] : Reading in geometry from '" << detectorPath << "'... " << std::flush;
-        //}
         G4GeometryManager::GetInstance()->OpenGeometry();
-        //parser->Read( detectorPath, validateGeometry );
-        parser->read(); 
+        parser->read();
+
+        // Once the detector has been built, specify the world volume.  
         runManager_->DefineWorldVolume( parser->GetWorldVolume() );
 
         auto preInitCommands = parameters_.getParameter< std::vector< std::string > >("preInitCommands" ,{} ); 
