@@ -110,6 +110,7 @@ class simulator(Producer):
         self.rootPrimaryGenUseSeed = False
         self.validate_detector = False
         self.verbosity = 0
+        self.parser = 'gdml'
 
         # Biasing stuff
         self.biasing_enabled = False
