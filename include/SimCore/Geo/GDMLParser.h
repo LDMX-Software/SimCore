@@ -24,6 +24,10 @@ namespace simcore {
 namespace geo {
 
 /**
+ * The parser for reading GDML files into Geant4.
+ * 
+ * This class extends the interface Parser which allows creation of the parser
+ * at runtime via a factory. 
  */
 class GDMLParser : public Parser {
 
@@ -52,13 +56,15 @@ public:
    */
   std::string getDetectorName() final override { return detector_name_; };
 
-  /**
-   * Parse the detector geometry and read it into memory.
-   */
+  /// Parse the detector geometry and read it into memory.
   void read() final override;
 
   /**
    * Create an instance of this parser.
+   * 
+   * @param parameters The parameter set used to configure this parser.
+   *
+   * @return An instance of a GDMLParser object.
    */
   static Parser *create(ldmx::Parameters &parameters) {
     return new GDMLParser(parameters);
