@@ -36,6 +36,22 @@ endif()
 # Configure Geant4
 setup_geant4_target()
 
+# If the path to the LCDD headers and libraries has been specified, search for
+# the package and configure it
+if(LCDD_DIR)
+  find_package(LCDD)
+  set(registered_targets ${registered_targets} LCDD::LCDD
+      CACHE INTERNAL "registered_targets")
+endif()
+
+# If the path to the GDML headers and libraries has been specified, search for
+# the package and configure it
+if(GDML_DIR)
+  find_package(GDML)
+  set(registered_targets ${registered_targets} GDML::GDML
+      CACHE INTERNAL "registered_targets")
+endif()
+
 file(GLOB SRC_FILES ${PROJECT_SOURCE_DIR}/src/SimCore/Geo/*.cxx
                     ${PROJECT_SOURCE_DIR}/src/SimCore/*.cxx)
 
