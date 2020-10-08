@@ -5,11 +5,12 @@
 /*   SimCore   */
 /*~~~~~~~~~~~~~*/
 #include "SimCore/Geo/GDMLParser.h"
+#include "SimCore/Geo/LCDDParser.h"
 
 namespace simcore {
 namespace geo {
 
-ParserFactory* ParserFactory::instance_ = nullptr;  
+ParserFactory *ParserFactory::instance_ = nullptr;
 
 ParserFactory *ParserFactory::getInstance() {
   if (!instance_)
@@ -17,7 +18,10 @@ ParserFactory *ParserFactory::getInstance() {
   return instance_;
 }
 
-ParserFactory::ParserFactory() { registerParser("gdml", &GDMLParser::create); }
+ParserFactory::ParserFactory() {
+  registerParser("gdml", &GDMLParser::create);
+  registerParser("lcdd", &LCDDParser::create);
+}
 
 void ParserFactory::registerParser(const std::string &name, createFunc create) {
   parser_map[name] = create;
