@@ -50,7 +50,7 @@ void LCDDParser::read() {
 
   // Get the header to extract the detector name.
   auto header{LCDDProcessor::instance()->getHeader()};
-  detector_data_ = header->getDetectorName();
+  detector_name_ = header->getDetectorName();
 
   // Get the world volume created by the parser.
   try {
