@@ -76,7 +76,7 @@ G4bool RootPersistencyManager::Store(const G4Run *) {
                       ->getDetectorConstruction();
 
   // Create the run header.
-  RunHeader runHeader(run_, detector->getDetectorHeader()->getName(),
+  RunHeader runHeader(run_, detector->getDetectorName(),
                       parameters_.getParameter<std::string>("description"));
 
   // Set parameter value with number of events processed.
