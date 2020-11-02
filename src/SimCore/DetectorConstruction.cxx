@@ -8,7 +8,8 @@
 namespace ldmx {
 
 DetectorConstruction::DetectorConstruction(simcore::geo::Parser *parser,
-                                           Parameters &parameters)
+                                           Parameters &parameters,
+                                           ConditionsInterface& ci) :
     : parser_(parser) {
   parameters_ = parameters;
 }

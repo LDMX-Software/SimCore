@@ -11,6 +11,10 @@ project(
 # Search and configure ROOT
 find_package(ROOT CONFIG REQUIRED)
 
+# Search for Boost
+find_package(Boost REQUIRED
+             COMPONENTS log)
+
 option(BUILD_EVENT_ONLY "Build the event library." ON)
 if(BUILD_EVENT_ONLY)
 
@@ -62,7 +66,9 @@ setup_library(name SimCore
               dependencies Geant4::Interface
                            ROOT::Physics
                            Framework::Configure
+                           Framework::Framework
                            DetDescr::DetDescr
+                           Boost::log
                            "${registered_targets}"
               sources ${SRC_FILES})
 
