@@ -25,15 +25,15 @@ namespace geo {
 
 /**
  * The parser for reading GDML files into Geant4.
- * 
+ *
  * This class extends the interface Parser which allows creation of the parser
- * at runtime via a factory. 
+ * at runtime via a factory.
  */
 class GDMLParser : public Parser {
 
 public:
   /// Default constructor
-  GDMLParser(ldmx::Parameters &parameters);
+  GDMLParser(ldmx::Parameters &parameters, ldmx::ConditionsInterface &ci);
 
   /// Default destructor
   ~GDMLParser();
@@ -61,13 +61,14 @@ public:
 
   /**
    * Create an instance of this parser.
-   * 
+   *
    * @param parameters The parameter set used to configure this parser.
    *
    * @return An instance of a GDMLParser object.
    */
-  static Parser *create(ldmx::Parameters &parameters) {
-    return new GDMLParser(parameters);
+  static Parser *create(ldmx::Parameters &parameters,
+                        ldmx::ConditionsInterface &ci) {
+    return new GDMLParser(parameters, ci);
   }
 
 private:
@@ -81,7 +82,7 @@ private:
   ldmx::Parameters parameters_;
 
   /// The name of the parsed detector
-  std::string detector_name_{""}; 
+  std::string detector_name_{""};
 
 }; // GDMLParser
 } // namespace geo

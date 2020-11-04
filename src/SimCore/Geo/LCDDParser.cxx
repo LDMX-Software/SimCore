@@ -21,7 +21,8 @@ extern "C" void LCDDLibLoad();
 namespace simcore {
 namespace geo {
 
-LCDDParser::LCDDParser(ldmx::Parameters &parameters) {
+LCDDParser::LCDDParser(ldmx::Parameters &parameters,
+                       ldmx::ConditionsInterface &ci) {
   // Initialize the SAX parser.
   parser_ = std::make_unique<SAXProcessor>();
   parser_->Initialize();

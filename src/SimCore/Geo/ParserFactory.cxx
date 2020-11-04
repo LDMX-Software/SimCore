@@ -4,6 +4,7 @@
 /*~~~~~~~~~~~~~*/
 /*   SimCore   */
 /*~~~~~~~~~~~~~*/
+#include "SimCore/ConditionsInterface.h"
 #include "SimCore/Geo/GDMLParser.h"
 #include "SimCore/Geo/LCDDParser.h"
 
@@ -28,10 +29,11 @@ void ParserFactory::registerParser(const std::string &name, createFunc create) {
 }
 
 Parser *ParserFactory::createParser(const std::string &name,
-                                    ldmx::Parameters &parameters) {
+                                    ldmx::Parameters &parameters,
+                                    ldmx::ConditionsInterface &ci) {
   auto it{parser_map.find(name)};
   if (it != parser_map.end())
-    return it->second(parameters);
+    return it->second(parameters, ci);
   return nullptr;
 }
 

@@ -30,7 +30,8 @@ public:
    *
    * @parser[in] type String type of the perser that needs to be created.
    */
-  Parser *createParser(const std::string &name, ldmx::Parameters &parameters);
+  Parser *createParser(const std::string &name, ldmx::Parameters &parameters,
+                       ldmx::ConditionsInterface &ci);
 
 private:
   /// Static instance of this class

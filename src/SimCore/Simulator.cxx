@@ -87,7 +87,8 @@ void Simulator::configure(Parameters &parameters) {
   // user via a parameter.
   auto parser_type{parameters_.getParameter<std::string>("parser", "gdml")};
   auto parser_factory{simcore::geo::ParserFactory::getInstance()};
-  auto parser{parser_factory->createParser(parser_type, parameters)};
+  auto parser{
+      parser_factory->createParser(parser_type, parameters, conditionsIntf_)};
 
   // Instantiate the class so cascade parameters can be set.
   G4CascadeParameters::Instance();
@@ -122,7 +123,7 @@ void Simulator::configure(Parameters &parameters) {
   }
 }
 
-void Simulator::onFileOpen(EventFile &file) {
+void Simulator::onFileOpen(framework::EventFile &file) {
   // Initialize persistency manager and connect it to the current EventFile
   persistencyManager_ =
       std::make_unique<simcore::persist::RootPersistencyManager>(
@@ -137,10 +138,10 @@ void Simulator::beforeNewRun(RunHeader &header) {
       static_cast<RunManager *>(RunManager::GetRunManager())
           ->getDetectorConstruction();
 
-  if (!detector or !detector->getDetectorHeader())
+  if (!detector)
     EXCEPTION_RAISE("SimSetup", "Detector not constructed before run start.");
 
-  header.setDetectorName(detector->getDetectorHeader()->getName());
+  header.setDetectorName(detector->getDetectorName());
   header.setDescription(parameters_.getParameter<std::string>("description"));
 
   header.setIntParameter("Save ECal Hit Contribs",
@@ -367,7 +368,7 @@ void Simulator::onProcessStart() {
   return;
 }
 
-void Simulator::onFileClose(EventFile &) {
+void Simulator::onFileClose(framework::EventFile &) {
 
   // End the current run and print out some basic statistics if verbose
   // level > 0.

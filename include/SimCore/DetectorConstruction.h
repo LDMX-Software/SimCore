@@ -22,6 +22,7 @@
 #include "SimCore/GammaToMuPairXsecBiasingOperator.h"
 #include "SimCore/PhotoNuclearXsecBiasingOperator.h"
 #include "SimCore/Geo/Parser.h"
+#include "SimCore/ConditionsInterface.h" 
 
 // Forward declaration
 namespace simcore {
@@ -45,7 +46,7 @@ public:
    * @param parser The parser used to parse the geometry.
    * @param parameters The parameters used to configure this class.
    */
-  DetectorConstruction(simcore::geo::Parser *parser, Parameters &parameters);
+  DetectorConstruction(simcore::geo::Parser *parser, Parameters &parameters, ConditionsInterface& ci);
 
   /// Class destructor
   virtual ~DetectorConstruction();

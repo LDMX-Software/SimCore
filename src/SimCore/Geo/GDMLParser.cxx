@@ -3,9 +3,10 @@
 namespace simcore {
 namespace geo {
 
-GDMLParser::GDMLParser(ldmx::Parameters &parameters) {
+GDMLParser::GDMLParser(ldmx::Parameters &parameters,
+                       ldmx::ConditionsInterface &ci) {
   parser_ = std::make_unique<G4GDMLParser>();
-  info_ = std::make_unique<ldmx::AuxInfoReader>(parser_.get(), parameters);
+  info_ = std::make_unique<ldmx::AuxInfoReader>(parser_.get(), parameters, ci);
   parameters_ = parameters;
 }
 
@@ -18,7 +19,7 @@ void GDMLParser::read() {
                 parameters_.getParameter<bool>("validate_detector"));
   info_->readGlobalAuxInfo();
   info_->assignAuxInfoToVolumes();
-  detector_name_ = info_->getDetectorHeader()->getName(); 
+  detector_name_ = info_->getDetectorHeader()->getName();
 }
 
 } // namespace geo

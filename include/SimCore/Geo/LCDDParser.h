@@ -38,7 +38,7 @@ class LCDDParser : public Parser {
 
 public:
   /// Default constructor
-  LCDDParser(ldmx::Parameters &parameters);
+  LCDDParser(ldmx::Parameters &parameters, ldmx::ConditionsInterface &ci);
 
   /// Default destructor
   ~LCDDParser();
@@ -71,8 +71,8 @@ public:
    *
    * @return An instance of a LCDDParser object.
    */
-  static Parser *create(ldmx::Parameters &parameters) {
-    return new LCDDParser(parameters);
+  static Parser *create(ldmx::Parameters &parameters, ldmx::ConditionsInterface &ci) {
+    return new LCDDParser(parameters, ci);
   }
 
 private:

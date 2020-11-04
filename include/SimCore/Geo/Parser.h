@@ -11,6 +11,11 @@
 /*~~~~~~~~~~~~~~~*/
 #include "Framework/Configure/Parameters.h"
 
+/*~~~~~~~~~~~~~*/
+/*   SimCore   */
+/*~~~~~~~~~~~~~*/
+#include "SimCore/ConditionsInterface.h"
+
 /*~~~~~~~~~~~~*/
 /*   Geant4   */
 /*~~~~~~~~~~~~*/
@@ -53,7 +58,8 @@ public:
 
 }; // Parser
 
-using createFunc = std::function<Parser *(ldmx::Parameters &parameters)>;
+using createFunc = std::function<Parser *(ldmx::Parameters &parameters,
+                                          ldmx::ConditionsInterface &ci)>;
 
 } // namespace geo
 } // namespace simcore
