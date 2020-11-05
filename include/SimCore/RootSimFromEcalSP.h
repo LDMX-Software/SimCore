@@ -94,7 +94,7 @@ namespace ldmx {
             /**
              * The input root file
              */
-            std::unique_ptr<EventFile> ifile_;
+            std::unique_ptr<framework::EventFile> ifile_;
 
             /**
              * The input ldmx event bus

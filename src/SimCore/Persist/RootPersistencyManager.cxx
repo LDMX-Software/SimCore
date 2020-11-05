@@ -38,7 +38,7 @@
 namespace simcore {
 namespace persist {
 
-RootPersistencyManager::RootPersistencyManager(EventFile &file,
+RootPersistencyManager::RootPersistencyManager(framework::EventFile &file,
                                                Parameters &parameters,
                                                const int &runNumber,
                                                ConditionsInterface &ci)

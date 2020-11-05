@@ -38,9 +38,12 @@ class RootPersistencyManager;
 }
 }
 
+namespace framework { 
+class EventFile;  
+}
+
 namespace ldmx {
 
-    class EventFile;  
     class ParameterSet; 
     class RunManager;
     class DetectorConstruction;
@@ -114,7 +117,7 @@ namespace ldmx {
              *
              *  @param eventFile  The input/output file.  
              */
-            void onFileOpen(EventFile& eventFile) final override;
+            void onFileOpen(framework::EventFile& eventFile) final override;
 
             /**
              * Callback for the EventProcessor to take any necessary action
@@ -122,7 +125,7 @@ namespace ldmx {
              *
              * @param eventFile The intput/output file. 
              */
-            void onFileClose(EventFile& eventFile) final override;  
+            void onFileClose(framework::EventFile& eventFile) final override;  
 
             /**
              * Initialization of simulation

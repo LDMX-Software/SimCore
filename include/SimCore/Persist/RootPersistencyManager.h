@@ -66,7 +66,7 @@ public:
    * @param parameters configuration parameters from Simulator
    * @param runNumber current run identifer from Process
    */
-  RootPersistencyManager(EventFile &file, Parameters &parameters,
+  RootPersistencyManager(framework::EventFile &file, Parameters &parameters,
                          const int &runNumber, ConditionsInterface &ci);
 
   /// Destructor
@@ -197,7 +197,7 @@ private:
   int eventsCompleted_{-1};
 
   /// The output file.
-  EventFile &file_;
+  framework::EventFile &file_;
 
   /// The event container used to manage the tree/branches/collections.
   Event *event_{nullptr};

@@ -22,14 +22,20 @@
 //-------------//
 #include "SimCore/Event/SimParticle.h"
 #include "Framework/Configure/Parameters.h"
+#include "Framework/EventFileFactory.h" 
 
 namespace ldmx {
 
     RootCompleteReSim::RootCompleteReSim( const std::string& name , Parameters& parameters )
         : PrimaryGenerator( name , parameters ), ievent_( "InputReSim" )
     {
+  
+        // Instantiate the event file factory.  
+        auto event_file_factory{framework::EventFileFactory::getInstance()}; 
+        
         std::string filename = parameters_.getParameter< std::string >( "filePath" );
-        ifile_ = std::make_unique<EventFile>( filename );
+        ifile_ = event_file_factory->createEventFile("root", filename, 
+            nullptr, false, false, -1); 
         ifile_->setupEvent( &ievent_ );
 
         simParticleCollName_ = parameters.getParameter<std::string>( "collection_name" );
