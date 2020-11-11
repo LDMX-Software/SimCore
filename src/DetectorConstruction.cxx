@@ -66,9 +66,8 @@ namespace ldmx {
 
 
             for (G4LogicalVolume* volume : *G4LogicalVolumeStore::GetInstance()) {
-                G4String volumeName = volume->GetName();
-                //std::cout << "[ DetectorConstruction ]: " << "Volume: " << volume->GetName() << std::endl;
                 if (biasingVolume.compare("ecal") == 0) {
+                    G4String volumeName = volume->GetName();
                     if ((
                                volumeName.contains("Wthick") 
                             || volumeName.contains("Si")
@@ -78,17 +77,21 @@ namespace ldmx {
                         ) && volumeName.contains("volume")
                     ) {
                         xsecBiasing->AttachTo(volume);
-                        std::cout << "[ DetectorConstruction ]: " << "Attaching biasing operator " 
-                                  << xsecBiasing->GetName() << " to volume " 
-                                  << volume->GetName() << std::endl;
-                    }
-                } else if (volumeName.contains(biasingVolume)) {
-                    xsecBiasing->AttachTo(volume);
-                    std::cout << "[ DetectorConstruction ]: " 
-                              << "Attaching biasing operator " << xsecBiasing->GetName() 
-                              << " to volume " << volume->GetName() << std::endl;
-                }
-            }
-        }
-    }
+                        std::cout << "[ DetectorConstruction ]: " 
+                                  << "Attaching biasing operator " << xsecBiasing->GetName() 
+                                  << " to volume " << volume->GetName() << std::endl;
+                    } //volumeName matches the pattern of volumes within ECal
+                } else if (biasingVolume.compare("target") == 0) {
+                    auto region=volume->GetRegion();
+                    if (region and region->GetName().contains("target")) {
+                        xsecBiasing->AttachTo(volume);
+                        std::cout << "[ DetectorConstruction ]: " 
+                                  << "Attaching biasing operator " << xsecBiasing->GetName() 
+                                  << " to volume " << volume->GetName() << std::endl;
+                    } //name of region that contains this volume is 'target'
+                }//trying to bias target or ecal
+            } //loop over logical volumes
+
+        } //biasing is enabled
+    } //ConstructSDandField
 }
