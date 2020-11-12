@@ -2,7 +2,7 @@
 #include "SimCore/DarkBremVertexLibraryModel.h"
 
 #include "SimCore/G4APrime.h"
-#include "Framework/Exception.h"
+#include "Framework/Exception/Exception.h"
 #include "Framework/Logger.h"
 
 // Geant4

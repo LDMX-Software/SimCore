@@ -5,7 +5,7 @@
 //----------//
 //   LDMX   //
 //----------//
-#include "Framework/Parameters.h"
+#include "Framework/Configure/Parameters.h"
 #include "Framework/Logger.h"
 #include "SimCore/G4eDarkBremsstrahlung.h"
 #include "SimCore/G4APrime.h"

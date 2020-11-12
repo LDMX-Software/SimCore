@@ -6,7 +6,7 @@
 
 #include "SimCore/G4APrime.h"
 
-#include "Framework/Exception.h"
+#include "Framework/Exception/Exception.h"
 
 #include "globals.hh"
 #include "G4ParticleTable.hh"

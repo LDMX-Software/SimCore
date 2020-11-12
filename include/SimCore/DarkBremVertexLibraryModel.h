@@ -1,7 +1,7 @@
 #ifndef SIMCORE_DARKBREMVERTEXLIBRARYMODLE_H_
 #define SIMCORE_DARKBREMVERTEXLIBRARYMODLE_H_
 
-#include "Framework/Parameters.h"
+#include "Framework/Configure/Parameters.h"
 
 #include "SimCore/G4eDarkBremsstrahlung.h"
 

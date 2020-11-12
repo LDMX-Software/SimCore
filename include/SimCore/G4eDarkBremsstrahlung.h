@@ -8,9 +8,9 @@
 #ifndef SIMCORE_G4EDARKBREMSSTRAHLUNG_H_
 #define SIMCORE_G4EDARKBREMSSTRAHLUNG_H_
 
-#include "Framework/Parameters.h"
+#include "Framework/Configure/Parameters.h"
 #include "Framework/Logger.h"
-#include "Event/RunHeader.h"
+#include "Framework/RunHeader.h"
 
 // Geant
 #include "G4VDiscreteProcess.hh"

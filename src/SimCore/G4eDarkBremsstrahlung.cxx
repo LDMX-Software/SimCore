@@ -9,7 +9,7 @@
 #include "SimCore/G4APrime.h"
 #include "SimCore/DarkBremVertexLibraryModel.h"
 
-#include "Event/RunHeader.h"
+#include "Framework/RunHeader.h"
 
 #include "G4Electron.hh" //for electron definition
 #include "G4ProcessTable.hh" //for deactivating dark brem process
