@@ -3,7 +3,7 @@
 
 #include "Framework/Configure/Parameters.h"
 
-#include "SimCore/G4eDarkBremsstrahlung.h"
+#include "SimCore/DarkBrem/G4eDarkBremsstrahlung.h"
 
 // ROOT
 #include "TLorentzVector.h"
