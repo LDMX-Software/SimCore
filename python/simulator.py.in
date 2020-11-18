@@ -105,6 +105,7 @@ class simulator(Producer):
         self.validate_detector = False
         self.verbosity = 0
         self.parser = 'gdml'
+        self.persistency = 'root'
 
         # Biasing stuff
         self.biasing_enabled = False
