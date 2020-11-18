@@ -48,7 +48,7 @@ public:
    * Build SimParticle collection into an output event.
    * @param outputEvent The output event.
    */
-  void buildSimParticles(Event *outputEvent);
+  void buildSimParticles(framework::Event *outputEvent);
 
 private:
   /** The map of tracks to their parent IDs and Trajectory objects. */
