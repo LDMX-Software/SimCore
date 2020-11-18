@@ -20,6 +20,7 @@
 #include "SimCore/DetectorConstruction.h"
 #include "SimCore/G4Session.h"
 #include "SimCore/Geo/ParserFactory.h"
+#include "SimCore/Persist/PersistencyManagerFactory.h"
 #include "SimCore/Persist/RootPersistencyManager.h"
 #include "SimCore/RunManager.h"
 
@@ -124,14 +125,21 @@ void Simulator::configure(Parameters &parameters) {
 }
 
 void Simulator::onFileOpen(framework::EventFile &file) {
+
+  // Retrieve the persistency manager factory used to create the specified
+  // persistency manager
+  auto persist_factory{
+      simcore::persist::PersistencyManagerFactory::getInstance()};
+  auto type{parameters_.getParameter<std::string>("persistency", "root")};
+
   // Initialize persistency manager and connect it to the current EventFile
-  persistencyManager_ =
-      std::make_unique<simcore::persist::RootPersistencyManager>(
-          file, parameters_, this->getRunNumber(), conditionsIntf_);
+  persistencyManager_ = persist_factory->createPersistencyManager(
+      type, file, parameters_, getRunNumber(), conditionsIntf_);
   persistencyManager_->Initialize();
 }
 
-void Simulator::beforeNewRun(RunHeader &header) {
+void Simulator::beforeNewRun(
+    std::shared_ptr<framework::AbstractRunHeader> header) {
 
   // Get the detector header from the user detector construction
   DetectorConstruction *detector =
@@ -141,26 +149,27 @@ void Simulator::beforeNewRun(RunHeader &header) {
   if (!detector)
     EXCEPTION_RAISE("SimSetup", "Detector not constructed before run start.");
 
-  header.setDetectorName(detector->getDetectorName());
-  header.setDescription(parameters_.getParameter<std::string>("description"));
+  header->setDetectorName(detector->getDetectorName());
+  header->setDescription(parameters_.getParameter<std::string>("description"));
 
-  header.setIntParameter("Save ECal Hit Contribs",
-                         parameters_.getParameter<bool>("enableHitContribs"));
-  header.setIntParameter("Compress ECal Hit Contribs",
-                         parameters_.getParameter<bool>("compressHitContribs"));
-  header.setIntParameter(
+  header->setIntParameter("Save ECal Hit Contribs",
+                          parameters_.getParameter<bool>("enableHitContribs"));
+  header->setIntParameter(
+      "Compress ECal Hit Contribs",
+      parameters_.getParameter<bool>("compressHitContribs"));
+  header->setIntParameter(
       "Included Scoring Planes",
       !parameters_.getParameter<std::string>("scoringPlanes").empty());
-  header.setIntParameter(
+  header->setIntParameter(
       "Use Random Seed from Event Header",
       parameters_.getParameter<bool>("rootPrimaryGenUseSeed"));
 
   // lambda function for dumping 3-vectors into the run header
-  auto threeVectorDump = [&header](const std::string &name,
-                                   const std::vector<double> &vec) {
-    header.setFloatParameter(name + " X", vec.at(0));
-    header.setFloatParameter(name + " Y", vec.at(1));
-    header.setFloatParameter(name + " Z", vec.at(2));
+  auto threeVectorDump = [header](const std::string &name,
+                                  const std::vector<double> &vec) {
+    header->setFloatParameter(name + " X", vec.at(0));
+    header->setFloatParameter(name + " Y", vec.at(1));
+    header->setFloatParameter(name + " Z", vec.at(2));
   };
 
   auto beamSpotSmear{
@@ -169,11 +178,11 @@ void Simulator::beforeNewRun(RunHeader &header) {
     threeVectorDump("Smear Beam Spot [mm]", beamSpotSmear);
 
   // lambda function for dumping vectors of strings to the run header
-  auto stringVectorDump = [&header](const std::string &name,
-                                    const std::vector<std::string> &vec) {
+  auto stringVectorDump = [header](const std::string &name,
+                                   const std::vector<std::string> &vec) {
     int index = 0;
     for (auto const &val : vec) {
-      header.setStringParameter(name + " " + std::to_string(++index), val);
+      header->setStringParameter(name + " " + std::to_string(++index), val);
     }
   };
 
@@ -185,40 +194,40 @@ void Simulator::beforeNewRun(RunHeader &header) {
                        "postInitCommands", {}));
 
   if (parameters_.getParameter<bool>("biasing_enabled")) {
-    header.setStringParameter(
+    header->setStringParameter(
         "Biasing Process",
         parameters_.getParameter<std::string>("biasing_process"));
-    header.setStringParameter(
+    header->setStringParameter(
         "Biasing Volume",
         parameters_.getParameter<std::string>("biasing_volume"));
-    header.setStringParameter(
+    header->setStringParameter(
         "Biasing Particle",
         parameters_.getParameter<std::string>("biasing_particle"));
-    header.setIntParameter("Biasing All",
-                           parameters_.getParameter<bool>("biasing_all"));
-    header.setIntParameter("Biasing Incident",
-                           parameters_.getParameter<bool>("biasing_incident"));
-    header.setIntParameter(
+    header->setIntParameter("Biasing All",
+                            parameters_.getParameter<bool>("biasing_all"));
+    header->setIntParameter("Biasing Incident",
+                            parameters_.getParameter<bool>("biasing_incident"));
+    header->setIntParameter(
         "Biasing Disable EM",
         parameters_.getParameter<bool>("biasing_disableEMBiasing"));
-    header.setIntParameter("Biasing Factor",
-                           parameters_.getParameter<int>("biasing_factor"));
-    header.setFloatParameter(
+    header->setIntParameter("Biasing Factor",
+                            parameters_.getParameter<int>("biasing_factor"));
+    header->setFloatParameter(
         "Biasing Threshold",
         parameters_.getParameter<double>("biasing_threshold"));
   }
 
   auto apMass{parameters_.getParameter<double>("APrimeMass")};
   if (apMass > 0) {
-    header.setFloatParameter("A' Mass [MeV]", apMass);
-    header.setFloatParameter(
+    header->setFloatParameter("A' Mass [MeV]", apMass);
+    header->setFloatParameter(
         "Dark Brem Global Bias",
         parameters_.getParameter<double>("darkbrem_globalxsecfactor"));
-    header.setStringParameter(
+    header->setStringParameter(
         "Dark Brem Vertex Library Path",
         parameters_.getParameter<std::string>("darkbrem_madgraphfilepath"));
-    header.setIntParameter("Dark Brem Interpretation Method",
-                           parameters_.getParameter<int>("darkbrem_method"));
+    header->setIntParameter("Dark Brem Interpretation Method",
+                            parameters_.getParameter<int>("darkbrem_method"));
   }
 
   auto generators{
@@ -228,42 +237,43 @@ void Simulator::beforeNewRun(RunHeader &header) {
 
     std::string genID = "Gen " + std::to_string(++counter);
     auto className{gen.getParameter<std::string>("class_name")};
-    header.setStringParameter(genID + " Class", className);
+    header->setStringParameter(genID + " Class", className);
 
     if (className.find("ldmx::ParticleGun") != std::string::npos) {
-      header.setFloatParameter(genID + " Time [ns]",
-                               gen.getParameter<double>("time"));
-      header.setFloatParameter(genID + " Energy [MeV]",
-                               gen.getParameter<double>("energy"));
-      header.setStringParameter(genID + " Particle",
-                                gen.getParameter<std::string>("particle"));
+      header->setFloatParameter(genID + " Time [ns]",
+                                gen.getParameter<double>("time"));
+      header->setFloatParameter(genID + " Energy [MeV]",
+                                gen.getParameter<double>("energy"));
+      header->setStringParameter(genID + " Particle",
+                                 gen.getParameter<std::string>("particle"));
       threeVectorDump(genID + " Position [mm]",
                       gen.getParameter<std::vector<double>>("position"));
       threeVectorDump(genID + " Direction",
                       gen.getParameter<std::vector<double>>("direction"));
     } else if (className.find("ldmx::MultiParticleGunPrimaryGenerator") !=
                std::string::npos) {
-      header.setIntParameter(genID + " Poisson Enabled",
-                             gen.getParameter<bool>("enablePoisson"));
-      header.setIntParameter(genID + " N Particles",
-                             gen.getParameter<int>("nParticles"));
-      header.setIntParameter(genID + " PDG ID", gen.getParameter<int>("pdgID"));
+      header->setIntParameter(genID + " Poisson Enabled",
+                              gen.getParameter<bool>("enablePoisson"));
+      header->setIntParameter(genID + " N Particles",
+                              gen.getParameter<int>("nParticles"));
+      header->setIntParameter(genID + " PDG ID",
+                              gen.getParameter<int>("pdgID"));
       threeVectorDump(genID + " Vertex [mm]",
                       gen.getParameter<std::vector<double>>("vertex"));
       threeVectorDump(genID + " Momentum [MeV]",
                       gen.getParameter<std::vector<double>>("momentum"));
     } else if (className.find("ldmx::LHEPrimaryGenerator") !=
                std::string::npos) {
-      header.setStringParameter(genID + " LHE File",
-                                gen.getParameter<std::string>("filePath"));
+      header->setStringParameter(genID + " LHE File",
+                                 gen.getParameter<std::string>("filePath"));
     } else if (className.find("ldmx::RootCompleteReSim") != std::string::npos) {
-      header.setStringParameter(genID + " ROOT File",
-                                gen.getParameter<std::string>("filePath"));
+      header->setStringParameter(genID + " ROOT File",
+                                 gen.getParameter<std::string>("filePath"));
     } else if (className.find("ldmx::RootSimFromEcalSP") != std::string::npos) {
-      header.setStringParameter(genID + " ROOT File",
-                                gen.getParameter<std::string>("filePath"));
-      header.setFloatParameter(genID + " Time Cutoff [ns]",
-                               gen.getParameter<double>("time_cutoff"));
+      header->setStringParameter(genID + " ROOT File",
+                                 gen.getParameter<std::string>("filePath"));
+      header->setFloatParameter(genID + " Time Cutoff [ns]",
+                                gen.getParameter<double>("time_cutoff"));
     } else if (className.find("ldmx::GeneralParticleSource") !=
                std::string::npos) {
       stringVectorDump(
@@ -279,25 +289,30 @@ void Simulator::beforeNewRun(RunHeader &header) {
   if (G4RunManagerKernel::GetRunManagerKernel()) {
     G4String g4Version{
         G4RunManagerKernel::GetRunManagerKernel()->GetVersionString()};
-    header.setStringParameter("Geant4 revision", g4Version);
+    header->setStringParameter("Geant4 revision", g4Version);
   } else {
     ldmx_log(warn) << "Unable to access G4 RunManager Kernel. Will not store "
                       "G4 Version string.";
   }
 
-  header.setStringParameter("ldmx-sw revision", GIT_SHA1);
+  header->setStringParameter("ldmx-sw revision", GIT_SHA1);
 }
 
-void Simulator::onNewRun(const RunHeader &) {
-  const RandomNumberSeedService &rseed = getCondition<RandomNumberSeedService>(
-      RandomNumberSeedService::CONDITIONS_OBJECT_NAME);
+void Simulator::onNewRun(
+    std::shared_ptr<const framework::AbstractRunHeader> header) {
+  std::cout << "Setting up the seeds." << std::endl;
+  auto seed{getCondition<RandomNumberSeedService>(
+      RandomNumberSeedService::CONDITIONS_OBJECT_NAME)};
+  std::cout << "Setting up the seeds." << std::endl;
   std::vector<int> seeds;
-  seeds.push_back(rseed.getSeed("Simulator[0]"));
-  seeds.push_back(rseed.getSeed("Simulator[1]"));
-  setSeeds(seeds);
+  // seeds.push_back(rseed.getSeed("Simulator[0]"));
+  // seeds.push_back(rseed.getSeed("Simulator[1]"));
+  std::cout << "Setting up the seeds." << std::endl;
+  // setSeeds(seeds);
+  std::cout << "I'm finished setting up the seeds." << std::endl;
 }
 
-void Simulator::produce(ldmx::Event &event) {
+void Simulator::produce(framework::Event &event) {
 
   // Pass the current LDMX event object to the persistency manager.  This
   // is needed by the persistency manager to fill the current event.
