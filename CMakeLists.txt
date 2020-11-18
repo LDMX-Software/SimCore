@@ -59,6 +59,7 @@ endif()
 # Get a list of all of the source files.
 file(GLOB SRC_FILES CONFIGURE_DEPDENDS ${PROJECT_SOURCE_DIR}/src/SimCore/Persist/*.cxx
                                        ${PROJECT_SOURCE_DIR}/src/SimCore/Geo/*.cxx
+                                       ${PROJECT_SOURCE_DIR}/src/SimCore/LCIO/*.cxx
                                        ${PROJECT_SOURCE_DIR}/src/SimCore/*.cxx)
 
 # Setup the library
