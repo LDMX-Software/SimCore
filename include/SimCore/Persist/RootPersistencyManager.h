@@ -7,18 +7,13 @@
 #include <string>
 #include <vector>
 
-/*~~~~~~~~~~~~~~~*/
-/*   Framework   */
-/*~~~~~~~~~~~~~~~*/
-#include "Framework/EventFile.h"
-#include "Framework/Configure/Parameters.h"
-
 /*~~~~~~~~~~~~~*/
 /*   SimCore   */
 /*~~~~~~~~~~~~~*/
 #include "SimCore/EcalHitIO.h"
 #include "SimCore/G4CalorimeterHit.h"
 #include "SimCore/G4TrackerHit.h"
+#include "SimCore/Persist/PersistencyManager.h"
 #include "SimCore/Persist/SimParticleBuilder.h"
 
 /*~~~~~~~~~~~~*/
@@ -30,11 +25,14 @@
 // Forward declarations
 class G4Run;
 
+namespace framework { 
+class Event;
+}
+
 // Forward declarations within the ldmx namespace
 namespace ldmx {
-class Event;
 class RunHeader;
-}
+} // namespace ldmx
 
 using namespace ldmx;
 
@@ -56,7 +54,7 @@ namespace persist {
  * collections of G4TrackerHit objects are translated directly into
  * output SimTrackerHit collections.
  */
-class RootPersistencyManager : public G4PersistencyManager {
+class RootPersistencyManager : public PersistencyManager {
 
 public:
   /**
@@ -65,24 +63,13 @@ public:
    * @param eventFile file to put output events into
    * @param parameters configuration parameters from Simulator
    * @param runNumber current run identifer from Process
+   * @param ci Object that interfaces to the conditions system. 
    */
   RootPersistencyManager(framework::EventFile &file, Parameters &parameters,
                          const int &runNumber, ConditionsInterface &ci);
 
   /// Destructor
-  virtual ~RootPersistencyManager() {}
-
-  /**
-   * Get the current ROOT persistency manager or <i>nullptr</i> if not
-   * registered.
-   *
-   * @return The ROOT persistency manager.
-   */
-  static RootPersistencyManager *getInstance() {
-    return static_cast<RootPersistencyManager *>(
-        G4PersistencyCenter::GetPersistencyCenter()
-            ->CurrentPersistencyManager());
-  }
+  virtual ~RootPersistencyManager() = default; 
 
   /**
    * Builds the output ROOT event.
@@ -101,44 +88,12 @@ public:
    */
   G4bool Store(const G4Run *aRun);
 
-  /**
-   * Implementing this makes an "overloaded-virtual" compiler warning go away.
-   */
-  G4bool Store(const G4VPhysicalVolume *) { return false; }
 
   /**
    * This is called "manually" in UserRunAction to open the ROOT writer for the
    * run.
    */
   void Initialize();
-
-  /**
-   * Set the current ldmx-sw event.  This is used by the persistency
-   * manager to retrieve and fill the containers that will be
-   * persisted.
-   *
-   * @param event Event buffer for the current event.
-   */
-  void setCurrentEvent(Event *event) { event_ = event; }
-
-  /**
-   * Set the number of events began and completed.
-   *
-   * These two numbers may or may not be equal
-   * depending on if the simulation ran with any filters
-   * that would abort events early.
-   *
-   * These numbers are helpful for evaluating filtering
-   * performance, so we put them both in the RunHeader.
-   *
-   * @param[in] began number of events that were started
-   * @param[in] completed number of events that were completed without an abort
-   * signal
-   */
-  void setNumEvents(int began, int completed) {
-    eventsBegan_ = began;
-    eventsCompleted_ = completed;
-  }
 
 public:
   /**
@@ -162,7 +117,7 @@ public:
    * @param anEvent The Geant4 event.
    * @param outputEvent The output event.
    */
-  void writeHitsCollections(const G4Event *anEvent, Event *outputEvent);
+  void writeHitsCollections(const G4Event *anEvent, framework::Event *outputEvent);
 
   /**
    * Write a collection of tracker hits to an output collection.
@@ -183,24 +138,15 @@ public:
   writeCalorimeterHitsCollection(G4CalorimeterHitsCollection *hc,
                                  std::vector<SimCalorimeterHit> &outputColl);
 
+  static std::unique_ptr<PersistencyManager>
+  create(framework::EventFile &file, ldmx::Parameters &parameters,
+         const int &run_number, ConditionsInterface &ci) {
+    std::unique_ptr<PersistencyManager> manager(
+        new RootPersistencyManager(file, parameters, run_number, ci));
+    return manager;
+  }
+
 private:
-  /// Configuration parameters passed to Simulator
-  Parameters parameters_;
-
-  /// Run Number, given to us by Simulator from Process
-  int run_;
-
-  /// Number of events started on this production run
-  int eventsBegan_{-1};
-
-  /// Number of events completed without being aborted (due to filters)
-  int eventsCompleted_{-1};
-
-  /// The output file.
-  framework::EventFile &file_;
-
-  /// The event container used to manage the tree/branches/collections.
-  Event *event_{nullptr};
 
   /// Handles ECal hit readout and IO.
   EcalHitIO ecalHitIO_;

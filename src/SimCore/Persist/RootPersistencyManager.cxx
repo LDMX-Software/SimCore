@@ -42,21 +42,9 @@ RootPersistencyManager::RootPersistencyManager(framework::EventFile &file,
                                                Parameters &parameters,
                                                const int &runNumber,
                                                ConditionsInterface &ci)
-    : G4PersistencyManager(G4PersistencyCenter::GetPersistencyCenter(),
-                           "RootPersistencyManager"),
-      file_(file), ecalHitIO_(ci) {
-
-  // Let Geant4 know what to use this persistency manager
-  G4PersistencyCenter::GetPersistencyCenter()->RegisterPersistencyManager(this);
-  G4PersistencyCenter::GetPersistencyCenter()->SetPersistencyManager(
-      this, "RootPersistencyManager");
-
-  // Set the parameters, used laster when printing run header
-  parameters_ = parameters;
+    : PersistencyManager(file, parameters, runNumber, ci), ecalHitIO_(ci) {
 
   ecalHitIO_.configure(parameters_);
-
-  run_ = runNumber;
 }
 
 G4bool RootPersistencyManager::Store(const G4Event *anEvent) {
@@ -81,11 +69,11 @@ G4bool RootPersistencyManager::Store(const G4Run *) {
   auto runHeader = file_.getRunHeader(run_);
 
   // Set parameter value with number of events processed.
-  runHeader.setIntParameter("Event Count", eventsCompleted_);
-  runHeader.setIntParameter("Events Began", eventsBegan_);
+  runHeader->setIntParameter("Event Count", events_completed_);
+  runHeader->setIntParameter("Events Began", events_began_);
 
   // debug printout TODO add to logging
-  file_.getRunHeader(run_).Print();
+  //file_.getRunHeader(run_).Print();
 
   return true;
 }
@@ -131,7 +119,7 @@ void RootPersistencyManager::writeHeader(const G4Event *anEvent) {
 }
 
 void RootPersistencyManager::writeHitsCollections(const G4Event *anEvent,
-                                                  Event *outputEvent) {
+                                                  framework::Event *outputEvent) {
 
   // Get the HC of this event.
   G4HCofThisEvent *hce = anEvent->GetHCofThisEvent();
