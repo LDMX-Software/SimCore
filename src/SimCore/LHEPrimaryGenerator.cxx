@@ -27,6 +27,8 @@ namespace ldmx {
         std::string filePath = parameters_.getParameter< std::string >( "filePath" );
         reader_ = new LHEReader( filePath );
 
+        theta_xz_ = parameters_.getParameter<double>("rot_theta_xz", 0.);
+        vertex_pos_ = parameters_.getParameter< std::vector<double> >("vertex", {});
     }
 
     LHEPrimaryGenerator::~LHEPrimaryGenerator() {
@@ -40,7 +42,12 @@ namespace ldmx {
         if (lheEvent != NULL) {
 
             G4PrimaryVertex* vertex = new G4PrimaryVertex();
-            vertex->SetPosition(lheEvent->getVertex()[0],lheEvent->getVertex()[1],lheEvent->getVertex()[2]);
+            if (!vertex_pos_.empty()) {
+              rotateVector(vertex_pos_); 
+              vertex->SetPosition(vertex_pos_[0], vertex_pos_[1], vertex_pos_[2]); 
+            } else { 
+              vertex->SetPosition(lheEvent->getVertex()[0],lheEvent->getVertex()[1],lheEvent->getVertex()[2]);
+            }
             vertex->SetWeight(lheEvent->getXWGTUP());
 
             std::map<LHEParticle*, G4PrimaryParticle*> particleMap;
@@ -66,9 +73,10 @@ namespace ldmx {
                         primary->SetPDGcode(particle->getIDUP());
                     }
 
-                    primary->Set4Momentum(particle->getPUP(0) * GeV, 
-                                          particle->getPUP(1) * GeV, 
-                                          particle->getPUP(2) * GeV, 
+                    std::vector<double> pvec 
+                      = {particle->getPUP(0)*GeV, particle->getPUP(1)*GeV,particle->getPUP(2)*GeV};
+                    rotateVector(pvec);  
+                    primary->Set4Momentum(pvec[0], pvec[1], pvec[2], 
                                           particle->getPUP(3) * GeV);
                     primary->SetProperTime(particle->getVTIMUP() * nanosecond);
 
@@ -104,6 +112,11 @@ namespace ldmx {
         }
 
         delete lheEvent;
+    }
+
+    void LHEPrimaryGenerator::rotateVector(std::vector<double> &v) {
+      v[0] = v[0]*cos(theta_xz_) + v[2]*sin(theta_xz_); 
+      v[2] = v[2]*cos(theta_xz_) - v[0]*sin(theta_xz_); 
     }
 
 }

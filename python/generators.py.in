@@ -96,6 +96,8 @@ class lhe(simcfg.PrimaryGenerator) :
         super().__init__(name,'ldmx::LHEPrimaryGenerator')
 
         self.filePath = filePath
+        self.rot_theta_xz = 0.
+        self.vertex = [ ]
 
 class completeReSim(simcfg.PrimaryGenerator) :
     """New complete re-simprimary generator

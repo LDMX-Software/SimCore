@@ -49,6 +49,17 @@ namespace ldmx {
              * The LHE reader with the event data.
              */
             LHEReader* reader_;
+
+            /**
+             *
+             */
+            void rotateVector(std::vector<double> &v); 
+            
+            /// Angle in the x-z plane at which to fire the particles
+            double theta_xz_; 
+
+            /// Vertex position
+            std::vector<double> vertex_pos_; 
     };
 
 }
