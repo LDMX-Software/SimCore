@@ -66,8 +66,6 @@ G4bool LcioPersistencyManager::Store(const G4Event *event) {
 
 G4bool LcioPersistencyManager::Store(const G4Run *run) {}
 
-void LcioPersistencyManager::Initialize() {}
-
 void LcioPersistencyManager::writeHitsCollections(
     const G4Event *g4_event, IMPL::LCEventImpl *lcio_event) {
 
