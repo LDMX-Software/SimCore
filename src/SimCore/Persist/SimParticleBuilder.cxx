@@ -27,7 +27,7 @@ SimParticleBuilder::SimParticleBuilder() : currentEvent_(nullptr) {
 
 SimParticleBuilder::~SimParticleBuilder() {}
 
-void SimParticleBuilder::buildSimParticles(ldmx::Event *outputEvent) {
+void SimParticleBuilder::buildSimParticles(framework::Event *outputEvent) {
 
   // Get the trajectory container for the event.
   auto trajectories{

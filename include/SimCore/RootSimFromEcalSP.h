@@ -99,7 +99,7 @@ namespace ldmx {
             /**
              * The input ldmx event bus
              */
-            Event ievent_;
+            framework::Event ievent_;
 
     };
 
