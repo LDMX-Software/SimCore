@@ -23,7 +23,7 @@ class PhotoNuclear : public XsecBiasingOperator {
    *         to bias the occurence of photonuclear events.
    */
   G4VBiasingOperation* ProposeOccurenceBiasingOperation(
-      const G4Track* track, const G4BiasingProcessInterface* callingProcess);
+      const G4Track* track, const G4BiasingProcessInterface* callingProcess) final override;
 
   /// return the process we want to bias
   virtual std::string getProcessToBias() const { return "photonNuclear"; }

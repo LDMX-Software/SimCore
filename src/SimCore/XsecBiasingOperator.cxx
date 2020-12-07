@@ -17,8 +17,8 @@ void XsecBiasingOperator::StartRun() {
   } else if (this->getParticleToBias().compare("e-") == 0) {
     processManager_ = G4Electron::ElectronDefinition()->GetProcessManager();
   } else {
-    EXCEPTION_RAISE("BiasingException", "Invalid particle type '" +
-                                            this->getParticleToBias() + "'.");
+    EXCEPTION_RAISE("BiasSetup", "Invalid particle type '" +
+                                     this->getParticleToBias() + "'.");
   }
 
   std::cout << "[ XsecBiasingOperator ]: Biasing particles of type "
@@ -57,7 +57,7 @@ bool XsecBiasingOperator::processIsBiased(std::string process) {
 
 void XsecBiasingOperator::declare(const std::string& className,
                                   XsecBiasingOperatorBuilder* builder) {
-  PluginFactory::getInstance().registerBiasingOperator(className,builder);
+  PluginFactory::getInstance().registerBiasingOperator(className, builder);
 }
 
 }  // namespace simcore

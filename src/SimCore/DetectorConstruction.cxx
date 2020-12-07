@@ -27,7 +27,10 @@ namespace ldmx {
         //  which is called before RunManager::Initialize
         //  which is where this method ends up being called.
 
-        for (simcore::XsecBiasingOperator *bop : simcore::PluginFactory::getInstance().getBiasingOperators()) {
+        auto bops{simcore::PluginFactory::getInstance().getBiasingOperators()};
+
+        std::cout << "ConstructSDandField: " << bops.size() << std::endl;
+        for (simcore::XsecBiasingOperator *bop : bops) {
             for (G4LogicalVolume* volume : *G4LogicalVolumeStore::GetInstance()) {
                 if (bop->getVolumeToBias().compare("ecal") == 0) {
                   G4String volumeName = volume->GetName();

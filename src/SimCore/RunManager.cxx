@@ -65,9 +65,12 @@ namespace ldmx {
        
         auto biasing_operators{parameters_.getParameter<std::vector<Parameters>>("biasing_operators",{})}; 
         if (!biasing_operators.empty()) {
+            
+            std::cout << "[ RunManager ]: Biasing enabled with " 
+              << biasing_operators.size() << " operator(s)." << std::endl;
 
             //create all the biasing operators that will be used
-            auto factory{simcore::PluginFactory::getInstance()};
+            auto& factory{simcore::PluginFactory::getInstance()};
             for (Parameters& bop : biasing_operators ) {
               factory.createBiasingOperator(
                   bop.getParameter<std::string>("class_name"),
@@ -83,6 +86,11 @@ namespace ldmx {
             //  this will put a biasing interface wrapper around *all* processes
             //  associated with these particles
             for (const simcore::XsecBiasingOperator* bop : factory.getBiasingOperators()) {
+              std::cout << "[ RunManager ]: Biasing operator '"
+                  << bop->GetName()
+                  << "' set to bias "
+                  << bop->getParticleToBias()
+                  << std::endl;
               biasingPhysics->Bias(bop->getParticleToBias());
             }
 
@@ -118,7 +126,7 @@ namespace ldmx {
         SetUserAction( primaryGeneratorAction );
 
         // Get the plugin factory so we can get the actions
-        auto factory{simcore::PluginFactory::getInstance()}; 
+        auto& factory{simcore::PluginFactory::getInstance()}; 
        
         // Get instances of all G4 actions
         //      also create them in the factory
