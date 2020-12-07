@@ -1,13 +1,7 @@
-/**
- * @file XsecBiasingPlugin.h
- * @brief Geant4 Biasing Operator used to bias the occurence of photonuclear
- *        events by modifying the cross-section.
- * @author Omar Moreno
- *         SLAC National Accelerator Laboratory
- */
+#ifndef SIMCORE_XSECBIASINGOPERATOR_H_
+#define SIMCORE_XSECBIASINGOPERATOR_H_
 
-#ifndef BIASING_XSECBIASINGOPERATOR_H_
-#define BIASING_XSECBIASINGOPERATOR_H_
+#include "Framework/Configure/Parameters.h"
 
 //------------//
 //   Geant4   //
@@ -26,16 +20,29 @@
 
 namespace simcore {
 
+/// Forward declaration for generic building function
+class XsecBiasingOperator;
+
+/// Define type of building fuction for biasing operators
+typedef XsecBiasingOperator* XsecBiasingOperatorBuilder(
+    const std::string& name, ldmx::Parameters& parameters);
+
 class XsecBiasingOperator : public G4VBiasingOperator {
  public:
   /** Constructor */
-  XsecBiasingOperator(std::string name);
+  XsecBiasingOperator(std::string name, ldmx::Parameters& parameters);
 
   /** Destructor */
   virtual ~XsecBiasingOperator();
 
-  /** Method called at the beginning of a run. */
-  void StartRun();
+  /**
+   * Method used to register an operator with the manager.
+   *
+   * @param className Name of the class instance
+   * @param builder The builder used to create and instance of this class.
+   */
+  static void declare(const std::string& className,
+                      XsecBiasingOperatorBuilder* builder);
 
   /**
    * @return Method that returns the biasing operation that will be used
@@ -45,30 +52,34 @@ class XsecBiasingOperator : public G4VBiasingOperator {
       const G4Track* track,
       const G4BiasingProcessInterface* callingProcess) = 0;
 
-  /** Bias all particles of the given type. */
-  void biasAll() { biasAll_ = true; };
+  /** Method called at the beginning of a run. */
+  void StartRun();
 
-  /** Bias only the incident particle. */
-  void biasIncident() { biasIncident_ = true; };
-
-  /**
-   * Disable the biasing down of EM when either the
-   * photonuclear or gamma->mu+mu- xsections are biased up. This was
-   * added to remain backwards compatible with the old biasing
-   * scheme.
+  /** 
+   * Return the process whose cross-section will be biased. 
+   *
+   * We need this to be able to check that the process
+   * was biased before creating the biasing operator.
    */
-  void disableBiasDownEM() { biasDownEM_ = false; };
+  virtual std::string getProcessToBias() const = 0;
 
-  /** Set the particle type to bias. */
-  void setParticleType(std::string particleType) {
-    particleType_ = particleType;
-  };
+  /** 
+   * Return the particle which should be biased. 
+   *
+   * We need this to be able to tell the physics
+   * list which particle to bias.
+   * @see RunManager::setupPhysics
+   */
+  virtual std::string getParticleToBias() const = 0;
 
-  /** Set the minimum energy required to bias the particle. */
-  void setThreshold(double threshold) { threshold_ = threshold; };
-
-  /** Set the factor by which the xsec will be enhanced. */
-  void setBiasFactor(double xsecFactor) { xsecFactor_ = xsecFactor; };
+  /** 
+   * Return the volume which should be biased. 
+   *
+   * We need this to be able to tell the detector
+   * construction which volumes to attach this
+   * operator to.
+   */
+  virtual std::string getVolumeToBias() const = 0;
 
  protected:
   /**
@@ -79,46 +90,23 @@ class XsecBiasingOperator : public G4VBiasingOperator {
    */
   bool processIsBiased(std::string process);
 
-  /** Return the process whose cross-section will be biased. */
-  virtual std::string getProcessToBias() = 0;
-
   /** Cross-section biasing operation. */
-  G4BOptnChangeCrossSection* xsecOperation{nullptr};
+  G4BOptnChangeCrossSection* xsecOperation_{nullptr};
 
   /** Process manager associated with the particle of interest. */
   G4ProcessManager* processManager_{nullptr};
 
   /**
-   * Flag indicating whether EM should be biased down when either
-   * photonuclear or gammatomumu is biased up.  This flag is only
-   * valid when either PhotoNuclearXsecBiasingOperator or
-   * GammaToMuMuXsecBiasingOperator is used.
+   * Do *not* propose any biasing on final states.
    */
-  bool biasDownEM_{true};
-
-  /** Flag indicating whether all particles should be biased. */
-  bool biasAll_{false};
-
-  /** Flag indicating whether to bias only the incident particle. */
-  bool biasIncident_{false};
-
-  /** The particle type to bias. */
-  std::string particleType_{""};
-
-  /** The minimum energy required to apply the biasing operation. */
-  double threshold_{0};
-
-  /** Factor to multiply the xsec by. */
-  double xsecFactor_{0};
-
-  //--------//
-  // Unused //
-  //--------//
   G4VBiasingOperation* ProposeFinalStateBiasingOperation(
       const G4Track*, const G4BiasingProcessInterface*) {
     return nullptr;
   }
 
+  /**
+   * Do *not* propose any non-physics biasing.
+   */
   G4VBiasingOperation* ProposeNonPhysicsBiasingOperation(
       const G4Track*, const G4BiasingProcessInterface*) {
     return nullptr;
@@ -127,4 +115,20 @@ class XsecBiasingOperator : public G4VBiasingOperator {
 };  // XsecBiasingOperator
 }  // namespace simcore
 
-#endif  // SIMPLUGINS_XSECBIASINGOPERATOR_H_
+/**
+ * @macro DECLARE_XSECBIASINGOPERATOR
+ *
+ * Defines a builder for the declared class
+ * and then registers the class as a biasing operator.
+ */
+#define DECLARE_XSECBIASINGOPERATOR(NS, CLASS)                              \
+  ldmx::XsecBiasingOperator* CLASS##Builder(const std::string& name,        \
+                                            ldmx::Parameters& parameters) { \
+    return new NS::CLASS(name, parameters);                                 \
+  }                                                                         \
+  __attribute((constructor(405))) static void CLASS##Declare() {            \
+    ldmx::XsecBiasingOperator::declare(                                     \
+        std::string(#NS) + "::" + std::string(#CLASS), &CLASS##Builder);    \
+  }
+
+#endif  // SIMCORE_XSECBIASINGOPERATOR_H_

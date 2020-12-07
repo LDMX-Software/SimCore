@@ -4,7 +4,7 @@
 /*~~~~~~~~~~~~~*/
 /*   SimCore   */
 /*~~~~~~~~~~~~~*/
-#include "SimCore/UserActionManager.h"
+#include "SimCore/PluginFactory.h"
 
 /*~~~~~~~~~~~~*/
 /*   Geant4   */
@@ -25,6 +25,6 @@ UserAction::~UserAction() {}
 
 void UserAction::declare(const std::string& className,
                          UserActionBuilder* builder) {
-  UserActionManager::getInstance().registerAction(className, builder);
+  PluginFactory::getInstance().registerAction(className, builder);
 }
 }  // namespace simcore

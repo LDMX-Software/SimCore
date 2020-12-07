@@ -15,11 +15,11 @@
 #include "SimCore/ParallelWorld.h"
 #include "SimCore/PrimaryGeneratorAction.h"
 #include "SimCore/USteppingAction.h"
-#include "SimCore/UserActionManager.h"
 #include "SimCore/UserEventAction.h"
 #include "SimCore/UserRunAction.h"
 #include "SimCore/UserStackingAction.h"
 #include "SimCore/UserTrackingAction.h"
+#include "SimCore/PluginFactory.h"
 
 //------------//
 //   Geant4   //
@@ -62,18 +62,26 @@ void RunManager::setupPhysics() {
   pList->RegisterPhysics(new GammaPhysics);
   pList->RegisterPhysics(new APrimePhysics(parameters_));
 
-  auto biasingEnabled{parameters_.getParameter<bool>("biasing_enabled")};
-  if (biasingEnabled) {
-    auto biasedParticle{
-        parameters_.getParameter<std::string>("biasing_particle")};
-    std::cout << "RunManager::setupPhysics : Enabling biasing of particle type "
-              << biasedParticle << std::endl;
+  auto biasing_operators{parameters_.getParameter<std::vector<Parameters>>(
+      "biasing_operators", {})};
+  if (!biasing_operators.empty()) {
+    // create all the biasing operators that will be used
+    auto factory{simcore::PluginFactory::getInstance()};
+    for (const Parameters& bop : biasing_operators) {
+      factory.createBiasingOperator(
+          bop.getParameter<std::string>("class_name"),
+          bop.getParameter<std::string>("instance_name"), bop);
+    }
 
     // Instantiate the constructor used when biasing
     G4GenericBiasingPhysics* biasingPhysics = new G4GenericBiasingPhysics();
 
-    // Specify what particles are being biased
-    biasingPhysics->Bias(biasedParticle);
+    // specify which particles are going to be biased
+    //  this will put a biasing interface wrapper around *all* processes
+    //  associated with these particles
+    for (const XsecBiasingOperator* bop : factory.getBiasingOperators()) {
+      biasingPhysics->Bias(bop->getParticleToBias());
+    }
 
     // Register the physics constructor to the physics list:
     pList->RegisterPhysics(biasingPhysics);
@@ -104,18 +112,18 @@ void RunManager::Initialize() {
   auto primaryGeneratorAction{new PrimaryGeneratorAction(parameters_)};
   SetUserAction(primaryGeneratorAction);
 
-  // Instantiate action manager
-  auto actionManager{UserActionManager::getInstance()};
+  // Get the plugin factory so we can get the actions
+  auto factory{PluginFactory::getInstance()};
 
   // Get instances of all G4 actions
   //      also create them in the action manager
-  auto actions{actionManager.getActions()};
+  auto actions{factory.getActions()};
 
   // Create all user actions
   auto userActions{
       parameters_.getParameter<std::vector<framework::config::Parameters> >("actions", {})};
   for (auto& userAction : userActions) {
-    actionManager.createAction(
+    factory.createAction(
         userAction.getParameter<std::string>("class_name"),
         userAction.getParameter<std::string>("instance_name"), userAction);
   }
@@ -133,10 +141,10 @@ void RunManager::TerminateOneEvent() {
   // reset dark brem process (if needed)
   G4ProcessTable* ptable = G4ProcessTable::GetProcessTable();
   G4int verbosity = ptable->GetVerboseLevel();
-  ptable->SetVerboseLevel(
-      0);  // silent ptable while searching for process that may/may not exist
-  G4String pname =
-      "biasWrapper(eDBrem)";  // TODO allow eDBrem to be biased or unbiased
+  // silent ptable while searching for process that may/may not exist
+  ptable->SetVerboseLevel(0);  
+  // TODO allow eDBrem to be biased or unbiased
+  G4String pname = "biasWrapper(eDBrem)";  
   bool active = true;
   ptable->SetProcessActivation(pname, active);
   if (this->GetVerboseLevel() > 1) {

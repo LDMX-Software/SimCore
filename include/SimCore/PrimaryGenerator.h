@@ -83,7 +83,7 @@ class PrimaryGenerator : public G4VPrimaryGenerator {
  *
  * Defines a builder for the declared class
  * and then registers the class as a generator
- * with the PrimaryGeneratorManager
+ * with the PluginFactory
  */
 #define DECLARE_GENERATOR(NS, CLASS)                                     \
   simcore::PrimaryGenerator* CLASS##Builder(const std::string& name,        \
