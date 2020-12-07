@@ -33,10 +33,10 @@ class XsecBiasingOperator:
             A human-readable version of this XsecBiasingOperator printing all its attributes
         """
 
-        string = "XsecBiasingOperator (" + self.__repr__() + ")\n" 
-        string += " Parameters: \n"
+        string = "XsecBiasingOperator (" + self.__repr__() + ") {"
         for k, v in self.__dict__.items(): 
-            string += "  %s : %s \n" % (k, v)
+            string += " %s : %s" % (k, v)
+        string += " }"
 
         return string
 

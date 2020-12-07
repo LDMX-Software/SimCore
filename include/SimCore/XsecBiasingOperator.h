@@ -28,9 +28,30 @@ class XsecBiasingOperator;
 typedef XsecBiasingOperator* XsecBiasingOperatorBuilder(
     const std::string& name, ldmx::Parameters& parameters);
 
+/**
+ * Our specialization of the biasing operator used with Geant4.
+ *
+ * This specialization accomplishes three main tasks.
+ * 1. Allows any derived class to be dynamically loaded after
+ *    using the declaration macro given below.
+ * 2. Interfaces with the derived class using our parameters
+ *    class.
+ * 3. Pre-defines the necessary biasing operation so the derived
+ *    class only needs to worry about calculating the biased
+ *    xsec.
+ */
 class XsecBiasingOperator : public G4VBiasingOperator {
  public:
-  /** Constructor */
+  /**
+   * Constructor
+   *
+   * Here, we define a unique name for this biasing operator
+   * and are given the configuration parameters loaded from the
+   * python script.
+   *
+   * @param[in] name unique instance name for this biasing operator
+   * @param[in] parameters python configuration parameters
+   */
   XsecBiasingOperator(std::string name, const ldmx::Parameters& parameters);
 
   /** Destructor */
@@ -46,14 +67,32 @@ class XsecBiasingOperator : public G4VBiasingOperator {
                       XsecBiasingOperatorBuilder* builder);
 
   /**
-   * @return Method that returns the biasing operation that will be used
-   *         to bias the occurence of photonuclear events.
+   * Propose a biasing operation for the current track and calling process.
+   *
+   * @note Returning `0` from this function will mean that the current track
+   * and process will not be biased.
+   *
+   * @see BiasedXsec for a method that allows the derived class to not
+   * interact with the biasing operation itself.
+   *
+   * @param[in] track handle to current track that could be biased
+   * @param[in] callingProcess handle to process asking if it should be biased
+   * @return the biasing operation with the biased xsec
    */
   virtual G4VBiasingOperation* ProposeOccurenceBiasingOperation(
       const G4Track* track,
       const G4BiasingProcessInterface* callingProcess) = 0;
 
-  /** Method called at the beginning of a run. */
+  /**
+   * Method called at the beginning of a run.
+   *
+   * This makes sure that the process we want to bias can
+   * be biased and constructs a corresponding biasing operation.
+   *
+   * It can be over-written, but then the derived class should
+   * call `XsecBiasingOperator::StartRun()` at the beginning of
+   * their own StartRun.
+   */
   void StartRun();
 
   /**
@@ -85,6 +124,8 @@ class XsecBiasingOperator : public G4VBiasingOperator {
   /**
    * Record the configuration of this
    * biasing operator into the run header.
+   *
+   * @param[in,out] header RunHeader to write configuration to
    */
   virtual void RecordConfig(ldmx::RunHeader& header) const = 0;
 
@@ -94,9 +135,14 @@ class XsecBiasingOperator : public G4VBiasingOperator {
    * to the Geant4 biasing framework.
    *
    * Use like:
-   *  return BiasedXsec(biased_xsec);
+   *
+   *    return BiasedXsec(biased_xsec);
+   *
    * inside of ProposeOccurenceBiasingOperation when
    * you want to update the biased cross section.
+   *
+   * @param[in] biased_xsec the biased cross section
+   * @return the biasing operation with the input biased cross section
    */
   G4VBiasingOperation* BiasedXsec(double biased_xsec) {
     xsecOperation_->SetBiasedCrossSection(biased_xsec);

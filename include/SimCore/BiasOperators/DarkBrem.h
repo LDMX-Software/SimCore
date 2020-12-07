@@ -10,6 +10,9 @@
 namespace simcore {
 namespace biasoperators {
 
+/**
+ * Bias operator for the dark brem process
+ */
 class DarkBrem : public XsecBiasingOperator {
  public:
   /**
@@ -28,8 +31,12 @@ class DarkBrem : public XsecBiasingOperator {
   ~DarkBrem() {}
 
   /**
-   * This the following protected member variables from XsecBiasingOperator:
-   *  - xsecOperator_ : Geant4 biasing operator to use
+   * Calculate the biased cross section given the
+   * input process and track. This allows for us
+   * to have access to the current information about the 
+   * track while calculating the biased cross section.
+   *
+   * @see XsecBiasingOperator::BiasedXsec
    *
    * @param[in] track const pointer to track to Bias
    * @param[in] callingProcess process that might be biased by this operator

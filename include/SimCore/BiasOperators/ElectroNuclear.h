@@ -6,6 +6,9 @@
 namespace simcore {
 namespace biasoperators {
 
+/**
+ * Bias the Electron-Nuclear process
+ */
 class ElectroNuclear : public XsecBiasingOperator {
  public:
   /**
