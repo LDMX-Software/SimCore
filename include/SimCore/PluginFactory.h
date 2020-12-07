@@ -1,35 +1,31 @@
 #ifndef SIMCORE_PLUGINFACTORY_H
 #define SIMCORE_PLUGINFACTORY_H
 
-/*~~~~~~~~~~~~~~~*/
-/*   Framework   */
-/*~~~~~~~~~~~~~~~*/
+#include <variant>
+
 #include "Framework/Configure/Parameters.h"
-#include "SimCore/PrimaryGenerator.h"
+
 #include "SimCore/USteppingAction.h"
 #include "SimCore/UserEventAction.h"
 #include "SimCore/UserRunAction.h"
 #include "SimCore/UserStackingAction.h"
 #include "SimCore/UserTrackingAction.h"
 
+#include "SimCore/PrimaryGenerator.h"
 #include "SimCore/UserAction.h"
+#include "SimCore/XsecBiasingOperator.h"
 
 namespace simcore {
 
 /**
- * @typedef action
- * Holding references to all the differenty types of actions
- * we could have.
- */
-typedef std::variant<UserRunAction*, UserEventAction*, UserTrackingAction*,
-                     USteppingAction*, UserStackingAction*>
-    action;
-
-/**
- * A map of the different types of actions to 
+ * A map of the different types of actions to
  * their reference.
  */
-typedef std::map<TYPE, action> actionMap;
+typedef std::map<ldmx::TYPE,
+                 std::variant<ldmx::UserRunAction*, ldmx::UserEventAction*,
+                              ldmx::UserTrackingAction*, ldmx::USteppingAction*,
+                              ldmx::UserStackingAction*>>
+    actionMap;
 
 /**
  * @class PluginFactory
@@ -43,13 +39,13 @@ class PluginFactory {
   /**
    * Get the collection of all enabled generators
    */
-  std::vector<PrimaryGenerator*> getGenerators() const { return generators_; };
+  std::vector<ldmx::PrimaryGenerator*> getGenerators() const { return generators_; };
 
   /**
    * Attach a new generator to the list of generators
    */
   void registerGenerator(const std::string& className,
-                         PrimaryGeneratorBuilder* builder);
+                         ldmx::PrimaryGeneratorBuilder* builder);
 
   /**
    * Create a new generate and attach it to the list of generators
@@ -65,7 +61,7 @@ class PluginFactory {
   /**
    *
    */
-  void registerAction(const std::string& className, UserActionBuilder* builder);
+  void registerAction(const std::string& className, ldmx::UserActionBuilder* builder);
 
   /**
    *
@@ -104,14 +100,14 @@ class PluginFactory {
     std::string className_;
 
     /// Class builder
-    PrimaryGeneratorBuilder* builder_;
+    ldmx::PrimaryGeneratorBuilder* builder_;
   };
 
   /// A map of all register generators
   std::map<std::string, GeneratorInfo> generatorMap_;
 
   /// Cointainer for all generators to be used by the simulation
-  std::vector<PrimaryGenerator*> generators_;
+  std::vector<ldmx::PrimaryGenerator*> generators_;
 
   /**
    * @struct ActionInfo
@@ -122,7 +118,7 @@ class PluginFactory {
     std::string className_;
 
     /// Class builder
-    UserActionBuilder* builder_;
+    ldmx::UserActionBuilder* builder_;
   };
 
   /// A map of all registered user actions to their corresponding info.

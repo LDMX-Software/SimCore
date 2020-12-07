@@ -68,7 +68,7 @@ namespace ldmx {
 
             //create all the biasing operators that will be used
             auto factory{simcore::PluginFactory::getInstance()};
-            for (const Parameters& bop : biasing_operators ) {
+            for (Parameters& bop : biasing_operators ) {
               factory.createBiasingOperator(
                   bop.getParameter<std::string>("class_name"),
                   bop.getParameter<std::string>("instance_name"),
@@ -82,7 +82,7 @@ namespace ldmx {
             // specify which particles are going to be biased
             //  this will put a biasing interface wrapper around *all* processes
             //  associated with these particles
-            for (const XsecBiasingOperator* bop : factory.getBiasingOperators()) {
+            for (const simcore::XsecBiasingOperator* bop : factory.getBiasingOperators()) {
               biasingPhysics->Bias(bop->getParticleToBias());
             }
 

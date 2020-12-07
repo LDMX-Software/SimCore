@@ -22,7 +22,7 @@ namespace simcore {
 PluginFactory& PluginFactory::getInstance() { return instance_; }
 
 void PluginFactory::registerGenerator(const std::string& className,
-                                      PrimaryGeneratorBuilder* builder) {
+                                      ldmx::PrimaryGeneratorBuilder* builder) {
   GeneratorInfo info;
   info.className_ = className;
   info.builder_ = builder;
@@ -47,18 +47,18 @@ void PluginFactory::createGenerator(const std::string& className,
 
 actionMap PluginFactory::getActions() {
   if (actions_.empty()) {
-    actions_[TYPE::RUN] = new UserRunAction();
-    actions_[TYPE::EVENT] = new UserEventAction();
-    actions_[TYPE::TRACKING] = new UserTrackingAction();
-    actions_[TYPE::STEPPING] = new USteppingAction();
-    actions_[TYPE::STACKING] = new UserStackingAction();
+    actions_[ldmx::TYPE::RUN] = new ldmx::UserRunAction();
+    actions_[ldmx::TYPE::EVENT] = new ldmx::UserEventAction();
+    actions_[ldmx::TYPE::TRACKING] = new ldmx::UserTrackingAction();
+    actions_[ldmx::TYPE::STEPPING] = new ldmx::USteppingAction();
+    actions_[ldmx::TYPE::STACKING] = new ldmx::UserStackingAction();
   }
 
   return actions_;
 }
 
 void PluginFactory::registerAction(const std::string& className,
-                                   UserActionBuilder* builder) {
+                                   ldmx::UserActionBuilder* builder) {
   auto it{actionInfo_.find(className)};
   if (it != actionInfo_.end()) {
     EXCEPTION_RAISE(
@@ -75,7 +75,7 @@ void PluginFactory::registerAction(const std::string& className,
 
 void PluginFactory::createAction(const std::string& className,
                                  const std::string& instanceName,
-                                 Parameters& parameters) {
+                                 ldmx::Parameters& parameters) {
   auto it{actionInfo_.find(className)};
   if (it == actionInfo_.end()) {
     EXCEPTION_RAISE("PluginFactory", "Failed to create " + className);
@@ -83,19 +83,19 @@ void PluginFactory::createAction(const std::string& className,
 
   auto act{it->second.builder_(instanceName, parameters)};
 
-  std::vector<TYPE> types = act->getTypes();
+  std::vector<ldmx::TYPE> types = act->getTypes();
   for (auto& type : types) {
-    if (type == TYPE::RUN)
-      std::get<UserRunAction*>(actions_[TYPE::RUN])->registerAction(act);
-    else if (type == TYPE::EVENT)
-      std::get<UserEventAction*>(actions_[TYPE::EVENT])->registerAction(act);
-    else if (type == TYPE::TRACKING)
-      std::get<UserTrackingAction*>(actions_[TYPE::TRACKING])
+    if (type == ldmx::TYPE::RUN)
+      std::get<ldmx::UserRunAction*>(actions_[ldmx::TYPE::RUN])->registerAction(act);
+    else if (type == ldmx::TYPE::EVENT)
+      std::get<ldmx::UserEventAction*>(actions_[ldmx::TYPE::EVENT])->registerAction(act);
+    else if (type == ldmx::TYPE::TRACKING)
+      std::get<ldmx::UserTrackingAction*>(actions_[ldmx::TYPE::TRACKING])
           ->registerAction(act);
-    else if (type == TYPE::STEPPING)
-      std::get<USteppingAction*>(actions_[TYPE::STEPPING])->registerAction(act);
-    else if (type == TYPE::STACKING)
-      std::get<UserStackingAction*>(actions_[TYPE::STACKING])
+    else if (type == ldmx::TYPE::STEPPING)
+      std::get<ldmx::USteppingAction*>(actions_[ldmx::TYPE::STEPPING])->registerAction(act);
+    else if (type == ldmx::TYPE::STACKING)
+      std::get<ldmx::UserStackingAction*>(actions_[ldmx::TYPE::STACKING])
           ->registerAction(act);
     else
       EXCEPTION_RAISE("PluginFactory", "User action type doesn't exist.");
@@ -114,16 +114,16 @@ void PluginFactory::registerBiasingOperator(
 void PluginFactory::createBiasingOperator(const std::string& className,
                                           const std::string& instanceName,
                                           ldmx::Parameters& parameters) {
-  auto it{biasingMap_.find(className)};
-  if (it == biasingMap_.end()) {
+  auto it{biasingInfo_.find(className)};
+  if (it == biasingInfo_.end()) {
     EXCEPTION_RAISE("CreateBiasingOperator",
                     "Failed to create biasing '" + className + "'.");
   }
 
-  auto op{it->second.builder_(instanceName, parameters)};
+  auto bop{it->second.builder_(instanceName, parameters)};
 
   // now that the biasing is built --> put it on active list
-  biasing_operators_.push_back(op);
+  biasing_operators_.push_back(bop);
 }
 
 }  // namespace simcore

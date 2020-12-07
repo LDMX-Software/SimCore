@@ -84,7 +84,7 @@ namespace ldmx {
             void setUserPrimaryInfo(G4Event* event);
 
             /// Manager of all generators used by the event
-            PluginFactory &manager_;
+            simcore::PluginFactory &manager_;
 
             /// Random number generator
             std::unique_ptr< TRandom3 > random_;
