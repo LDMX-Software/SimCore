@@ -113,7 +113,7 @@ void RunManager::Initialize() {
   SetUserAction(primaryGeneratorAction);
 
   // Get the plugin factory so we can get the actions
-  auto factory{simcore::PluginFactory::getInstance()};
+  auto& factory{simcore::PluginFactory::getInstance()};
 
   // Get instances of all G4 actions
   //      also create them in the action manager

@@ -123,6 +123,9 @@ void PluginFactory::createBiasingOperator(const std::string& className,
   auto bop{it->second.builder_(instanceName, parameters)};
 
   // now that the biasing is built --> put it on active list
+  std::cout << "[ PluginFactory ]: Biasing operator '"
+    << instanceName << "' of class '"
+    << className << "' has been created." << std::endl;
   biasing_operators_.push_back(bop);
 }
 

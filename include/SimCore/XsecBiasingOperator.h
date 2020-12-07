@@ -194,7 +194,7 @@ class XsecBiasingOperator : public G4VBiasingOperator {
                                                ldmx::Parameters& parameters) { \
     return new NS::CLASS(name, parameters);                                    \
   }                                                                            \
-  __attribute((constructor(405))) static void CLASS##Declare() {               \
+  __attribute((constructor(205))) static void CLASS##Declare() {               \
     simcore::XsecBiasingOperator::declare(                                     \
         std::string(#NS) + "::" + std::string(#CLASS), &CLASS##Builder);       \
   }
