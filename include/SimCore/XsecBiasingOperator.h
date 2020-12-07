@@ -56,16 +56,16 @@ class XsecBiasingOperator : public G4VBiasingOperator {
   /** Method called at the beginning of a run. */
   void StartRun();
 
-  /** 
-   * Return the process whose cross-section will be biased. 
+  /**
+   * Return the process whose cross-section will be biased.
    *
    * We need this to be able to check that the process
    * was biased before creating the biasing operator.
    */
   virtual std::string getProcessToBias() const = 0;
 
-  /** 
-   * Return the particle which should be biased. 
+  /**
+   * Return the particle which should be biased.
    *
    * We need this to be able to tell the physics
    * list which particle to bias.
@@ -73,8 +73,8 @@ class XsecBiasingOperator : public G4VBiasingOperator {
    */
   virtual std::string getParticleToBias() const = 0;
 
-  /** 
-   * Return the volume which should be biased. 
+  /**
+   * Return the volume which should be biased.
    *
    * We need this to be able to tell the detector
    * construction which volumes to attach this
@@ -89,6 +89,21 @@ class XsecBiasingOperator : public G4VBiasingOperator {
   virtual void RecordConfig(ldmx::RunHeader& header) const = 0;
 
  protected:
+  /**
+   * Helper method for passing a biased interaction length
+   * to the Geant4 biasing framework.
+   *
+   * Use like:
+   *  return BiasedXsec(biased_xsec);
+   * inside of ProposeOccurenceBiasingOperation when
+   * you want to update the biased cross section.
+   */
+  G4VBiasingOperation* BiasedXsec(double biased_xsec) {
+    xsecOperation_->SetBiasedCrossSection(biased_xsec);
+    xsecOperation_->Sample();
+    return xsecOperation_;
+  }
+
   /**
    * Check if the given processed is being biased.
    *
@@ -128,14 +143,14 @@ class XsecBiasingOperator : public G4VBiasingOperator {
  * Defines a builder for the declared class
  * and then registers the class as a biasing operator.
  */
-#define DECLARE_XSECBIASINGOPERATOR(NS, CLASS)                              \
-  ldmx::XsecBiasingOperator* CLASS##Builder(const std::string& name,        \
-                                            ldmx::Parameters& parameters) { \
-    return new NS::CLASS(name, parameters);                                 \
-  }                                                                         \
-  __attribute((constructor(405))) static void CLASS##Declare() {            \
-    ldmx::XsecBiasingOperator::declare(                                     \
-        std::string(#NS) + "::" + std::string(#CLASS), &CLASS##Builder);    \
+#define DECLARE_XSECBIASINGOPERATOR(NS, CLASS)                                 \
+  simcore::XsecBiasingOperator* CLASS##Builder(const std::string& name,        \
+                                               ldmx::Parameters& parameters) { \
+    return new NS::CLASS(name, parameters);                                    \
+  }                                                                            \
+  __attribute((constructor(405))) static void CLASS##Declare() {               \
+    simcore::XsecBiasingOperator::declare(                                     \
+        std::string(#NS) + "::" + std::string(#CLASS), &CLASS##Builder);       \
   }
 
 #endif  // SIMCORE_XSECBIASINGOPERATOR_H_

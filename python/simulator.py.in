@@ -70,7 +70,6 @@ class simulator(Producer):
         self.detector = ''
         self.description = ''
 
-
         #######################################################################
         # Optional Parameters (with helpful defaults)
         self.scoringPlanes = ''
@@ -121,14 +120,3 @@ class simulator(Producer):
         self.detector = mP.makeDetectorPath( det_name )
         if include_scoring_planes :
             self.scoringPlanes = mP.makeScoringPlanesPath( det_name )
-
-    def biasingOn(self,yes=True):
-        """Turn biasing on in the simulation
-
-        Parameters
-        ----------
-        yes : bool
-            we should turn the biasing on
-        """
-
-        self.biasing_enabled = yes

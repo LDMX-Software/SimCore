@@ -1,84 +1,72 @@
-/**
- * @file XsecBiasingPlugin.h
- * @brief Geant4 Biasing Operator used to bias the occurence of photonuclear 
- *        events by modifying the cross-section.
- * @author Omar Moreno
- *         SLAC National Accelerator Laboratory
- */
 
-#ifndef BIASING_PHOTONUCLEARXSECBIASINGOPERATOR_H_
-#define BIASING_PHOTONUCLEARXSECBIASINGOPERATOR_H_
+#ifndef SIMCORE_BIASOPERATORS_PHOTONUCLEAR_H_
+#define SIMCORE_BIASOPERATORS_PHOTONUCLEAR_H_
 
-//----------------//
-//   C++ StdLib   //
-//----------------//
-#include <algorithm>
+#include "SimCore/XsecBiasingOperator.h"
 
-//------------//
-//   Geant4   //
-//------------//
-#include "G4BiasingProcessInterface.hh"
-#include "G4BiasingProcessSharedData.hh"
-#include "G4BOptnChangeCrossSection.hh"
-#include "G4Electron.hh"
-#include "G4Gamma.hh"
-#include "G4ParticleDefinition.hh"
-#include "G4ParticleTable.hh"
-#include "G4ProcessManager.hh"
-#include "G4RunManager.hh"
-#include "G4Track.hh"
-#include "G4VBiasingOperator.hh"
+namespace simcore {
+namespace biasoperators {
 
-//----------//
-//   LDMX   //
-//----------//
-#include "XsecBiasingOperator.h"
+class PhotoNuclear : public XsecBiasingOperator {
+ public:
+  /** Constructor */
+  PhotoNuclear(std::string name,const ldmx::Parameters& p);
 
-namespace ldmx { 
+  /** Method called at the beginning of a run. */
+  void StartRun();
 
-    class PhotoNuclearXsecBiasingOperator : public XsecBiasingOperator { 
+  /**
+   * @return Method that returns the biasing operation that will be used
+   *         to bias the occurence of photonuclear events.
+   */
+  G4VBiasingOperation* ProposeOccurenceBiasingOperation(
+      const G4Track* track, const G4BiasingProcessInterface* callingProcess);
 
-        public: 
+  /// return the process we want to bias
+  virtual std::string getProcessToBias() const { return "photonNuclear"; }
 
-            /** Constructor */
-            PhotoNuclearXsecBiasingOperator(std::string name);
+  /// return the particle that we want to bias
+  virtual std::string getParticleToBias() const { return "gamma"; }
 
-            /** Destructor */
-            ~PhotoNuclearXsecBiasingOperator();
+  /// return the volume we want to bias within
+  virtual std::string getVolumeToBias() const { return volume_; }
 
-            /** Method called at the beginning of a run. */
-            void StartRun();
+  /// record the configuration into the run header
+  virtual void RecordConfig(ldmx::RunHeader& h) const {
+    h.setStringParameter("BiasOperators::PhotoNuclear::Volume", volume_);
+    h.setFloatParameter("BiasOperators::PhotoNuclear::Threshold", threshold_);
+    h.setFloatParameter("BiasOperators::PhotoNuclear::Factor", factor_);
+    h.setIntParameter("BiasOperators::PhotoNuclear::Bias Conv Down",
+                      down_bias_conv_);
+  }
 
-            /** 
-             * @return Method that returns the biasing operation that will be used
-             *         to bias the occurence of photonuclear events.
-             */
-            G4VBiasingOperation* ProposeOccurenceBiasingOperation(const G4Track* track,
-                    const G4BiasingProcessInterface* callingProcess);
+ private:
+  /** Geant4 gamma conversion process name. */
+  static const std::string CONVERSION_PROCESS;
 
-        
-        protected:
+  /** Cross-section biasing operation for conversion process */
+  G4BOptnChangeCrossSection* emXsecOperation{nullptr};
 
-            virtual std::string getProcessToBias() { return PHOTONUCLEAR_PROCESS; }
+  /** Unbiased photonuclear xsec. */
+  double pnXsecUnbiased_{0};
 
-        private: 
+  /** Biased photonuclear xsec. */
+  double pnXsecBiased_{0};
 
-            /** Geant4 photonuclear process name. */
-            static const std::string PHOTONUCLEAR_PROCESS;
+  /** Volume we are going to bias within */
+  std::string volume_;
 
-            /** Geant4 gamma conversion process name. */
-            static const std::string CONVERSION_PROCESS;
+  /** minimum kinetic energy [MeV] for a track to be biased */
+  double threshold_;
 
-            /** Cross-section biasing operation */
-            G4BOptnChangeCrossSection* emXsecOperation{nullptr};
+  /** factor to bias PN by */
+  double factor_;
 
-            /** Unbiased photonuclear xsec. */
-            double pnXsecUnbiased_{0};
+  /// Should we down-bias the gamma conversion process?
+  bool down_bias_conv_;
 
-            /** Biased photonuclear xsec. */
-            double pnXsecBiased_{0};  
+};  // PhotoNuclear
+}  // namespace biasoperators
+}  // namespace simcore
 
-    };  // PhotoNuclearXsecBiasingOperator
-}
-
-#endif // SIMPLUGINS_PHOTONUCLEARXSECBIASINGOPERATOR_H_ 
+#endif  // SIMCORE_BIASOPERATORS_PHOTONUCLEAR_H_
