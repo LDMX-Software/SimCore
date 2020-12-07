@@ -19,12 +19,18 @@
 /*~~~~~~~~~~~~~*/
 #include "SimCore/DetectorConstruction.h"
 #include "SimCore/G4Session.h"
-#include "SimCore/Persist/RootPersistencyManager.h"
-#include "SimCore/RunManager.h"
+#include "SimCore/Persist/RootPersistencyManager.h" 
+#include "SimCore/DarkBrem/G4eDarkBremsstrahlung.h"
+#include "SimCore/XsecBiasingOperator.h"
+#include "SimCore/PluginFactory.h"
 
 /*~~~~~~~~~~~~~~*/
 /*    Geant4    */
 /*~~~~~~~~~~~~~~*/
+#include "G4UIsession.hh"
+#include "G4UImanager.hh"
+#include "G4BiasingProcessInterface.hh"
+#include "G4Electron.hh"
 #include "G4CascadeParameters.hh"
 #include "G4GDMLParser.hh"
 #include "G4GeometryManager.hh"
@@ -182,28 +188,9 @@ void Simulator::beforeNewRun(framework::RunHeader& header) {
                    parameters_.getParameter<std::vector<std::string>>(
                        "postInitCommands", {}));
 
-  if (parameters_.getParameter<bool>("biasing_enabled")) {
-    header.setStringParameter(
-        "Biasing Process",
-        parameters_.getParameter<std::string>("biasing_process"));
-    header.setStringParameter(
-        "Biasing Volume",
-        parameters_.getParameter<std::string>("biasing_volume"));
-    header.setStringParameter(
-        "Biasing Particle",
-        parameters_.getParameter<std::string>("biasing_particle"));
-    header.setIntParameter("Biasing All",
-                           parameters_.getParameter<bool>("biasing_all"));
-    header.setIntParameter("Biasing Incident",
-                           parameters_.getParameter<bool>("biasing_incident"));
-    header.setIntParameter(
-        "Biasing Disable EM",
-        parameters_.getParameter<bool>("biasing_disableEMBiasing"));
-    header.setIntParameter("Biasing Factor",
-                           parameters_.getParameter<int>("biasing_factor"));
-    header.setFloatParameter(
-        "Biasing Threshold",
-        parameters_.getParameter<double>("biasing_threshold"));
+  auto bops{simcore::PluginFactory::getInstance().getBiasingOperators()};
+  for (const simcore::XsecBiasingOperator* bop : bops ) {
+    bop->RecordConfig(header);
   }
 
   auto apMass{parameters_.getParameter<double>("APrimeMass")};

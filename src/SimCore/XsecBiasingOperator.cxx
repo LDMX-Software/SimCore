@@ -1,14 +1,12 @@
 #include "SimCore/XsecBiasingOperator.h"
 
-/*~~~~~~~~~~~~~~~*/
-/*   Framework   */
-/*~~~~~~~~~~~~~~~*/
 #include "Framework/Exception/Exception.h"
+#include "SimCore/PluginFactory.h"
 
 namespace simcore {
 
 XsecBiasingOperator::XsecBiasingOperator(std::string name,
-                                         ldmx::Parameters parameters)
+                                         const ldmx::Parameters& parameters)
     : G4VBiasingOperator(name) {}
 
 XsecBiasingOperator::~XsecBiasingOperator() {}
@@ -24,7 +22,7 @@ void XsecBiasingOperator::StartRun() {
   }
 
   std::cout << "[ XsecBiasingOperator ]: Biasing particles of type "
-            << particleType_ << std::endl;
+            << this->getParticleToBias() << std::endl;
 
   if (processIsBiased(this->getProcessToBias())) {
     xsecOperation_ =
@@ -59,8 +57,7 @@ bool XsecBiasingOperator::processIsBiased(std::string process) {
 
 void XsecBiasingOperator::declare(const std::string& className,
                                   XsecBiasingOperatorBuilder* builder) {
-  XsecBiasingOperatorManager::getInstance().registerOperator(className,
-                                                             builder);
+  PluginFactory::getInstance().registerBiasingOperator(className,builder);
 }
 
 }  // namespace simcore

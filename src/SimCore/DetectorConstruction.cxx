@@ -1,9 +1,8 @@
 #include "SimCore/DetectorConstruction.h"
 
-/*~~~~~~~~~~~~~~~*/
-/*   Framework   */
-/*~~~~~~~~~~~~~~~*/
-#include "Framework/Exception/Exception.h"
+#include "Framework/Exception/Exception.h" 
+#include "SimCore/XsecBiasingOperator.h"
+#include "SimCore/PluginFactory.h"
 
 namespace simcore {
 

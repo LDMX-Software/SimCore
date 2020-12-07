@@ -2,6 +2,7 @@
 #define SIMCORE_XSECBIASINGOPERATOR_H_
 
 #include "Framework/Configure/Parameters.h"
+#include "Framework/RunHeader.h"
 
 //------------//
 //   Geant4   //
@@ -30,7 +31,7 @@ typedef XsecBiasingOperator* XsecBiasingOperatorBuilder(
 class XsecBiasingOperator : public G4VBiasingOperator {
  public:
   /** Constructor */
-  XsecBiasingOperator(std::string name, ldmx::Parameters& parameters);
+  XsecBiasingOperator(std::string name, const ldmx::Parameters& parameters);
 
   /** Destructor */
   virtual ~XsecBiasingOperator();
@@ -80,6 +81,12 @@ class XsecBiasingOperator : public G4VBiasingOperator {
    * operator to.
    */
   virtual std::string getVolumeToBias() const = 0;
+
+  /**
+   * Record the configuration of this
+   * biasing operator into the run header.
+   */
+  virtual void RecordConfig(ldmx::RunHeader& header) const = 0;
 
  protected:
   /**
