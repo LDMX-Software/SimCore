@@ -7,6 +7,9 @@
 namespace simcore {
 namespace biasoperators {
 
+/**
+ * Bias the Photon-Nuclear process
+ */
 class PhotoNuclear : public XsecBiasingOperator {
  public:
   /** Constructor */
