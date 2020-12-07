@@ -25,48 +25,14 @@ namespace ldmx {
     }
 
     void DetectorConstruction::ConstructSDandField() {
+        
+        //Biasing operators were created in RunManager::setupPhysics
+        //  which is called before RunManager::Initialize
+        //  which is where this method ends up being called.
 
-        auto biasingEnabled{parameters_.getParameter< bool >("biasing_enabled")};
-        if (biasingEnabled) {
-
-            auto biasingProcess{parameters_.getParameter< std::string >("biasing_process")}; 
-            auto biasingVolume{parameters_.getParameter< std::string >("biasing_volume")};
-            auto biasingParticle{parameters_.getParameter< std::string >("biasing_particle")}; 
-            auto biasAll{parameters_.getParameter< bool >("biasing_all")}; 
-            auto biasIncident{parameters_.getParameter< bool >("biasing_incident")}; 
-            auto disableEMBiasing{parameters_.getParameter< bool >("biasing_disableEMBiasing")};
-            auto biasThreshold{parameters_.getParameter< double >("biasing_threshold")}; 
-            auto biasFactor{parameters_.getParameter< double >("biasing_factor")}; 
-
-            // Instantiate the biasing operator
-            // TODO: At some point, this should be more generic i.e. operators should be
-            //       similar to plugins.
-            XsecBiasingOperator* xsecBiasing{nullptr}; 
-            if (biasingProcess.compare("photonNuclear") == 0) { 
-                xsecBiasing = new PhotoNuclearXsecBiasingOperator("PhotoNuclearXsecBiasingOperator");
-            } else if (biasingProcess.compare("GammaToMuPair") == 0) { 
-                xsecBiasing = new GammaToMuPairXsecBiasingOperator("GammaToMuPairXsecBiasingOperator");
-            } else if (biasingProcess.compare("electronNuclear") == 0) { 
-                xsecBiasing = new ElectroNuclearXsecBiasingOperator("ElectroNuclearXsecBiasingOperator");
-            } else if (biasingProcess.compare(darkbrem::G4eDarkBremsstrahlung::PROCESS_NAME) == 0) { 
-                xsecBiasing = new darkbrem::DarkBremXsecBiasingOperator("DarkBremXsecBiasingOperator");
-            } else {
-                EXCEPTION_RAISE("BiasingException", "Invalid process name '" + biasingProcess + "'." ); 
-            }
-
-            // Configure the operator
-            xsecBiasing->setParticleType(biasingParticle);
-            xsecBiasing->setThreshold(biasThreshold); 
-            xsecBiasing->setBiasFactor(biasFactor); 
-
-            if (biasAll) xsecBiasing->biasAll(); 
-            else if (biasIncident) xsecBiasing->biasIncident();
-            
-            if (disableEMBiasing) xsecBiasing->disableBiasDownEM(); 
-
-
+        for (const XsecBiasingOperator *bop : simcore::PluginFactory::getInstance().getBiasingOperators()) {
             for (G4LogicalVolume* volume : *G4LogicalVolumeStore::GetInstance()) {
-                if (biasingVolume.compare("ecal") == 0) {
+                if (bop->getVolumeToBias().compare("ecal") == 0) {
                   G4String volumeName = volume->GetName();
                     if ((
                                volumeName.contains("Wthick") 
@@ -80,17 +46,17 @@ namespace ldmx {
                         std::cout << "[ DetectorConstruction ]: " << "Attaching biasing operator " 
                                   << xsecBiasing->GetName() << " to volume " 
                                   << volume->GetName() << std::endl;
-                    }
-                } else if (biasingVolume.compare("target") == 0) {
+                    } //volume matches pattern for ecal volumes
+                } else if (bop->getVolumeToBias().compare("target") == 0) {
                   auto region = volume->GetRegion();
                   if (region and region->GetName().contains("target")) {
                     xsecBiasing->AttachTo(volume);
                     std::cout << "[ DetectorConstruction ]: " 
                               << "Attaching biasing operator " << xsecBiasing->GetName() 
                               << " to volume " << volume->GetName() << std::endl;
-                  }
-                }
-            }
-        }
+                  } //volume is in target region
+                } //BOP attached to target or ecal
+            } //loop over volumes
+        } //loop over biasing operators
     }
 }

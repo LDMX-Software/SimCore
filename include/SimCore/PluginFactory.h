@@ -1,76 +1,157 @@
-/**
- * @file PrimaryGeneratorManager.h 
- * @brief Class that manages the generators used to fire particles. 
- * @author Omar Moreno, SLAC National Accelerator Laboratory
- */
-
-#ifndef SIMCORE_PRIMARYGENERATORMANAGER_H
-#define SIMCORE_PRIMARYGENERATORMANAGER_H
+#ifndef SIMCORE_PLUGINFACTORY_H
+#define SIMCORE_PLUGINFACTORY_H
 
 /*~~~~~~~~~~~~~~~*/
 /*   Framework   */
 /*~~~~~~~~~~~~~~~*/
-#include "Framework/Configure/Parameters.h" 
+#include "Framework/Configure/Parameters.h"
 #include "SimCore/PrimaryGenerator.h"
+#include "SimCore/USteppingAction.h"
+#include "SimCore/UserEventAction.h"
+#include "SimCore/UserRunAction.h"
+#include "SimCore/UserStackingAction.h"
+#include "SimCore/UserTrackingAction.h"
 
-namespace ldmx { 
+#include "SimCore/UserAction.h"
 
-    /**
-     * @class PrimaryGeneratorManager
-     * @brief Class that manages the generators used to fire particles. 
-     */
-    class PrimaryGeneratorManager {
+namespace simcore {
 
-        public: 
+/**
+ * @typedef action
+ * Holding references to all the differenty types of actions
+ * we could have.
+ */
+typedef std::variant<UserRunAction*, UserEventAction*, UserTrackingAction*,
+                     USteppingAction*, UserStackingAction*>
+    action;
 
-            /// @return the global PrimaryGeneratorManager instance
-            static PrimaryGeneratorManager& getInstance();
+/**
+ * A map of the different types of actions to 
+ * their reference.
+ */
+typedef std::map<TYPE, action> actionMap;
 
-            /**
-             * Get the collection of all enabled generators
-             */
-            std::vector< PrimaryGenerator* > getGenerators() const { return generators_; }; 
+/**
+ * @class PluginFactory
+ * @brief Class that manages the generators used to fire particles.
+ */
+class PluginFactory {
+ public:
+  /// @return the global PluginFactory instance
+  static PluginFactory& getInstance();
 
-            /**
-             * Attach a new generator to the list of generators
-             */
-            void registerGenerator(const std::string& className, PrimaryGeneratorBuilder* builder);
+  /**
+   * Get the collection of all enabled generators
+   */
+  std::vector<PrimaryGenerator*> getGenerators() const { return generators_; };
 
-            /**
-             * Create a new generate and attach it to the list of generators
-             */
-            void createGenerator(const std::string& className, const std::string& instanceName, Parameters& parameters);
+  /**
+   * Attach a new generator to the list of generators
+   */
+  void registerGenerator(const std::string& className,
+                         PrimaryGeneratorBuilder* builder);
 
-        private:
+  /**
+   * Create a new generate and attach it to the list of generators
+   */
+  void createGenerator(const std::string& className,
+                    const std::string& instanceName, ldmx::Parameters& parameters);
 
-            /// PrimaryGeneratorManager instance
-            static PrimaryGeneratorManager instance_;
+  /**
+   * Get all of the actions.
+   */
+  actionMap getActions();
 
-            /// Constructor - private to prevent initialization
-            PrimaryGeneratorManager() { }
+  /**
+   *
+   */
+  void registerAction(const std::string& className, UserActionBuilder* builder);
 
-            /**
-             * @struct GeneratorInfo
-             * @brief Holds necessary information to create a generator
-             */
-            struct GeneratorInfo {
+  /**
+   *
+   */
+  void createAction(const std::string& className,
+                    const std::string& instanceName, ldmx::Parameters& parameters);
 
-                /// Name of the Class
-                std::string className_;
+  /**
+   */
+  std::vector<XsecBiasingOperator*> getBiasingOperators() const { return biasing_operators_; }
 
-                /// Class builder
-                PrimaryGeneratorBuilder* builder_;
-            };
+  /**
+   *
+   */
+  void registerBiasingOperator(const std::string& className, XsecBiasingOperatorBuilder* builder);
 
-            /// A map of all register generators
-            std::map< std::string , GeneratorInfo > generatorMap_;
+  /**
+   *
+   */
+  void createBiasingOperator(const std::string& className,
+                    const std::string& instanceName, ldmx::Parameters& parameters);
 
-            /// Cointainer for all generators to be used by the simulation
-            std::vector< PrimaryGenerator* > generators_;
+ private:
+  /// PluginFactory instance
+  static PluginFactory instance_;
 
-    }; // PrimaryGeneratorManager
+  /// Constructor - private to prevent initialization
+  PluginFactory() {}
 
-} // ldmx
+  /**
+   * @struct GeneratorInfo
+   * @brief Holds necessary information to create a generator
+   */
+  struct GeneratorInfo {
+    /// Name of the Class
+    std::string className_;
 
-#endif // SIMCORE_PRIMARYGENERATORMANAGER_H
+    /// Class builder
+    PrimaryGeneratorBuilder* builder_;
+  };
+
+  /// A map of all register generators
+  std::map<std::string, GeneratorInfo> generatorMap_;
+
+  /// Cointainer for all generators to be used by the simulation
+  std::vector<PrimaryGenerator*> generators_;
+
+  /**
+   * @struct ActionInfo
+   * @brief Encapsulates the information required to create a UserAction
+   */
+  struct ActionInfo {
+    /// Name of the class
+    std::string className_;
+
+    /// Class builder
+    UserActionBuilder* builder_;
+  };
+
+  /// A map of all registered user actions to their corresponding info.
+  std::map<std::string, ActionInfo> actionInfo_;
+
+  /// Container for all Geant4 actions
+  actionMap actions_;
+
+  /**
+   * @struct BiasingOperatorInfo
+   * @brief Encapsulates the information required to create a XsecBiasingOperator
+   */
+  struct BiasingOperatorInfo {
+    /// Name of the class
+    std::string className_;
+
+    /// Class builder
+    XsecBiasingOperatorBuilder* builder_;
+  };
+
+  /// A map of all registered user actions to their corresponding info.
+  std::map<std::string, BiasingOperatorInfo> biasingInfo_;
+
+  /// Container for all biasing operators
+  std::vector<XsecBiasingOperator*> biasing_operators_;
+
+};  // PluginFactory
+
+}  // namespace simcore
+
+#endif  // SIMCORE_PLUGINFACTORY_H
 
