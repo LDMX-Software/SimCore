@@ -76,7 +76,6 @@ class simulator(Producer):
         self.detector = ''
         self.description = ''
 
-
         #######################################################################
         # Optional Parameters (with helpful defaults)
         self.scoringPlanes = ''

@@ -1,41 +1,23 @@
-/**
- * @file ElectroNulcearXsecBiasingOperator.h
- * @brief Geant4 Biasing Operator used to bias the occurrence of electronuclear
- *        events by modifying the cross-section.
- * @author Omar Moreno
- *         SLAC National Accelerator Laboratory
- */
+#ifndef SIMCORE_BIASOPERATORS_ELECTRONUCLEAR_H_
+#define SIMCORE_BIASOPERATORS_ELECTRONUCLEAR_H_
 
-#ifndef BIASING_ELECTRONUCLEARXSECBIASINGOPERATOR_H_
-#define BIASING_ELECTRONUCLEARXSECBIASINGOPERATOR_H_
-
-//------------//
-//   Geant4   //
-//------------//
-#include "G4BiasingProcessInterface.hh"
-#include "G4RunManager.hh"
-#include "G4Step.hh"
-#include "G4StepPoint.hh"
-#include "G4Track.hh"
-#include "G4VBiasingOperator.hh"
-
-//----------//
-//   LDMX   //
-//----------//
-#include "XsecBiasingOperator.h"
+#include "SimCore/XsecBiasingOperator.h"
 
 namespace simcore {
+namespace biasoperators {
 
-class ElectroNuclearXsecBiasingOperator : public XsecBiasingOperator {
+class ElectroNuclear : public XsecBiasingOperator {
  public:
-  /** Constructor */
-  ElectroNuclearXsecBiasingOperator(std::string name);
+  /**
+   * Constructor
+   *
+   * Calls parent constructor and allows
+   * accesss to configuration parameters.
+   */
+  ElectroNuclear(std::string name, const ldmx::Parameters& p);
 
   /** Destructor */
-  ~ElectroNuclearXsecBiasingOperator();
-
-  /** Method called at the beginning of a run. */
-  void StartRun();
+  ~ElectroNuclear() {}
 
   /**
    * @return Method that returns the biasing operation that will be used
@@ -44,15 +26,40 @@ class ElectroNuclearXsecBiasingOperator : public XsecBiasingOperator {
   G4VBiasingOperation* ProposeOccurenceBiasingOperation(
       const G4Track* track, const G4BiasingProcessInterface* callingProcess);
 
- protected:
-  /** Return the process to bias. */
-  virtual std::string getProcessToBias() { return ELECTRONUCLEAR_PROCESS; }
+  /// Return the process to bias
+  virtual std::string getProcessToBias() const { return "electronNuclear"; }
+
+  /// Return the particle to bias
+  virtual std::string getParticleToBias() const { return "e-"; }
+
+  /// Return the volume to bias in
+  virtual std::string getVolumeToBias() const { return volume_; }
+
+  /**
+   * Record the configuration to the run header
+   *
+   * @param[in,out] header RunHeader to record to
+   */
+  virtual void RecordConfig(ldmx::RunHeader& header) const {
+    header.setStringParameter("BiasOperator::ElectroNuclear::Volume", volume_);
+    header.setFloatParameter("BiasOperator::ElectroNuclear::Factor", factor_);
+    header.setFloatParameter("BiasOperator::ElectroNuclear::Threshold",
+                             threshold_);
+  }
 
  private:
-  /** Geant4 electronuclear process name. */
-  static const std::string ELECTRONUCLEAR_PROCESS;
+  /// The volume to bias in
+  std::string volume_;
 
-};  // ElectroNuclearXsecBiasingOperator
+  /// The biasing factor
+  double factor_;
+
+  /// Minimum kinetic energy [MeV] to allow a track to be biased
+  double threshold_;
+
+};  // ElectroNuclear
+
+}  // namespace biasoperators
 }  // namespace simcore
 
-#endif  // BIASING_ELECTRONUCLEARXSECBIASINGOPERATOR_H_
+#endif  // SIMCORE_BIASOPERATORS_ELECTRONUCLEAR_H_
