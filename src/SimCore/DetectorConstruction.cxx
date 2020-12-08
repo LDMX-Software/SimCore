@@ -24,12 +24,10 @@ namespace ldmx {
     void DetectorConstruction::ConstructSDandField() {
         
         //Biasing operators were created in RunManager::setupPhysics
-        //  which is called before RunManager::Initialize
+        //  which is called before G4RunManager::Initialize
         //  which is where this method ends up being called.
 
         auto bops{simcore::PluginFactory::getInstance().getBiasingOperators()};
-
-        std::cout << "ConstructSDandField: " << bops.size() << std::endl;
         for (simcore::XsecBiasingOperator *bop : bops) {
             for (G4LogicalVolume* volume : *G4LogicalVolumeStore::GetInstance()) {
                 if (bop->getVolumeToBias().compare("ecal") == 0) {

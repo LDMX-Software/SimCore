@@ -90,7 +90,7 @@ namespace ldmx {
     ldmx::PrimaryGenerator* CLASS ## Builder (const std::string& name, ldmx::Parameters& parameters) {      \
         return new NS::CLASS(name, parameters);                                                             \
     }                                                                                                       \
-    __attribute((constructor(305)))                                                                         \
+    __attribute((constructor(205)))                                                                         \
     static void CLASS ## Declare() {                                                                        \
         ldmx::PrimaryGenerator::declare(std::string(#NS) + "::" + std::string(#CLASS), & CLASS ## Builder); \
     } 

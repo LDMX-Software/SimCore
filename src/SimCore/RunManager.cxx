@@ -70,9 +70,8 @@ namespace ldmx {
               << biasing_operators.size() << " operator(s)." << std::endl;
 
             //create all the biasing operators that will be used
-            auto& factory{simcore::PluginFactory::getInstance()};
             for (Parameters& bop : biasing_operators ) {
-              factory.createBiasingOperator(
+              simcore::PluginFactory::getInstance().createBiasingOperator(
                   bop.getParameter<std::string>("class_name"),
                   bop.getParameter<std::string>("instance_name"),
                   bop
@@ -85,7 +84,7 @@ namespace ldmx {
             // specify which particles are going to be biased
             //  this will put a biasing interface wrapper around *all* processes
             //  associated with these particles
-            for (const simcore::XsecBiasingOperator* bop : factory.getBiasingOperators()) {
+            for (const simcore::XsecBiasingOperator* bop : simcore::PluginFactory::getInstance().getBiasingOperators()) {
               std::cout << "[ RunManager ]: Biasing operator '"
                   << bop->GetName()
                   << "' set to bias "
@@ -124,18 +123,15 @@ namespace ldmx {
         // Instantiate the primary generator action
         auto primaryGeneratorAction{ new PrimaryGeneratorAction(parameters_) };
         SetUserAction( primaryGeneratorAction );
-
-        // Get the plugin factory so we can get the actions
-        auto& factory{simcore::PluginFactory::getInstance()}; 
        
         // Get instances of all G4 actions
         //      also create them in the factory
-        auto actions{factory.getActions()};
+        auto actions{simcore::PluginFactory::getInstance().getActions()};
 
         // Create all user actions
         auto userActions{parameters_.getParameter< std::vector< Parameters > >("actions",{})}; 
         for ( auto& userAction : userActions ) {
-            factory.createAction(
+          simcore::PluginFactory::getInstance().createAction(
                     userAction.getParameter<std::string>("class_name"),
                     userAction.getParameter<std::string>("instance_name"), 
                     userAction
