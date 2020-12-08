@@ -85,14 +85,14 @@ class PrimaryGenerator : public G4VPrimaryGenerator {
  * and then registers the class as a generator
  * with the PluginFactory
  */
-#define DECLARE_GENERATOR(NS, CLASS)                                     \
-  simcore::PrimaryGenerator* CLASS##Builder(const std::string& name,        \
-                                         framework::config::Parameters& parameters) { \
-    return new NS::CLASS(name, parameters);                              \
-  }                                                                      \
-  __attribute((constructor(305))) static void CLASS##Declare() {         \
+#define DECLARE_GENERATOR(NS, CLASS)                                        \
+  simcore::PrimaryGenerator* CLASS##Builder(                                \
+      const std::string& name, framework::config::Parameters& parameters) { \
+    return new NS::CLASS(name, parameters);                                 \
+  }                                                                         \
+  __attribute((constructor(305))) static void CLASS##Declare() {            \
     simcore::PrimaryGenerator::declare(                                     \
-        std::string(#NS) + "::" + std::string(#CLASS), &CLASS##Builder); \
+        std::string(#NS) + "::" + std::string(#CLASS), &CLASS##Builder);    \
   }
 
 #endif  // SIMCORE_PRIMARYGENERATOR_H

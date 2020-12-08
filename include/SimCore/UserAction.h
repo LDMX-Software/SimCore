@@ -169,14 +169,14 @@ class UserAction {
 
 }  // namespace simcore
 
-#define DECLARE_ACTION(NS, CLASS)                                            \
-  simcore::UserAction* CLASS##Builder(const std::string& name,                  \
-                                   framework::config::Parameters& parameters) {           \
-    return new NS::CLASS(name, parameters);                                  \
-  }                                                                          \
-  __attribute((constructor(205))) static void CLASS##Declare() {             \
-    simcore::UserAction::declare(std::string(#NS) + "::" + std::string(#CLASS), \
-                              &CLASS##Builder);                              \
+#define DECLARE_ACTION(NS, CLASS)                                           \
+  simcore::UserAction* CLASS##Builder(                                      \
+      const std::string& name, framework::config::Parameters& parameters) { \
+    return new NS::CLASS(name, parameters);                                 \
+  }                                                                         \
+  __attribute((constructor(205))) static void CLASS##Declare() {            \
+    simcore::UserAction::declare(                                           \
+        std::string(#NS) + "::" + std::string(#CLASS), &CLASS##Builder);    \
   }
 
 #endif  // SIMCORE_USERACTION_H

@@ -65,6 +65,10 @@ void RunManager::setupPhysics() {
   auto biasing_operators{parameters_.getParameter<std::vector<Parameters>>(
       "biasing_operators", {})};
   if (!biasing_operators.empty()) {
+
+    std::cout << "[ RunManager ]: Biasing enabled with "
+      << biasing_operators.size() << " operator(s)." << std::endl;
+
     // create all the biasing operators that will be used
     auto factory{simcore::PluginFactory::getInstance()};
     for (const Parameters& bop : biasing_operators) {
@@ -80,6 +84,8 @@ void RunManager::setupPhysics() {
     //  this will put a biasing interface wrapper around *all* processes
     //  associated with these particles
     for (const XsecBiasingOperator* bop : factory.getBiasingOperators()) {
+      std::cout << "[ RunManager ]: Biasing operator '" << bop->GetName()
+                << "' set to bias " << bop->getParticleToBias() << std::endl;
       biasingPhysics->Bias(bop->getParticleToBias());
     }
 
