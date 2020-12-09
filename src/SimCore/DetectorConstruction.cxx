@@ -34,7 +34,7 @@ void DetectorConstruction::ConstructSDandField() {
         G4String volumeName = volume->GetName();
         if ((volumeName.contains("Wthick") || volumeName.contains("Si") ||
              volumeName.contains("W") || volumeName.contains("PCB") ||
-             volumeName.contains("CFMix")) &&
+             volumeName.contains("CFMix") || volumeName.contains("Al")) &&
             volumeName.contains("volume")) {
           xsecBiasing->AttachTo(volume);
           std::cout << "[ DetectorConstruction ]: "
