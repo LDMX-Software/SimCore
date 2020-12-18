@@ -7,6 +7,10 @@ ClassImp(ldmx::SimCalorimeterHit)
 
 namespace ldmx {
 
+    const std::string SimCalorimeterHit::ECAL_COLLECTION = "EcalSimHits";
+
+    const std::string SimCalorimeterHit::HCAL_COLLECTION = "HcalSimHits";
+
     SimCalorimeterHit::SimCalorimeterHit() { }
 
     SimCalorimeterHit::~SimCalorimeterHit() {

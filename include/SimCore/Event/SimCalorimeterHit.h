@@ -32,6 +32,12 @@ namespace ldmx {
 
         public:
 
+            /// name of the ecal sim collection, should match gdml
+            static const std::string ECAL_COLLECTION;
+
+            /// name of the hcal sim collection, should match gdml
+            static const std::string HCAL_COLLECTION;
+
             /**
              * @class Contrib
              * @brief Information about a contribution to the hit in the associated cell
