@@ -7,11 +7,6 @@
 #include <algorithm>
 #include <memory>
 
-/*~~~~~~~~~~~*/
-/*   Event   */
-/*~~~~~~~~~~~*/
-#include "Recon/Event/EventConstants.h"
-
 /*~~~~~~~~~~~~~~~*/
 /*   Framework   */
 /*~~~~~~~~~~~~~~~*/
@@ -27,6 +22,8 @@
 #include "SimCore/RunManager.h"
 #include "SimCore/UserEventInformation.h"
 #include "SimCore/UserTrackingAction.h"
+#include "SimCore/Event/SimTrackerHit.h"
+#include "SimCore/Event/SimCalorimeterHit.h"
 
 /*~~~~~~~~~~~~*/
 /*   Geant4   */
@@ -158,7 +155,7 @@ void RootPersistencyManager::writeHitsCollections(const G4Event *anEvent,
       G4CalorimeterHitsCollection *calHitsColl =
           dynamic_cast<G4CalorimeterHitsCollection *>(hc);
       std::vector<simcore::event::SimCalorimeterHit> outputColl;
-      if (collName == recon::event::EventConstants::ECAL_SIM_HITS) {
+      if (collName == simcore::event::SimCalorimeterHit::ECAL_COLLECTION) {
         // Write ECal G4CalorimeterHit collection to output SimCalorimeterHit
         // collection using helper class.
         ecalHitIO_.writeHitsCollection(calHitsColl, outputColl);

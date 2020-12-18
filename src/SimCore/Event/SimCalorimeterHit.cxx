@@ -7,9 +7,11 @@ ClassImp(simcore::event::SimCalorimeterHit)
 
 namespace simcore {
 namespace event {
-SimCalorimeterHit::SimCalorimeterHit() {}
+const std::string SimCalorimeterHit::ECAL_COLLECTION = "EcalSimHits";
 
-SimCalorimeterHit::~SimCalorimeterHit() {}
+const std::string SimCalorimeterHit::HCAL_COLLECTION = "HcalSimHits";
+
+SimCalorimeterHit::SimCalorimeterHit() {}
 
 void SimCalorimeterHit::Clear() {
   incidentIDContribs_.clear();
