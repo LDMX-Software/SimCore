@@ -4,7 +4,6 @@
 //----------//
 //   LDMX   //
 //----------//
-#include "SimCore/DarkBrem/G4eDarkBremsstrahlung.h"
 #include "SimCore/XsecBiasingOperator.h"
 
 namespace simcore {
@@ -48,7 +47,7 @@ class DarkBrem : public XsecBiasingOperator {
 
   /// Return the name of the process this operator biases
   virtual std::string getProcessToBias() const {
-    return ldmx::darkbrem::G4eDarkBremsstrahlung::PROCESS_NAME;
+    return "eDBrem";
   }
 
   /// Return the name of the particle this operator biases

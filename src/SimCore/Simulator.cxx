@@ -20,7 +20,6 @@
 #include "SimCore/DetectorConstruction.h"
 #include "SimCore/G4Session.h"
 #include "SimCore/Persist/RootPersistencyManager.h" 
-#include "SimCore/DarkBrem/G4eDarkBremsstrahlung.h"
 #include "SimCore/XsecBiasingOperator.h"
 #include "SimCore/PluginFactory.h"
 
