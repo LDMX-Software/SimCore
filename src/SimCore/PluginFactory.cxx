@@ -26,30 +26,24 @@ PluginFactory& PluginFactory::getInstance() {
 void PluginFactory::registerGenerator(const std::string& className,
                                       ldmx::PrimaryGeneratorBuilder* builder) {
 
-  auto it{registeredGenerators_.find(className)};
-  if (it != registeredGenerators_.end()) {
+  if (registeredGenerators_.find(className) != registeredGenerators_.end()) {
     EXCEPTION_RAISE(
         "ExistingGeneratorDefinition",
         "The primary generator " + className + " has already been registered.");
   }
 
-  GeneratorInfo info;
-  info.className_ = className;
-  info.builder_ = builder;
-
-  registeredGenerators_[className] = info;
+  registeredGenerators_[className] = builder;
 }
 
 void PluginFactory::createGenerator(const std::string& className,
                                     const std::string& instanceName,
                                     ldmx::Parameters& parameters) {
-  auto it{registeredGenerators_.find(className)};
-  if (it == registeredGenerators_.end()) {
+  if (registeredGenerators_.find(className) == registeredGenerators_.end()) {
     EXCEPTION_RAISE("CreateGenerator",
                     "Failed to create generator '" + className + "'.");
   }
 
-  auto generator{it->second.builder_(instanceName, parameters)};
+  auto generator{registeredGenerators_[className](instanceName, parameters)};
 
   // now that the generator is built --> put it on active list
   generators_.push_back(generator);
@@ -69,29 +63,23 @@ actionMap PluginFactory::getActions() {
 
 void PluginFactory::registerAction(const std::string& className,
                                    ldmx::UserActionBuilder* builder) {
-  auto it{registeredActions_.find(className)};
-  if (it != registeredActions_.end()) {
+  if (registeredActions_.find(className) != registeredActions_.end()) {
     EXCEPTION_RAISE(
         "ExistingActionDefinition",
         "The user action " + className + " has already been registered.");
   }
 
-  ActionInfo info;
-  info.className_ = className;
-  info.builder_ = builder;
-
-  registeredActions_[className] = info;
+  registeredActions_[className] = builder;
 }
 
 void PluginFactory::createAction(const std::string& className,
                                  const std::string& instanceName,
                                  ldmx::Parameters& parameters) {
-  auto it{registeredActions_.find(className)};
-  if (it == registeredActions_.end()) {
+  if (registeredActions_.find(className) == registeredActions_.end()) {
     EXCEPTION_RAISE("PluginFactory", "Failed to create " + className);
   }
 
-  auto act{it->second.builder_(instanceName, parameters)};
+  auto act{registeredActions_[className](instanceName, parameters)};
 
   std::vector<ldmx::TYPE> types = act->getTypes();
   for (auto& type : types) {
@@ -115,30 +103,24 @@ void PluginFactory::createAction(const std::string& className,
 void PluginFactory::registerBiasingOperator(
     const std::string& className, XsecBiasingOperatorBuilder* builder) {
 
-  auto it{registeredOperators_.find(className)};
-  if (it != registeredOperators_.end()) {
+  if (registeredOperators_.find(className) != registeredOperators_.end()) {
     EXCEPTION_RAISE(
         "ExistingOperatorDefinition",
         "The biasing operator " + className + " has already been registered.");
   }
 
-  BiasingOperatorInfo info;
-  info.className_ = className;
-  info.builder_ = builder;
-
-  registeredOperators_[className] = info;
+  registeredOperators_[className] = builder;
 }
 
 void PluginFactory::createBiasingOperator(const std::string& className,
                                           const std::string& instanceName,
                                           ldmx::Parameters& parameters) {
-  auto it{registeredOperators_.find(className)};
-  if (it == registeredOperators_.end()) {
+  if (registeredOperators_.find(className) == registeredOperators_.end()) {
     EXCEPTION_RAISE("CreateBiasingOperator",
                     "Failed to create biasing '" + className + "'.");
   }
 
-  auto bop{it->second.builder_(instanceName, parameters)};
+  auto bop{registeredOperators_[className](instanceName, parameters)};
 
   // now that the biasing is built --> put it on active list
   std::cout << "[ PluginFactory ]: Biasing operator '"

@@ -63,7 +63,7 @@ class PluginFactory {
    * @param[in] builder pointer to function to use to create the generator
    */
   void registerGenerator(const std::string& className,
-                         ldmx::PrimaryGeneratorBuilder* builder);
+               ldmx::PrimaryGeneratorBuilder* builder);
 
   /**
    * Create a new generate and attach it to the list of generators
@@ -168,56 +168,20 @@ class PluginFactory {
   /// Constructor - private to prevent initialization
   PluginFactory() {}
 
-  /**
-   * @struct GeneratorInfo
-   * @brief Holds necessary information to create a generator
-   */
-  struct GeneratorInfo {
-    /// Name of the Class
-    std::string className_;
-
-    /// Class builder
-    ldmx::PrimaryGeneratorBuilder* builder_;
-  };
-
-  /// A map of all register generators
-  std::map<std::string, GeneratorInfo> registeredGenerators_;
+  /// A map of all register generators to their builders
+  std::map<std::string, ldmx::PrimaryGeneratorBuilder*> registeredGenerators_;
 
   /// Cointainer for all generators to be used by the simulation
   std::vector<ldmx::PrimaryGenerator*> generators_;
 
-  /**
-   * @struct ActionInfo
-   * @brief Encapsulates the information required to create a UserAction
-   */
-  struct ActionInfo {
-    /// Name of the class
-    std::string className_;
-
-    /// Class builder
-    ldmx::UserActionBuilder* builder_;
-  };
-
   /// A map of all registered user actions to their corresponding info.
-  std::map<std::string, ActionInfo> registeredActions_;
+  std::map<std::string, ldmx::UserActionBuilder*> registeredActions_;
 
   /// Container for all Geant4 actions
   actionMap actions_;
 
-  /**
-   * @struct BiasingOperatorInfo
-   * @brief Encapsulates the information required to create a XsecBiasingOperator
-   */
-  struct BiasingOperatorInfo {
-    /// Name of the class
-    std::string className_;
-
-    /// Class builder
-    XsecBiasingOperatorBuilder* builder_;
-  };
-
   /// A map of all registered user actions to their corresponding info.
-  std::map<std::string, BiasingOperatorInfo> registeredOperators_;
+  std::map<std::string, XsecBiasingOperatorBuilder*> registeredOperators_;
 
   /// Container for all biasing operators
   std::vector<XsecBiasingOperator*> biasing_operators_;
