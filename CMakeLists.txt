@@ -53,9 +53,6 @@ setup_library(module SimCore
                            "${registered_targets}"
               sources ${SRC_FILES})
 
-# Testing includes .py files as well as .cxx files in test directory
-setup_test(dependencies SimCore::SimCore)
-
 # Setup the biasing operators library
 setup_library(module SimCore
               name BiasOperators
@@ -68,3 +65,7 @@ set_target_properties(SimCore
                       CXX_EXTENSIONS NO)
 
 setup_python(package_name ${PYTHON_PACKAGE_NAME}/SimCore)
+
+# Add the config in the test directory to be run in tests
+register_test_config(py_script ${PROJECT_SOURCE_DIR}/test/basic.py)
+
