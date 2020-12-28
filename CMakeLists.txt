@@ -67,5 +67,5 @@ set_target_properties(SimCore
 setup_python(package_name ${PYTHON_PACKAGE_NAME}/SimCore)
 
 # Add the config in the test directory to be run in tests
-register_test_config(py_script ${PROJECT_SOURCE_DIR}/test/basic.py)
+setup_test(configs ${PROJECT_SOURCE_DIR}/test/basic.py)
 
