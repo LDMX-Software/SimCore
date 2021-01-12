@@ -46,7 +46,7 @@ class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
    * @param parameters The parameters used to configure the primary
    *                   generator action.
    */
-  PrimaryGeneratorAction(framework::config::Parameters& parameters);
+  PrimaryGeneratorAction(const framework::config::Parameters& parameters);
 
   /**
    * Class destructor.

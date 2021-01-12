@@ -22,7 +22,7 @@
 namespace simcore {
 
 LHEPrimaryGenerator::LHEPrimaryGenerator(const std::string& name,
-                                         framework::config::Parameters& parameters)
+                                         const framework::config::Parameters& parameters)
     : PrimaryGenerator(name, parameters) {
   std::string filePath = parameters_.getParameter<std::string>("filePath");
   reader_ = new LHEReader(filePath);

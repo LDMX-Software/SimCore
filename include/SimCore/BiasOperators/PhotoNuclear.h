@@ -13,7 +13,7 @@ namespace biasoperators {
 class PhotoNuclear : public XsecBiasingOperator {
  public:
   /** Constructor */
-  PhotoNuclear(std::string name,const ldmx::Parameters& p);
+  PhotoNuclear(std::string name,const framework::config::Parameters& p);
 
   /** Method called at the beginning of a run. */
   void StartRun();
@@ -35,7 +35,7 @@ class PhotoNuclear : public XsecBiasingOperator {
   virtual std::string getVolumeToBias() const { return volume_; }
 
   /// record the configuration into the run header
-  virtual void RecordConfig(ldmx::RunHeader& h) const {
+  virtual void RecordConfig(framework::RunHeader& h) const {
     h.setStringParameter("BiasOperators::PhotoNuclear::Volume", volume_);
     h.setFloatParameter("BiasOperators::PhotoNuclear::Threshold", threshold_);
     h.setFloatParameter("BiasOperators::PhotoNuclear::Factor", factor_);

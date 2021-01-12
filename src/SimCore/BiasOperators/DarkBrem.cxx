@@ -9,7 +9,7 @@
 namespace simcore {
 namespace biasoperators {
 
-DarkBrem::DarkBrem(std::string name, const ldmx::Parameters& p)
+DarkBrem::DarkBrem(std::string name, const framework::config::Parameters& p)
     : XsecBiasingOperator(name, p) {
   volume_ = p.getParameter<std::string>("volume");
   factor_ = p.getParameter<double>("factor");
@@ -43,7 +43,7 @@ G4VBiasingOperation* DarkBrem::ProposeOccurenceBiasingOperation(
     return 0;
 }
 
-void DarkBrem::RecordConfig(ldmx::RunHeader& h) const {
+void DarkBrem::RecordConfig(framework::RunHeader& h) const {
   h.setIntParameter("BiasOperator::DarkBrem::Bias All Electrons", bias_all_);
   h.setFloatParameter("BiasOperator::DarkBrem::Factor", factor_);
   h.setStringParameter("BiasOperator::DarkBrem::Volume", volume_);

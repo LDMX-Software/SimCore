@@ -10,7 +10,7 @@
 namespace simcore {
 
 MultiParticleGunPrimaryGenerator::MultiParticleGunPrimaryGenerator(
-    const std::string& name, framework::config::Parameters& parameters)
+    const std::string& name, const framework::config::Parameters& parameters)
     : PrimaryGenerator(name, parameters), random_(new TRandom) {
   auto stlVertex{parameters_.getParameter<std::vector<double> >("vertex")};
   auto stlMomentum{parameters_.getParameter<std::vector<double> >("momentum")};

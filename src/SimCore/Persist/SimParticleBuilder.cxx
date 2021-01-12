@@ -5,10 +5,10 @@
 // LDMX
 #include "Framework/Event.h"
 #include "Framework/Exception/Exception.h"
-#include "Recon/Event/EventConstants.h"
 #include "SimCore/G4CalorimeterHit.h"
 #include "SimCore/G4TrackerHit.h"
 #include "SimCore/UserTrackingAction.h"
+#include "SimCore/Event/SimParticle.h"
 
 // Geant4
 #include "G4Event.hh"
@@ -16,8 +16,6 @@
 #include "G4HCofThisEvent.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4VTrajectoryPoint.hh"
-
-using namespace simcore;
 
 namespace simcore {
 namespace persist {

@@ -27,7 +27,7 @@ void DetectorConstruction::ConstructSDandField() {
   //  which is called before RunManager::Initialize
   //  which is where this method ends up being called.
 
-  for (const XsecBiasingOperator* bop :
+  for (XsecBiasingOperator* bop :
        simcore::PluginFactory::getInstance().getBiasingOperators()) {
     for (G4LogicalVolume* volume : *G4LogicalVolumeStore::GetInstance()) {
       if (bop->getVolumeToBias().compare("ecal") == 0) {
@@ -36,17 +36,17 @@ void DetectorConstruction::ConstructSDandField() {
              volumeName.contains("W") || volumeName.contains("PCB") ||
              volumeName.contains("CFMix") || volumeName.contains("Al")) &&
             volumeName.contains("volume")) {
-          xsecBiasing->AttachTo(volume);
+          bop->AttachTo(volume);
           std::cout << "[ DetectorConstruction ]: "
-                    << "Attaching biasing operator " << xsecBiasing->GetName()
+                    << "Attaching biasing operator " << bop->GetName()
                     << " to volume " << volume->GetName() << std::endl;
         }  // volume matches pattern for ecal volumes
       } else if (bop->getVolumeToBias().compare("target") == 0) {
         auto region = volume->GetRegion();
         if (region and region->GetName().contains("target")) {
-          xsecBiasing->AttachTo(volume);
+          bop->AttachTo(volume);
           std::cout << "[ DetectorConstruction ]: "
-                    << "Attaching biasing operator " << xsecBiasing->GetName()
+                    << "Attaching biasing operator " << bop->GetName()
                     << " to volume " << volume->GetName() << std::endl;
         }  // volume is in target region
       }    // BOP attached to target or ecal

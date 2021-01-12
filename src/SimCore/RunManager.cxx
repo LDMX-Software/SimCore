@@ -62,7 +62,7 @@ void RunManager::setupPhysics() {
   pList->RegisterPhysics(new GammaPhysics);
   pList->RegisterPhysics(new APrimePhysics(parameters_));
 
-  auto biasing_operators{parameters_.getParameter<std::vector<Parameters>>(
+  auto biasing_operators{parameters_.getParameter<std::vector<framework::config::Parameters>>(
       "biasing_operators", {})};
   if (!biasing_operators.empty()) {
 
@@ -70,8 +70,8 @@ void RunManager::setupPhysics() {
       << biasing_operators.size() << " operator(s)." << std::endl;
 
     // create all the biasing operators that will be used
-    auto factory{simcore::PluginFactory::getInstance()};
-    for (const Parameters& bop : biasing_operators) {
+    auto& factory{simcore::PluginFactory::getInstance()};
+    for (const framework::config::Parameters& bop : biasing_operators) {
       factory.createBiasingOperator(
           bop.getParameter<std::string>("class_name"),
           bop.getParameter<std::string>("instance_name"), bop);

@@ -24,7 +24,7 @@ PluginFactory& PluginFactory::getInstance() {
 }
 
 void PluginFactory::registerGenerator(const std::string& className,
-                                      ldmx::PrimaryGeneratorBuilder* builder) {
+                                      simcore::PrimaryGeneratorBuilder* builder) {
 
   if (registeredGenerators_.find(className) != registeredGenerators_.end()) {
     EXCEPTION_RAISE(
@@ -37,7 +37,7 @@ void PluginFactory::registerGenerator(const std::string& className,
 
 void PluginFactory::createGenerator(const std::string& className,
                                     const std::string& instanceName,
-                                    ldmx::Parameters& parameters) {
+                                    const framework::config::Parameters& parameters) {
   if (registeredGenerators_.find(className) == registeredGenerators_.end()) {
     EXCEPTION_RAISE("CreateGenerator",
                     "Failed to create generator '" + className + "'.");
@@ -51,18 +51,18 @@ void PluginFactory::createGenerator(const std::string& className,
 
 actionMap PluginFactory::getActions() {
   if (actions_.empty()) {
-    actions_[ldmx::TYPE::RUN] = new ldmx::UserRunAction();
-    actions_[ldmx::TYPE::EVENT] = new ldmx::UserEventAction();
-    actions_[ldmx::TYPE::TRACKING] = new ldmx::UserTrackingAction();
-    actions_[ldmx::TYPE::STEPPING] = new ldmx::USteppingAction();
-    actions_[ldmx::TYPE::STACKING] = new ldmx::UserStackingAction();
+    actions_[simcore::TYPE::RUN] = new simcore::UserRunAction();
+    actions_[simcore::TYPE::EVENT] = new simcore::UserEventAction();
+    actions_[simcore::TYPE::TRACKING] = new simcore::UserTrackingAction();
+    actions_[simcore::TYPE::STEPPING] = new simcore::USteppingAction();
+    actions_[simcore::TYPE::STACKING] = new simcore::UserStackingAction();
   }
 
   return actions_;
 }
 
 void PluginFactory::registerAction(const std::string& className,
-                                   ldmx::UserActionBuilder* builder) {
+                                   simcore::UserActionBuilder* builder) {
   if (registeredActions_.find(className) != registeredActions_.end()) {
     EXCEPTION_RAISE(
         "ExistingActionDefinition",
@@ -74,26 +74,26 @@ void PluginFactory::registerAction(const std::string& className,
 
 void PluginFactory::createAction(const std::string& className,
                                  const std::string& instanceName,
-                                 ldmx::Parameters& parameters) {
+                                 const framework::config::Parameters& parameters) {
   if (registeredActions_.find(className) == registeredActions_.end()) {
     EXCEPTION_RAISE("PluginFactory", "Failed to create " + className);
   }
 
   auto act{registeredActions_[className](instanceName, parameters)};
 
-  std::vector<ldmx::TYPE> types = act->getTypes();
+  std::vector<simcore::TYPE> types = act->getTypes();
   for (auto& type : types) {
-    if (type == ldmx::TYPE::RUN)
-      std::get<ldmx::UserRunAction*>(actions_[ldmx::TYPE::RUN])->registerAction(act);
-    else if (type == ldmx::TYPE::EVENT)
-      std::get<ldmx::UserEventAction*>(actions_[ldmx::TYPE::EVENT])->registerAction(act);
-    else if (type == ldmx::TYPE::TRACKING)
-      std::get<ldmx::UserTrackingAction*>(actions_[ldmx::TYPE::TRACKING])
+    if (type == simcore::TYPE::RUN)
+      std::get<simcore::UserRunAction*>(actions_[simcore::TYPE::RUN])->registerAction(act);
+    else if (type == simcore::TYPE::EVENT)
+      std::get<simcore::UserEventAction*>(actions_[simcore::TYPE::EVENT])->registerAction(act);
+    else if (type == simcore::TYPE::TRACKING)
+      std::get<simcore::UserTrackingAction*>(actions_[simcore::TYPE::TRACKING])
           ->registerAction(act);
-    else if (type == ldmx::TYPE::STEPPING)
-      std::get<ldmx::USteppingAction*>(actions_[ldmx::TYPE::STEPPING])->registerAction(act);
-    else if (type == ldmx::TYPE::STACKING)
-      std::get<ldmx::UserStackingAction*>(actions_[ldmx::TYPE::STACKING])
+    else if (type == simcore::TYPE::STEPPING)
+      std::get<simcore::USteppingAction*>(actions_[simcore::TYPE::STEPPING])->registerAction(act);
+    else if (type == simcore::TYPE::STACKING)
+      std::get<simcore::UserStackingAction*>(actions_[simcore::TYPE::STACKING])
           ->registerAction(act);
     else
       EXCEPTION_RAISE("PluginFactory", "User action type doesn't exist.");
@@ -114,7 +114,7 @@ void PluginFactory::registerBiasingOperator(
 
 void PluginFactory::createBiasingOperator(const std::string& className,
                                           const std::string& instanceName,
-                                          ldmx::Parameters& parameters) {
+                                          const framework::config::Parameters& parameters) {
   if (registeredOperators_.find(className) == registeredOperators_.end()) {
     EXCEPTION_RAISE("CreateBiasingOperator",
                     "Failed to create biasing '" + className + "'.");

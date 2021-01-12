@@ -25,9 +25,9 @@
 
 namespace simcore {
 
-PrimaryGeneratorAction::PrimaryGeneratorAction(framework::config::Parameters& parameters)
+PrimaryGeneratorAction::PrimaryGeneratorAction(const framework::config::Parameters& parameters)
     : G4VUserPrimaryGeneratorAction(),
-      manager_(PrimaryGeneratorManager::getInstance()) {
+      manager_(simcore::PluginFactory::getInstance()) {
   // The parameters used to configure the primary generator action
   parameters_ = parameters;
 

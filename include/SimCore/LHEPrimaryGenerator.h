@@ -16,8 +16,6 @@ class G4Event;
 
 namespace simcore {
 
-class Parameters;
-
 /**
  * @class LHEPrimaryGenerator
  * @brief Generates a Geant4 event from an LHEEvent
@@ -28,7 +26,7 @@ class LHEPrimaryGenerator : public PrimaryGenerator {
    * Class constructor.
    * @param reader The LHE reader with the event data.
    */
-  LHEPrimaryGenerator(const std::string& name, framework::config::Parameters& parameters);
+  LHEPrimaryGenerator(const std::string& name, const framework::config::Parameters& parameters);
 
   /**
    * Class destructor.

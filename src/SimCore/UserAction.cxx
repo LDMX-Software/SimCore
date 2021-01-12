@@ -16,7 +16,7 @@
 
 namespace simcore {
 
-UserAction::UserAction(const std::string& name, framework::config::Parameters& parameters) {
+UserAction::UserAction(const std::string& name, const framework::config::Parameters& parameters) {
   name_ = name;
   parameters_ = parameters;
 }
@@ -25,6 +25,6 @@ UserAction::~UserAction() {}
 
 void UserAction::declare(const std::string& className,
                          UserActionBuilder* builder) {
-  PluginFactory::getInstance().registerAction(className, builder);
+  simcore::PluginFactory::getInstance().registerAction(className, builder);
 }
 }  // namespace simcore

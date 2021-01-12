@@ -13,6 +13,8 @@ const std::string SimCalorimeterHit::HCAL_COLLECTION = "HcalSimHits";
 
 SimCalorimeterHit::SimCalorimeterHit() {}
 
+SimCalorimeterHit::~SimCalorimeterHit() {}
+
 void SimCalorimeterHit::Clear() {
   incidentIDContribs_.clear();
   trackIDContribs_.clear();

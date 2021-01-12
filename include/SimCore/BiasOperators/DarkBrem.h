@@ -20,7 +20,7 @@ class DarkBrem : public XsecBiasingOperator {
    * Calls base class constructor and allows
    * access to configuration parameters.
    */
-  DarkBrem(std::string name, const ldmx::Parameters& p);
+  DarkBrem(std::string name, const framework::config::Parameters& p);
 
   /**
    * Destructor
@@ -61,7 +61,7 @@ class DarkBrem : public XsecBiasingOperator {
    *
    * @param[in,out] header RunHeader to record configuration to
    */
-  virtual void RecordConfig(ldmx::RunHeader& header) const;
+  virtual void RecordConfig(framework::RunHeader& header) const;
 
  protected:
   /**

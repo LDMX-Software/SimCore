@@ -21,10 +21,10 @@ namespace simcore {
  * @typedef actionMap
  * A map of the different types of actions to their reference.
  */
-typedef std::map<ldmx::TYPE,
-                 std::variant<ldmx::UserRunAction*, ldmx::UserEventAction*,
-                              ldmx::UserTrackingAction*, ldmx::USteppingAction*,
-                              ldmx::UserStackingAction*>>
+typedef std::map<simcore::TYPE,
+                 std::variant<simcore::UserRunAction*, simcore::UserEventAction*,
+                              simcore::UserTrackingAction*, simcore::USteppingAction*,
+                              simcore::UserStackingAction*>>
     actionMap;
 
 /**
@@ -50,12 +50,12 @@ class PluginFactory {
    *
    * @return vector of pointers to constructed primary generators
    */
-  std::vector<ldmx::PrimaryGenerator*> getGenerators() const { return generators_; };
+  std::vector<simcore::PrimaryGenerator*> getGenerators() const { return generators_; };
 
   /**
    * Put the primary generator into the list of possible generators
    *
-   * @see ldmx::PrimaryGenerator::declare for where this method is called.
+   * @see simcore::PrimaryGenerator::declare for where this method is called.
    * This method is used to construct a list of all possible generators that
    * the user could use.
    *
@@ -63,7 +63,7 @@ class PluginFactory {
    * @param[in] builder pointer to function to use to create the generator
    */
   void registerGenerator(const std::string& className,
-               ldmx::PrimaryGeneratorBuilder* builder);
+               simcore::PrimaryGeneratorBuilder* builder);
 
   /**
    * Create a new generate and attach it to the list of generators
@@ -81,7 +81,7 @@ class PluginFactory {
    * @param[in] parameters Parameters to pass to the generator for configuration
    */
   void createGenerator(const std::string& className,
-                    const std::string& instanceName, ldmx::Parameters& parameters);
+                    const std::string& instanceName, const framework::config::Parameters& parameters);
 
   /**
    * Get the map of all types of user actions to 
@@ -98,14 +98,14 @@ class PluginFactory {
   /**
    * Put the user action into the list of possible actions.
    *
-   * @see ldmx::UserAction::declare for where this method is called.
+   * @see simcore::UserAction::declare for where this method is called.
    * This method is used to construct a list of all possible actions that
    * the user could use.
    *
    * @param[in] className full name of class (including namespaces) of action
    * @param[in] builder pointer to function to use to create the action
    */
-  void registerAction(const std::string& className, ldmx::UserActionBuilder* builder);
+  void registerAction(const std::string& className, simcore::UserActionBuilder* builder);
 
   /**
    * Construct a new action and attach it to the types of actions it will be a part of.
@@ -124,7 +124,7 @@ class PluginFactory {
    * @param[in] parameters Parameters to pass to the action for configuration
    */
   void createAction(const std::string& className,
-                    const std::string& instanceName, ldmx::Parameters& parameters);
+                    const std::string& instanceName, const framework::config::Parameters& parameters);
 
   /**
    * Retrieve the current list of biasing operators.
@@ -162,29 +162,29 @@ class PluginFactory {
    * @param[in] parameters Parameters to pass to the operator for configuration
    */
   void createBiasingOperator(const std::string& className,
-                    const std::string& instanceName, ldmx::Parameters& parameters);
+                    const std::string& instanceName, const framework::config::Parameters& parameters);
 
  private:
   /// Constructor - private to prevent initialization
   PluginFactory() {}
 
   /// A map of all register generators to their builders
-  std::map<std::string, ldmx::PrimaryGeneratorBuilder*> registeredGenerators_;
+  std::map<std::string, simcore::PrimaryGeneratorBuilder*> registeredGenerators_;
 
   /// Cointainer for all generators to be used by the simulation
-  std::vector<ldmx::PrimaryGenerator*> generators_;
+  std::vector<simcore::PrimaryGenerator*> generators_;
 
   /// A map of all registered user actions to their corresponding info.
-  std::map<std::string, ldmx::UserActionBuilder*> registeredActions_;
+  std::map<std::string, simcore::UserActionBuilder*> registeredActions_;
 
   /// Container for all Geant4 actions
   actionMap actions_;
 
   /// A map of all registered user actions to their corresponding info.
-  std::map<std::string, XsecBiasingOperatorBuilder*> registeredOperators_;
+  std::map<std::string, simcore::XsecBiasingOperatorBuilder*> registeredOperators_;
 
   /// Container for all biasing operators
-  std::vector<XsecBiasingOperator*> biasing_operators_;
+  std::vector<simcore::XsecBiasingOperator*> biasing_operators_;
 
 };  // PluginFactory
 

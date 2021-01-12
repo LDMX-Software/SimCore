@@ -5,11 +5,8 @@
 #include "G4VSensitiveDetector.hh"
 
 // LDMX
-#include "DetDescr/DetectorID.h"
 #include "Framework/Event.h"
 #include "SimCore/G4CalorimeterHit.h"
-
-using ldmx::DetectorID;
 
 namespace simcore {
 

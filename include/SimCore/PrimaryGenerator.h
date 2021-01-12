@@ -29,8 +29,9 @@ namespace simcore {
 // Forward declarations
 class PrimaryGenerator;
 
-typedef PrimaryGenerator* PrimaryGeneratorBuilder(const std::string& name,
-                                                  framework::config::Parameters& parameters);
+typedef PrimaryGenerator* PrimaryGeneratorBuilder(
+    const std::string& name, 
+    const framework::config::Parameters& parameters);
 
 /**
  * @class PrimaryGenerator
@@ -46,7 +47,8 @@ class PrimaryGenerator : public G4VPrimaryGenerator {
    *
    * @param name Name given the to class instance.
    */
-  PrimaryGenerator(const std::string& name, framework::config::Parameters& parameters);
+  PrimaryGenerator(const std::string& name,
+                   const framework::config::Parameters& parameters);
 
   /// Destructor
   virtual ~PrimaryGenerator();
@@ -85,14 +87,15 @@ class PrimaryGenerator : public G4VPrimaryGenerator {
  * and then registers the class as a generator
  * with the PluginFactory
  */
-#define DECLARE_GENERATOR(NS, CLASS)                                        \
-  simcore::PrimaryGenerator* CLASS##Builder(                                \
-      const std::string& name, framework::config::Parameters& parameters) { \
-    return new NS::CLASS(name, parameters);                                 \
-  }                                                                         \
-  __attribute((constructor(305))) static void CLASS##Declare() {            \
-    simcore::PrimaryGenerator::declare(                                     \
-        std::string(#NS) + "::" + std::string(#CLASS), &CLASS##Builder);    \
+#define DECLARE_GENERATOR(NS, CLASS)                                     \
+  simcore::PrimaryGenerator* CLASS##Builder(                             \
+      const std::string& name,                                           \
+      const framework::config::Parameters& parameters) {                 \
+    return new NS::CLASS(name, parameters);                              \
+  }                                                                      \
+  __attribute((constructor(305))) static void CLASS##Declare() {         \
+    simcore::PrimaryGenerator::declare(                                  \
+        std::string(#NS) + "::" + std::string(#CLASS), &CLASS##Builder); \
   }
 
 #endif  // SIMCORE_PRIMARYGENERATOR_H

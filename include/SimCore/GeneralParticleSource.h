@@ -22,9 +22,6 @@ class G4Event;
 
 namespace simcore {
 
-// Forward declarations
-class Parameters;
-
 /**
  * @class GeneralParticleSource
  * @brief Class that extends the functionality of G4GeneralParticleSource.
@@ -39,7 +36,7 @@ class GeneralParticleSource : public PrimaryGenerator {
    * Parameters:
    *  initCommands : vector of Geant4 strings to initialize the GPS
    */
-  GeneralParticleSource(const std::string& name, framework::config::Parameters& parameters);
+  GeneralParticleSource(const std::string& name, const framework::config::Parameters& parameters);
 
   /// Destructor
   ~GeneralParticleSource();

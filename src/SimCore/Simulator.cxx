@@ -213,7 +213,7 @@ void Simulator::beforeNewRun(framework::RunHeader& header) {
     auto className{gen.getParameter<std::string>("class_name")};
     header.setStringParameter(genID + " Class", className);
 
-    if (className.find("ldmx::ParticleGun") != std::string::npos) {
+    if (className.find("ParticleGun") != std::string::npos) {
       header.setFloatParameter(genID + " Time [ns]",
                                gen.getParameter<double>("time"));
       header.setFloatParameter(genID + " Energy [MeV]",
@@ -224,7 +224,7 @@ void Simulator::beforeNewRun(framework::RunHeader& header) {
                       gen.getParameter<std::vector<double>>("position"));
       threeVectorDump(genID + " Direction",
                       gen.getParameter<std::vector<double>>("direction"));
-    } else if (className.find("ldmx::MultiParticleGunPrimaryGenerator") !=
+    } else if (className.find("MultiParticleGunPrimaryGenerator") !=
                std::string::npos) {
       header.setIntParameter(genID + " Poisson Enabled",
                              gen.getParameter<bool>("enablePoisson"));
@@ -235,19 +235,19 @@ void Simulator::beforeNewRun(framework::RunHeader& header) {
                       gen.getParameter<std::vector<double>>("vertex"));
       threeVectorDump(genID + " Momentum [MeV]",
                       gen.getParameter<std::vector<double>>("momentum"));
-    } else if (className.find("ldmx::LHEPrimaryGenerator") !=
+    } else if (className.find("LHEPrimaryGenerator") !=
                std::string::npos) {
       header.setStringParameter(genID + " LHE File",
                                 gen.getParameter<std::string>("filePath"));
-    } else if (className.find("ldmx::RootCompleteReSim") != std::string::npos) {
+    } else if (className.find("RootCompleteReSim") != std::string::npos) {
       header.setStringParameter(genID + " ROOT File",
                                 gen.getParameter<std::string>("filePath"));
-    } else if (className.find("ldmx::RootSimFromEcalSP") != std::string::npos) {
+    } else if (className.find("RootSimFromEcalSP") != std::string::npos) {
       header.setStringParameter(genID + " ROOT File",
                                 gen.getParameter<std::string>("filePath"));
       header.setFloatParameter(genID + " Time Cutoff [ns]",
                                gen.getParameter<double>("time_cutoff"));
-    } else if (className.find("ldmx::GeneralParticleSource") !=
+    } else if (className.find("GeneralParticleSource") !=
                std::string::npos) {
       stringVectorDump(
           genID + " Init Cmd",

@@ -64,7 +64,7 @@ class MultiParticleGunPrimaryGenerator : public PrimaryGenerator {
    *  enablePoisson : whether to poisson distribute the number of particles
    */
   MultiParticleGunPrimaryGenerator(const std::string& name,
-                                   framework::config::Parameters& parameters);
+                                   const framework::config::Parameters& parameters);
 
   /** Destructor */
   virtual ~MultiParticleGunPrimaryGenerator();

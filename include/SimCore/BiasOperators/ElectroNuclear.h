@@ -17,7 +17,7 @@ class ElectroNuclear : public XsecBiasingOperator {
    * Calls parent constructor and allows
    * accesss to configuration parameters.
    */
-  ElectroNuclear(std::string name, const ldmx::Parameters& p);
+  ElectroNuclear(std::string name, const framework::config::Parameters& p);
 
   /** Destructor */
   ~ElectroNuclear() {}
@@ -43,7 +43,7 @@ class ElectroNuclear : public XsecBiasingOperator {
    *
    * @param[in,out] header RunHeader to record to
    */
-  virtual void RecordConfig(ldmx::RunHeader& header) const {
+  virtual void RecordConfig(framework::RunHeader& header) const {
     header.setStringParameter("BiasOperator::ElectroNuclear::Volume", volume_);
     header.setFloatParameter("BiasOperator::ElectroNuclear::Factor", factor_);
     header.setFloatParameter("BiasOperator::ElectroNuclear::Threshold",
