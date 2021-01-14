@@ -36,7 +36,7 @@ namespace ldmx {
 
         while (getline(ifs_, line)) {
 
-            if (line == "</event>") {
+	    if (line == "</event>" or line == "<mgrwt>") {
                 break;
             }
 
