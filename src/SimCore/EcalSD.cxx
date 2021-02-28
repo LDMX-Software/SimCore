@@ -69,7 +69,8 @@ G4bool EcalSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
   layerNumber = int(cpynum / 7);
   int module_position = cpynum % 7;
 
-  ldmx::EcalID partialId = hitMap_->getCellModuleID(hitPosition[0], hitPosition[1], hitPosition[2]);
+  ldmx::EcalID partialId =
+      hitMap_->getCellModuleID(hitPosition[0], hitPosition[1], hitPosition[2]);
   ldmx::EcalID id(layerNumber, module_position, partialId.cell());
   hit->setID(id.raw());
 
