@@ -52,7 +52,7 @@ if(NOT TARGET DMG4::Interface)
   get_filename_component(DMG4_INSTALL_PREFIX ${dmg4_include_dir} DIRECTORY)
   message(STATUS "Found DMG4: ${DMG4_INSTALL_PREFIX}")
 
-  file(GLOB DMG4_LINK_LIBRARIES CONFIGURE_DEPENDES "${DMG4_INSTALL_PREFIX}/lib*.so")
+  file(GLOB DMG4_LINK_LIBRARIES CONFIGURE_DEPENDES "${DMG4_INSTALL_PREFIX}/lib/lib*.so")
 
   # Create the target
   add_library(DMG4::Interface INTERFACE IMPORTED GLOBAL)
