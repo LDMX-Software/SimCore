@@ -14,6 +14,7 @@
 #include "G4ProcessType.hh"   //for type of process
 #include "G4RunManager.hh"    //for VerboseLevel
 #include "SimCore/DarkBrem/DarkBremVertexLibraryModel.h"
+#include "SimCore/DarkBrem/DMG4Model.h"
 #include "SimCore/DarkBrem/G4APrime.h"
 
 namespace simcore {
@@ -72,6 +73,8 @@ G4eDarkBremsstrahlung::G4eDarkBremsstrahlung(
   auto model_name{model.getParameter<std::string>("name")};
   if (model_name == "vertex_library") {
     model_ = std::make_shared<DarkBremVertexLibraryModel>(model);
+  } else if (model_name == "dmg4") {
+    model_ = std::make_shared<DMG4Model>(model);
   } else {
     EXCEPTION_RAISE("DarkBremModel",
                     "Model named '" + model_name + "' is not known.");

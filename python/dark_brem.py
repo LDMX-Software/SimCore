@@ -48,6 +48,22 @@ class VertexLibraryModel(DarkBremModel) :
         self.threshold    = 2.0 #GeV
         self.epsilon      = 0.01
 
+class DMG4Model(DarkBremModel) :
+    """Configuration for the DMG4 model
+
+    Attributes
+    ----------
+    threshold : float
+        Minimum energy [GeV] that electron should have for dark brem to have nonzero xsec
+    epsilon : float
+        Epsilon for dark brem xsec calculation
+    """
+
+    def __init__(self) :
+        super().__init__('dmg4')
+        self.threshold    = 2.0 #GeV
+        self.epsilon      = 0.01
+
 class DarkBrem:
     """Storage for parameters of dark brem process
 
