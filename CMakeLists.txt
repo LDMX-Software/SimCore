@@ -47,6 +47,7 @@ if(NOT TARGET DMG4::Interface)
   if (NOT dmg4_include_dir)
     message(FATAL_ERROR "DMG4 installation not found. Give the path as
       '-DDMG4_ROOT=<path-to-install>'.")
+    return()
   endif()
 
   get_filename_component(DMG4_INSTALL_PREFIX ${dmg4_include_dir} DIRECTORY)
