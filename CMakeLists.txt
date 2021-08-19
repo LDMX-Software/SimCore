@@ -17,18 +17,9 @@ find_package(Boost REQUIRED
 
 option(BUILD_EVENT_ONLY "Build the event library." ON)
 if(BUILD_EVENT_ONLY)
-
-  register_event_object(module_path "SimCore/Event" namespace "ldmx" 
-                        class "SimCalorimeterHit" type "collection")
-  register_event_object(module_path "SimCore/Event" namespace "ldmx"
-                        class "SimTrackerHit" type "collection")
-  register_event_object(module_path "SimCore/Event" namespace "ldmx"
-                        class "SimParticle" type "map" key "int")
-
   # Generate the files needed to build the event classes.
   setup_library(module SimCore name Event
-                dependencies ROOT::Core
-                register_target)
+                dependencies ROOT::Core)
 
   return()
 
@@ -60,7 +51,6 @@ setup_library(module SimCore
                            SimCore::DarkBrem
                            DetDescr::DetDescr
                            Boost::log
-                           "${registered_targets}"
               sources ${SRC_FILES})
 
 # Setup the biasing operators library
