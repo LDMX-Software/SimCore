@@ -49,6 +49,7 @@ setup_library(module SimCore
                            Framework::Configure
                            Framework::Framework
                            SimCore::DarkBrem
+                           SimCore::Event
                            DetDescr::DetDescr
                            Boost::log
               sources ${SRC_FILES})
