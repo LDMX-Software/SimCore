@@ -83,6 +83,23 @@ class UserTrackInformation : public G4VUserTrackInformation {
   }
 
   /**
+   * Check whether this track is a recoil electron.
+   *
+   * @return True if this track is a recoil electron, false otherwise.
+   */
+  bool isRecoilElectron() const { return isRecoilElectron_; }
+
+/**
+   * Tag this track as a recoil electron by the biasing filters.
+   *
+   * @param[in] isRecoilElectron flag indicating whether this track is
+   *      a candidate or not.
+   */
+  void tagRecoilElectron(bool isRecoilElectron = true) {
+    isRecoilElectron_ = isRecoilElectron;
+  }
+
+  /**
    * Check whether this track is a photon that has undergone a
    * photo-nuclear reaction.
    *
@@ -129,6 +146,9 @@ class UserTrackInformation : public G4VUserTrackInformation {
 
   /// Flag indicating whether this track is a brem candidate
   bool isBremCandidate_{false};
+
+  /// Flag indicating whether this track is a recoil electron
+  bool isRecoilElectron_{false};
 
   /**
    * Flag indicating whether this track has undergone a photo-nuclear
