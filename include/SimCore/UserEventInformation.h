@@ -25,9 +25,6 @@ class UserEventInformation : public G4VUserEventInformation {
   /// Decrease the number of brem candidates in an event.
   void decBremCandidateCount() { bremCandidateCount_ -= 1; }
 
-  /// Set the event to be true if it has a recoil electron
-  void foundRecoilElectron() { hasRecoilElectron_ = true; }
-
   /**
    * Set the event weight.
    *
@@ -53,12 +50,6 @@ class UserEventInformation : public G4VUserEventInformation {
    *      contains.
    */
   int bremCandidateCount() { return bremCandidateCount_; }
-
-  /** 
-   * @return If the event has a recoil electron.
-   */
-  int hasRecoilElectron() { return hasRecoilElectron_; }
-
 
   /**
    * Add energy to the photonuclear running total
@@ -113,9 +104,6 @@ class UserEventInformation : public G4VUserEventInformation {
  private:
   /// Total number of brem candidates in the event
   int bremCandidateCount_{0};
-
-  /// If the most recent step contained a recoil electron
-  bool hasRecoilElectron_{false};
 
   /**
    * The event weight
