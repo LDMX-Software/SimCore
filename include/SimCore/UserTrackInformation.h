@@ -85,7 +85,7 @@ class UserTrackInformation : public G4VUserTrackInformation {
 /**
    * Check whether this track is a recoil electron.
    *
-   * @return True if this track is a recoil electron, false otherwise.
+   * @return true if this track is a recoil electron, false otherwise.
    */
   bool isRecoilElectron() const { return isRecoilElectron_; }
 
