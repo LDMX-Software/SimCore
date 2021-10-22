@@ -111,6 +111,8 @@ void RootPersistencyManager::writeHeader(const G4Event *anEvent) {
                                 event_info->getPNEnergy());
   eventHeader.setFloatParameter("total_electronuclear_energy",
                                 event_info->getENEnergy());
+  eventHeader.setIntParameter("is_fiducial",
+                                event_info->isFiducial());
 
   // Save the state of the random engine to an output stream. A string
   // is then extracted and saved to the event header.

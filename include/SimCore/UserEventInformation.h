@@ -101,7 +101,23 @@ class UserEventInformation : public G4VUserEventInformation {
    */
   bool wasLastStepEN() const { return last_step_en_; }
 
+  /**
+   * Tell us if the event is fiducial
+   * @param[in] yes true if it was
+   */
+  void setFiducial(bool yes) { is_fiducial_ = yes; }
+
+  /**
+   * Was the event is fiducial?
+   * @returns true if it was
+   */
+  bool isFiducial() const { return is_fiducial_; }
+
  private:
+
+  /// The tag of whether an event is fiducial or non-fiducial
+  bool is_fiducial_{false};
+
   /// Total number of brem candidates in the event
   int bremCandidateCount_{0};
 
