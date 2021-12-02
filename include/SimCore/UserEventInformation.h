@@ -113,10 +113,24 @@ class UserEventInformation : public G4VUserEventInformation {
    */
   bool isFiducial() const { return is_fiducial_; }
 
+  /**
+   * Include the name of the ECal Volume that marked this event as fiducial
+   * @param[in] name name of the volume to include
+   */
+  void setFiducialVolume(string name) { fiducial_volume_ = name; }
+
+  /**
+   * @returns the name of the ECal Volume
+   */
+  string getFiducialVolume() const {return fiducial_volume_; }
+
  private:
 
   /// The tag of whether an event is fiducial or non-fiducial
   bool is_fiducial_{false};
+
+  /// The name of the ecal volume that made the event fiducial
+  string fiducial_volume_{'none'};
 
   /// Total number of brem candidates in the event
   int bremCandidateCount_{0};
