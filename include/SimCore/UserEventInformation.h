@@ -1,6 +1,8 @@
 #ifndef SIMCORE_USEREVENTINFORMATION_H
 #define SIMCORE_USEREVENTINFORMATION_H
-
+#include <string>
+#include <iostream>
+using namespace std;
 #include "G4VUserEventInformation.hh"
 
 namespace simcore {
@@ -117,12 +119,12 @@ class UserEventInformation : public G4VUserEventInformation {
    * Include the name of the ECal Volume that marked this event as fiducial
    * @param[in] name name of the volume to include
    */
-  void setFiducialVolume(string name) { fiducial_volume_ = name; }
+  void setFiducialVolume(std::string name) { fiducial_volume_ = name; }
 
   /**
    * @returns the name of the ECal Volume
    */
-  string getFiducialVolume() const {return fiducial_volume_; }
+  std::string getFiducialVolume() const {return fiducial_volume_; }
 
  private:
 
@@ -130,7 +132,7 @@ class UserEventInformation : public G4VUserEventInformation {
   bool is_fiducial_{false};
 
   /// The name of the ecal volume that made the event fiducial
-  string fiducial_volume_{'none'};
+  std::string fiducial_volume_{"none"};
 
   /// Total number of brem candidates in the event
   int bremCandidateCount_{0};
