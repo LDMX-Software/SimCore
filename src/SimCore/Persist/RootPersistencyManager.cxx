@@ -115,6 +115,8 @@ void RootPersistencyManager::writeHeader(const G4Event *anEvent) {
                                 event_info->isFiducial());
   eventHeader.setStringParameter("fiducial_volume",
                                 event_info->getFiducialVolume());
+  eventHeader.setIntParameter("num_recoil_electrons",
+                                event_info->recoilElectronCount());
 
   // Save the state of the random engine to an output stream. A string
   // is then extracted and saved to the event header.

@@ -27,6 +27,12 @@ class UserEventInformation : public G4VUserEventInformation {
   /// Decrease the number of brem candidates in an event.
   void decBremCandidateCount() { bremCandidateCount_ -= 1; }
 
+  /// Increment the number of target recoil electrons in an event.
+  void incRecoilElectronCount() { recoilElectronCount_ += 1; }
+
+  /// Decrease the number of target recoil electrons in an event.
+  void decRecoilElectronCount() { recoilElectronCount_ -= 1; }
+
   /**
    * Set the event weight.
    *
@@ -52,6 +58,12 @@ class UserEventInformation : public G4VUserEventInformation {
    *      contains.
    */
   int bremCandidateCount() { return bremCandidateCount_; }
+
+  /**
+   * @return The total number of target recoil electrons that this event
+   *      contains.
+   */
+  int recoilElectronCount() { return recoilElectronCount_; }  
 
   /**
    * Add energy to the photonuclear running total
@@ -136,6 +148,9 @@ class UserEventInformation : public G4VUserEventInformation {
 
   /// Total number of brem candidates in the event
   int bremCandidateCount_{0};
+
+  /// Total number of target recoil electrons in the event
+  int recoilElectronCount_{0};
 
   /**
    * The event weight
