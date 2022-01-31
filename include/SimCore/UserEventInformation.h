@@ -1,6 +1,7 @@
 #ifndef SIMCORE_USEREVENTINFORMATION_H
 #define SIMCORE_USEREVENTINFORMATION_H
 #include <string>
+#include <vector>
 #include <iostream>
 using namespace std;
 #include "G4VUserEventInformation.hh"
@@ -30,9 +31,17 @@ class UserEventInformation : public G4VUserEventInformation {
   /// Increment the number of target recoil electrons in an event.
   void incRecoilElectronCount() { recoilElectronCount_ += 1; }
 
-  /// Decrease the number of target recoil electrons in an event.
-  void decRecoilElectronCount() { recoilElectronCount_ -= 1; }
+  /// Add the volume name to the list of volumes 
+  void addVolume(std::string name) { all_volumes_.push_back(name); } 
 
+  void addXpos(double val) { x_positions_.push_back(val); }
+
+  void addYpos(double val) { y_positions_.push_back(val); }
+
+  void addZpos(double val) { z_positions_.push_back(val); }
+
+  /// Increment the total number of steps
+  void incTotalSteps() { total_steps_ += 1; }
   /**
    * Set the event weight.
    *
@@ -136,15 +145,42 @@ class UserEventInformation : public G4VUserEventInformation {
   /**
    * @returns the name of the ECal Volume
    */
-  std::string getFiducialVolume() const {return fiducial_volume_; }
+  std::string getFiducialVolume() const { return fiducial_volume_; }
+
+  /**
+   * @returns the name of each volume the recoil electron passes through
+   */
+  std::vector<std::string> getAllVolumes() const { return all_volumes_; }
+
+  int getTotalSteps() const { return total_steps_; }
+
+  std::vector<double> getXPositions() const { return x_positions_; }
+
+  std::vector<double> getYPositions() const { return y_positions_; }
+
+  std::vector<double> getZPositions() const { return z_positions_; }
 
  private:
+
+  int total_steps_{0};
 
   /// The tag of whether an event is fiducial or non-fiducial
   bool is_fiducial_{false};
 
   /// The name of the ecal volume that made the event fiducial
   std::string fiducial_volume_{"none"};
+
+  /// The names of the volumes that the particle passes through
+  std::vector<std::string> all_volumes_{};
+
+  /// X-positions
+  std::vector<double> x_positions_{};
+  
+  /// Y-positions
+  std::vector<double> y_positions_{};
+  
+  /// Z-positions
+  std::vector<double> z_positions_{};
 
   /// Total number of brem candidates in the event
   int bremCandidateCount_{0};
