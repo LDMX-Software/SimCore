@@ -112,27 +112,6 @@ void RootPersistencyManager::writeHeader(const G4Event *anEvent) {
   eventHeader.setFloatParameter("total_electronuclear_energy",
                                 event_info->getENEnergy());
 
-  int index = 0;
-  for (auto const& val : event_info->getAllVolumes()) {
-    eventHeader.setStringParameter("all_volumes_" + std::to_string(++index), val);
-  }
-
-  int index1 = 0;
-  for (auto const& val1 : event_info->getXPositions()) {
-    eventHeader.setFloatParameter("x_positions_" + std::to_string(++index1), val1);
-  }
-
-  int index2 = 0;
-  for (auto const& val2 : event_info->getYPositions()) {
-    eventHeader.setFloatParameter("y_positions_" + std::to_string(++index2), val2);
-  }
-
-  int index3 = 0;
-  for (auto const& val3 : event_info->getZPositions()) {
-    eventHeader.setFloatParameter("z_positions_" + std::to_string(++index3), val3);
-  }
-
-
   // Save the state of the random engine to an output stream. A string
   // is then extracted and saved to the event header.
   std::ostringstream stream;
