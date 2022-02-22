@@ -162,26 +162,6 @@ class UserEventInformation : public G4VUserEventInformation {
 
  private:
 
-  int total_steps_{0};
-
-  /// The tag of whether an event is fiducial or non-fiducial
-  bool is_fiducial_{false};
-
-  /// The name of the ecal volume that made the event fiducial
-  std::string fiducial_volume_{"none"};
-
-  /// The names of the volumes that the particle passes through
-  std::vector<std::string> all_volumes_{};
-
-  /// X-positions
-  std::vector<double> x_positions_{};
-  
-  /// Y-positions
-  std::vector<double> y_positions_{};
-  
-  /// Z-positions
-  std::vector<double> z_positions_{};
-
   /// Total number of brem candidates in the event
   int bremCandidateCount_{0};
 

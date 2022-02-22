@@ -111,14 +111,6 @@ void RootPersistencyManager::writeHeader(const G4Event *anEvent) {
                                 event_info->getPNEnergy());
   eventHeader.setFloatParameter("total_electronuclear_energy",
                                 event_info->getENEnergy());
-  eventHeader.setIntParameter("is_fiducial",
-                                event_info->isFiducial());
-  eventHeader.setStringParameter("fiducial_volume",
-                                event_info->getFiducialVolume());
-  eventHeader.setIntParameter("num_recoil_electrons",
-                                event_info->recoilElectronCount());
-  eventHeader.setIntParameter("num_steps",
-                                event_info->getTotalSteps());
 
   int index = 0;
   for (auto const& val : event_info->getAllVolumes()) {
