@@ -32,13 +32,13 @@ G4double DMG4Model::ComputeCrossSectionPerAtom(
     G4double electronKE, G4double A, G4double Z) {
   electronKE /= GeV; //DMG4 uses GeV internally
   if (electronKE < dm_model_->GetEThresh()) return 0.;  // outside viable region for model
-  return dm_model_->GetSigmaTot(electronKE)/dm_model_->GetMeanFreePathFactor()/epsilon_/epsilon_;
+  return epsilon_*epsilon_*dm_model_->GetSigmaTot(electronKE)/dm_model_->GetMeanFreePathFactor();
 }
 
 void DMG4Model::GenerateChange(
     G4ParticleChange &particleChange, const G4Track &track,
     const G4Step &step) {
-  const G4double incidentE = track.GetTotalEnergy();
+  const G4double incidentE = track.GetKineticEnergy();
   G4ThreeVector incidentDir = track.GetMomentumDirection();
 
   G4double XAcc=0., angles[2];
