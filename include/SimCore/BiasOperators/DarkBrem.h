@@ -74,7 +74,6 @@ class DarkBrem : public XsecBiasingOperator {
    *
    * This is called inside G4VBiasingOperator::ReportOperationApplied
    * which is called inside G4BiasingProcessInterface::PostStepDoIt
-   */
   void OperationApplied(const G4BiasingProcessInterface* callingProcess,
           G4BiasingAppliedCase biasingCase,
           G4VBiasingOperation* operationApplied,
@@ -91,6 +90,7 @@ class DarkBrem : public XsecBiasingOperator {
               << std::endl;
       }
   }
+   */
 
  private:
   /// volume we want to bias in

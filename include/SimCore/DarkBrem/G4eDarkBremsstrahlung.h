@@ -213,6 +213,12 @@ class G4eDarkBremsstrahlung : public G4VDiscreteProcess {
   static const std::string PROCESS_NAME;
 
   /**
+   * The created instance. This will exist if dark brem has been enabled and _after_
+   * run initialization where the physics lists are constructred
+   */
+  static G4eDarkBremsstrahlung* Get() { return the_process_; }
+
+  /**
    * Constructor
    *
    * Configures this process by doing three main things:
@@ -361,6 +367,8 @@ class G4eDarkBremsstrahlung : public G4VDiscreteProcess {
   framework::logging::logger theLog_ =
       framework::logging::makeLogger("DarkBremProcess");
 
+  /// the created process
+  static G4eDarkBremsstrahlung* the_process_;
 };  // G4eDarkBremsstrahlung
 
 }  // namespace darkbrem

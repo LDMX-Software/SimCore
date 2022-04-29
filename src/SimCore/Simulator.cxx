@@ -178,29 +178,9 @@ void Simulator::beforeNewRun(ldmx::RunHeader& header) {
     bop->RecordConfig(header);
   }
 
-  auto dark_brem{
-      parameters_.getParameter<framework::config::Parameters>("dark_brem")};
-  if (dark_brem.getParameter<bool>("enable")) {
-    // the dark brem process is enabled, find it and then record its
-    // configuration
-    G4ProcessVector* candidates = G4ProcessTable::GetProcessTable()->FindProcesses(
-        darkbrem::G4eDarkBremsstrahlung::PROCESS_NAME);
-    int n_processes = candidates->size();
-    for (int i_process = 0; i_process < n_processes; i_process++) {
-      G4VProcess* process = (*candidates)[i_process];
-      if (process->GetProcessName().contains(
-              darkbrem::G4eDarkBremsstrahlung::PROCESS_NAME)) {
-        // reset process to wrapped process if it is biased
-        if (dynamic_cast<G4BiasingProcessInterface*>(process))
-          process = dynamic_cast<G4BiasingProcessInterface*>(process)
-                        ->GetWrappedProcess();
-        // record the process configuration to the run header
-        dynamic_cast<darkbrem::G4eDarkBremsstrahlung*>(process)
-          ->RecordConfig(header);
-        break;
-      }  // this process is the dark brem process
-    }    // loop through electron processes
-  }      // dark brem has been enabled
+  if (darkbrem::G4eDarkBremsstrahlung::Get()) {
+    darkbrem::G4eDarkBremsstrahlung::Get()->RecordConfig(header);
+  }
 
   auto generators{
       parameters_.getParameter<std::vector<framework::config::Parameters>>(

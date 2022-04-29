@@ -57,11 +57,13 @@ ElementXsecCache::key_t ElementXsecCache::computeKey(G4double energy,
 }
 
 const std::string G4eDarkBremsstrahlung::PROCESS_NAME = "eDarkBrem";
+G4eDarkBremsstrahlung* G4eDarkBremsstrahlung::the_process_ = nullptr;
 
 G4eDarkBremsstrahlung::G4eDarkBremsstrahlung(
     const framework::config::Parameters& params)
     : G4VDiscreteProcess(G4eDarkBremsstrahlung::PROCESS_NAME,
                          fElectromagnetic) {
+  the_process_ = this;
   // we need to pretend to be an EM process so the biasing framework recognizes
   // us
   SetProcessSubType(63);  // needs to be different from the other Em Subtypes
