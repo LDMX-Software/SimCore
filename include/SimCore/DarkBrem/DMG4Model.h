@@ -71,6 +71,8 @@ class DMG4Model : public G4eDarkBremsstrahlungModel {
  private:
   /// model imported from DMG4 library
   std::unique_ptr<DarkMatter> dm_model_;
+  /// the epsilon value we will use
+  double epsilon_;
 };
 
 }  // namespace darkbrem

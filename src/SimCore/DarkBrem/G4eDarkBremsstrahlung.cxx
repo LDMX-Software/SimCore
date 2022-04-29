@@ -195,7 +195,7 @@ G4double G4eDarkBremsstrahlung::GetMeanFreePath(const G4Track& track, G4double,
 
     SIGMA += NbOfAtomsPerVolume[i] * element_xsec;
   }
-  SIGMA *= 1e12;
+  //SIGMA *= 1e12; // muons since biasing don't work
   return SIGMA > DBL_MIN ? 1. / SIGMA : DBL_MAX;
 }
 }  // namespace darkbrem

@@ -12,6 +12,7 @@ DMG4Model::DMG4Model(framework::config::Parameters &params)
     : G4eDarkBremsstrahlungModel(params) {
   double apmass = G4APrime::APrime()->GetPDGMass()/CLHEP::GeV;
   double threshold = std::max(params.getParameter<double>("threshold"), 2.*apmass);
+  epsilon_ = params.getParameter<double>("epsilon");
   dm_model_ = std::make_unique<DarkPhotons>(apmass,threshold);
   dm_model_->PrepareTable();
 }
@@ -31,7 +32,7 @@ G4double DMG4Model::ComputeCrossSectionPerAtom(
     G4double electronKE, G4double A, G4double Z) {
   electronKE /= GeV; //DMG4 uses GeV internally
   if (electronKE < dm_model_->GetEThresh()) return 0.;  // outside viable region for model
-  return dm_model_->GetSigmaTot(electronKE)/dm_model_->GetMeanFreePathFactor();
+  return dm_model_->GetSigmaTot(electronKE)/dm_model_->GetMeanFreePathFactor()/epsilon_/epsilon_;
 }
 
 void DMG4Model::GenerateChange(
