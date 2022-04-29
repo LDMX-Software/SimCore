@@ -73,6 +73,8 @@ class DarkBrem:
         Mass of A' in MeV
     enable : bool
         Should we use the custom Geant4 dark brem process? (Default: No)
+    muons : bool
+        Do dark brem off muons rather than electrons (Default: False)
     only_one_per_event : bool
         Should we deactivate the process after one dark brem or allow for more than one? (Default: No)
     cache_xsec : bool
@@ -85,10 +87,11 @@ class DarkBrem:
         self.ap_mass            = 0.
         self.only_one_per_event = False
         self.enable             = False #off by default
+        self.muons              = False
         self.cache_xsec         = True
         self.model              = DarkBremModel('UNDEFINED')
 
-    def activate(self, ap_mass, model = None) :
+    def activate(self, ap_mass, model = None, muons = False) :
         """Activate the dark brem process with the input A' mass [MeV] and dark brem model
 
         If no dark brem model is given, we do not activate the process
@@ -105,6 +108,8 @@ class DarkBrem:
     
             self.enable = True
             self.model  = model
+
+        self.muons = muons
 
     def __str__(self): 
         """Stringify the DarkBrem configuration

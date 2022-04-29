@@ -53,7 +53,7 @@ class DarkBrem : public XsecBiasingOperator {
   }
 
   /// Return the name of the particle this operator biases
-  virtual std::string getParticleToBias() const { return "e-"; }
+  virtual std::string getParticleToBias() const { return particle_; }
 
   /// Return the volume this operator biases
   virtual std::string getVolumeToBias() const { return volume_; }
@@ -74,6 +74,7 @@ class DarkBrem : public XsecBiasingOperator {
    *
    * This is called inside G4VBiasingOperator::ReportOperationApplied
    * which is called inside G4BiasingProcessInterface::PostStepDoIt
+   */
   void OperationApplied(const G4BiasingProcessInterface* callingProcess,
           G4BiasingAppliedCase biasingCase,
           G4VBiasingOperation* operationApplied,
@@ -81,20 +82,22 @@ class DarkBrem : public XsecBiasingOperator {
           G4VBiasingOperation* finalStateOpApplied,
           const G4VParticleChange* particleChangeProduced
           ) {
-      std::string currentProcess =
-  callingProcess->GetWrappedProcess()->GetProcessName(); if
-  (currentProcess.compare(this->getProcessToBias()) == 0) { std::cout << "DB
-  Final State Biasing Operator Applied: "
+      std::string currentProcess = callingProcess->GetWrappedProcess()
+        ->GetProcessName(); 
+      if (currentProcess.compare(this->getProcessToBias()) == 0) { 
+        std::cout << "DB Final State Biasing Operator Applied: "
               << callingProcess->GetProcessName()
               << " -> " << weight*particleChangeProduced->GetWeight()
               << std::endl;
       }
   }
-   */
 
  private:
   /// volume we want to bias in
   std::string volume_;
+
+  /// particle we want to bias
+  std::string particle_;
 
   /// factor we want to bias by
   double factor_;

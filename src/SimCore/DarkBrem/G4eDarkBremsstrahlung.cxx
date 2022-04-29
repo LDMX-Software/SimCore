@@ -9,6 +9,7 @@
 
 #include "Framework/RunHeader.h"
 #include "G4Electron.hh"      //for electron definition
+#include "G4MuonMinus.hh"     //for muon definition
 #include "G4EventManager.hh"  //for EventID number
 #include "G4ProcessTable.hh"  //for deactivating dark brem process
 #include "G4ProcessType.hh"   //for type of process
@@ -90,7 +91,7 @@ G4eDarkBremsstrahlung::G4eDarkBremsstrahlung(
 }
 
 G4bool G4eDarkBremsstrahlung::IsApplicable(const G4ParticleDefinition& p) {
-  return &p == G4Electron::Electron();
+  return &p == G4Electron::Definition() or &p == G4MuonMinus::Definition();
 }
 
 void G4eDarkBremsstrahlung::PrintInfo() {
@@ -192,7 +193,7 @@ G4double G4eDarkBremsstrahlung::GetMeanFreePath(const G4Track& track, G4double,
 
     SIGMA += NbOfAtomsPerVolume[i] * element_xsec;
   }
-
+  SIGMA *= 1e12;
   return SIGMA > DBL_MIN ? 1. / SIGMA : DBL_MAX;
 }
 }  // namespace darkbrem

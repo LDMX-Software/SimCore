@@ -101,6 +101,9 @@ class APrimePhysics : public G4VPhysicsConstructor {
   /// is dark brem enabled for this run?
   bool enable_;
 
+  /// link to muons instead of electrons? (EXPERIMENTAL)
+  bool muons_;
+
   /**
    * Dark brem parameters to pass to the process (if enabled)
    *

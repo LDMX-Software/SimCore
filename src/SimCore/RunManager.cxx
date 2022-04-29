@@ -143,6 +143,8 @@ void RunManager::Initialize() {
   for (const auto& [key, act] : actions) {
     std::visit([this](auto&& arg) { this->SetUserAction(arg); }, act);
   }
+  G4Electron::Definition()->GetProcessManager()->DumpInfo();
+  G4MuonMinus::Definition()->GetProcessManager()->DumpInfo();
 }
 
 void RunManager::TerminateOneEvent() {
@@ -164,8 +166,8 @@ void RunManager::TerminateOneEvent() {
   std::vector<G4String> dark_brem_processes = {
       darkbrem::G4eDarkBremsstrahlung::PROCESS_NAME,
       "biasWrapper(" + darkbrem::G4eDarkBremsstrahlung::PROCESS_NAME + ")"};
-  ptable->SetVerboseLevel(
-      0);  // silent ptable while searching for process that may/may not exist
+  // silent ptable while searching for process that may/may not exist
+  ptable->SetVerboseLevel(0);
   for (auto const& name : dark_brem_processes)
     ptable->SetProcessActivation(name, true);
   ptable->SetVerboseLevel(verbosity);

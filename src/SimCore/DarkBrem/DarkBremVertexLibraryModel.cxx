@@ -152,15 +152,14 @@ G4double DarkBremVertexLibraryModel::ComputeCrossSectionPerAtom(
 void DarkBremVertexLibraryModel::GenerateChange(
     G4ParticleChange &particleChange, const G4Track &track,
     const G4Step &step) {
-  static const double MA =
-      G4APrime::APrime()->GetPDGMass() / CLHEP::GeV;  // mass A' in GeV
-  static const double Mel = G4Electron::Electron()->GetPDGMass() /
-                            CLHEP::GeV;  // mass electron in GeV
+  // mass A' in GeV
+  static const double MA = G4APrime::APrime()->GetPDGMass() / CLHEP::GeV;
 
-  G4double incidentEnergy = step.GetPostStepPoint()->GetTotalEnergy();
-  incidentEnergy =
-      incidentEnergy / CLHEP::GeV;  // Convert the energy to GeV, the units used
-                                    // in the LHE files.
+  // mass of incident lepton (usually electrons, muons experimental)
+  const double Mel = track.GetDefinition()->GetPDGMass() / CLHEP::GeV;
+
+  // convert to energy units in LHE files [GeV]
+  G4double incidentEnergy = step.GetPostStepPoint()->GetTotalEnergy()/CLHEP::GeV;
 
   OutgoingKinematics data = GetMadgraphData(incidentEnergy);
   double EAcc = (data.electron.E() - Mel) *
@@ -185,10 +184,10 @@ void DarkBremVertexLibraryModel::GenerateChange(
       if (i > maxIterations_) {
         ldmx_log(warn)
             << "Could not produce a realistic vertex with library energy "
-            << data.electron.E() << " MeV.\n"
+            << data.electron.E() << " GeV.\n"
             << "Consider expanding your libary of A' vertices to include a "
                "beam energy closer to "
-            << incidentEnergy << " MeV.";
+            << incidentEnergy << " GeV.";
         break;
       }
     }
@@ -360,7 +359,7 @@ void DarkBremVertexLibraryModel::ParseLHE(std::string fname) {
     double skip, px, py, pz, E, M;
     if (iss >> ptype >> state >> skip >> skip >> skip >> skip >> px >> py >>
         pz >> E >> M) {
-      if ((ptype == 11) && (state == -1)) {
+      if ((ptype == 11 or ptype == 13) && (state == -1)) {
         double ebeam = E;
         double e_px, e_py, e_pz, a_px, a_py, a_pz, e_E, a_E, e_M, a_M;
         for (int i = 0; i < 2; i++) {
@@ -369,7 +368,7 @@ void DarkBremVertexLibraryModel::ParseLHE(std::string fname) {
         std::istringstream jss(line);
         jss >> ptype >> state >> skip >> skip >> skip >> skip >> e_px >> e_py >>
             e_pz >> e_E >> e_M;
-        if ((ptype == 11) && (state == 1)) {  // Find a final state electron.
+        if ((ptype == 11 or ptype == 13) && (state == 1)) {  // Find a final state electron.
           for (int i = 0; i < 2; i++) {
             std::getline(ifile, line);
           }

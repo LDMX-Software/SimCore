@@ -23,6 +23,7 @@
 /*~~~~~~~~~~~~~~*/
 #include "G4CascadeParameters.hh"
 #include "G4Electron.hh"
+#include "G4ProcessTable.hh"
 #include "G4GDMLParser.hh"
 #include "G4GeometryManager.hh"
 #include "G4UImanager.hh"
@@ -182,11 +183,11 @@ void Simulator::beforeNewRun(ldmx::RunHeader& header) {
   if (dark_brem.getParameter<bool>("enable")) {
     // the dark brem process is enabled, find it and then record its
     // configuration
-    G4ProcessVector* electron_processes =
-        G4Electron::Electron()->GetProcessManager()->GetProcessList();
-    int n_electron_processes = electron_processes->size();
-    for (int i_process = 0; i_process < n_electron_processes; i_process++) {
-      G4VProcess* process = (*electron_processes)[i_process];
+    G4ProcessVector* candidates = G4ProcessTable::GetProcessTable()->FindProcesses(
+        darkbrem::G4eDarkBremsstrahlung::PROCESS_NAME);
+    int n_processes = candidates->size();
+    for (int i_process = 0; i_process < n_processes; i_process++) {
+      G4VProcess* process = (*candidates)[i_process];
       if (process->GetProcessName().contains(
               darkbrem::G4eDarkBremsstrahlung::PROCESS_NAME)) {
         // reset process to wrapped process if it is biased
@@ -194,8 +195,8 @@ void Simulator::beforeNewRun(ldmx::RunHeader& header) {
           process = dynamic_cast<G4BiasingProcessInterface*>(process)
                         ->GetWrappedProcess();
         // record the process configuration to the run header
-        dynamic_cast<darkbrem::G4eDarkBremsstrahlung*>(process)->RecordConfig(
-            header);
+        dynamic_cast<darkbrem::G4eDarkBremsstrahlung*>(process)
+          ->RecordConfig(header);
         break;
       }  // this process is the dark brem process
     }    // loop through electron processes

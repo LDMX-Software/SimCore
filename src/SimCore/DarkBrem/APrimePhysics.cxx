@@ -12,6 +12,7 @@
 
 // Geant4
 #include "G4Electron.hh"
+#include "G4MuonMinus.hh"
 #include "G4ProcessManager.hh"
 
 namespace simcore {
@@ -23,6 +24,7 @@ APrimePhysics::APrimePhysics(const framework::config::Parameters &params)
     : G4VPhysicsConstructor(APrimePhysics::NAME), parameters_{params} {
   ap_mass_ = parameters_.getParameter<double>("ap_mass", 0.) * MeV;
   enable_ = parameters_.getParameter<bool>("enable", false);
+  muons_ = parameters_.getParameter<bool>("muons", false);
 }
 
 void APrimePhysics::ConstructParticle() {
@@ -54,8 +56,24 @@ void APrimePhysics::ConstructProcess() {
      * second argument means that the ordering index is given a default value of
      * 1000 which seems to be safely above all the internal/default processes.
      */
-    G4Electron::ElectronDefinition()->GetProcessManager()->AddDiscreteProcess(
-        new G4eDarkBremsstrahlung(parameters_));
+    G4ParticleDefinition* particle_def{G4Electron::ElectronDefinition()};
+    if (muons_) {
+      particle_def = G4MuonMinus::Definition();
+    }
+    std::cout << "[ APrimePhysics ] : Connecting dark brem to " 
+      << particle_def->GetParticleName() << " "
+      << particle_def->GetPDGEncoding() << std::endl;
+    G4int ret = particle_def->GetProcessManager()->AddProcess(
+        new G4eDarkBremsstrahlung(parameters_),
+        -1,-1,1000);
+    if (ret < 0) {
+      EXCEPTION_RAISE("DarkBremReg","Particle process manager returned non-zero status "
+          +std::to_string(ret)
+          + " when attempting to register dark brem to it.");
+    } else {
+      std::cout << "[ APrimePhysics ] : successfully put dark brem in index " 
+        << ret << " of process table." << std::endl;
+    }
   }
 }
 

@@ -169,12 +169,15 @@ class DarkBrem(XsecBiasingOperator) :
         Should we bias all electrons or just the primary?
     factor : float
         biasing factor to mutliply by
+    particle : str
+        which particle to bias (default: 'e-', 'mu-' is experimentally supported)
     """
 
-    def __init__(self,vol,bias_all,factor) :
+    def __init__(self,vol,bias_all,factor,particle = 'e-') :
         super().__init__('%s_bias_darkbrem'%vol,'simcore::biasoperators::DarkBrem')
 
         self.volume = vol
+        self.particle = particle
         self.bias_all = bias_all
         self.factor = factor
 
