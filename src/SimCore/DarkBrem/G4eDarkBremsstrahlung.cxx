@@ -10,6 +10,7 @@
 #include "Framework/RunHeader.h"
 #include "G4Electron.hh"      //for electron definition
 #include "G4MuonMinus.hh"     //for muon definition
+#include "G4MuonPlus.hh"      //for muon definition
 #include "G4EventManager.hh"  //for EventID number
 #include "G4ProcessTable.hh"  //for deactivating dark brem process
 #include "G4ProcessType.hh"   //for type of process
@@ -63,11 +64,12 @@ G4eDarkBremsstrahlung::G4eDarkBremsstrahlung(
     const framework::config::Parameters& params)
     : G4VDiscreteProcess(G4eDarkBremsstrahlung::PROCESS_NAME,
                          fElectromagnetic) {
-  the_process_ = this;
   // we need to pretend to be an EM process so the biasing framework recognizes
   // us
+  the_process_ = this;
   SetProcessSubType(63);  // needs to be different from the other Em Subtypes
 
+  global_bias_ = params.getParameter<double>("global_bias");
   only_one_per_event_ = params.getParameter<bool>("only_one_per_event");
   cache_xsec_ = params.getParameter<bool>("cache_xsec");
   ap_mass_ = params.getParameter<double>("ap_mass");
@@ -93,7 +95,7 @@ G4eDarkBremsstrahlung::G4eDarkBremsstrahlung(
 }
 
 G4bool G4eDarkBremsstrahlung::IsApplicable(const G4ParticleDefinition& p) {
-  return &p == G4Electron::Definition() or &p == G4MuonMinus::Definition();
+  return &p == G4Electron::Definition() or &p == G4MuonMinus::Definition() or &p == G4MuonPlus::Definition();
 }
 
 void G4eDarkBremsstrahlung::PrintInfo() {
@@ -195,7 +197,7 @@ G4double G4eDarkBremsstrahlung::GetMeanFreePath(const G4Track& track, G4double,
 
     SIGMA += NbOfAtomsPerVolume[i] * element_xsec;
   }
-  //SIGMA *= 1e12; // muons since biasing don't work
+  SIGMA *= global_bias_;
   return SIGMA > DBL_MIN ? 1. / SIGMA : DBL_MAX;
 }
 }  // namespace darkbrem

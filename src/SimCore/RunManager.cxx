@@ -88,8 +88,13 @@ void RunManager::setupPhysics() {
     for (const simcore::XsecBiasingOperator* bop :
          simcore::PluginFactory::getInstance().getBiasingOperators()) {
       std::cout << "[ RunManager ]: Biasing operator '" << bop->GetName()
-                << "' set to bias " << bop->getParticleToBias() << std::endl;
+                << "' set to bias '" << bop->getParticleToBias() << "'" << std::endl;
       biasingPhysics->Bias(bop->getParticleToBias());
+      if (bop->getParticleToBias() == "mu-") {
+        std::cout << "[ RunManager ]: Biasing operator '" << bop->GetName()
+                  << "' set to bias 'mu+'" << std::endl;
+        biasingPhysics->Bias("mu+");
+      }
     }
 
     // Register the physics constructor to the physics list:

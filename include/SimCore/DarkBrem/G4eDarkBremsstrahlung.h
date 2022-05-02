@@ -344,6 +344,11 @@ class G4eDarkBremsstrahlung : public G4VDiscreteProcess {
   bool only_one_per_event_;
 
   /**
+   * Bias the dark brem cross section GLOBALLY
+   */
+  double global_bias_;
+
+  /**
    * The mass of the A' during this run [MeV]
    */
   double ap_mass_;

@@ -71,6 +71,8 @@ class DarkBrem:
     ----------
     ap_mass : float
         Mass of A' in MeV
+    global_bias : float
+        Biasing factor to apply to the dark brem cross section everywhere (Default: 1.)
     enable : bool
         Should we use the custom Geant4 dark brem process? (Default: No)
     muons : bool
@@ -85,6 +87,7 @@ class DarkBrem:
 
     def __init__(self) : 
         self.ap_mass            = 0.
+        self.global_bias        = 1.
         self.only_one_per_event = False
         self.enable             = False #off by default
         self.muons              = False

@@ -35,10 +35,18 @@ G4double DMG4Model::ComputeCrossSectionPerAtom(
   return epsilon_*epsilon_*dm_model_->GetSigmaTot(electronKE)/dm_model_->GetMeanFreePathFactor();
 }
 
+/**
+ * Almost direct copy of DMG4::DMProcessDMBrem::PostStepDoIt
+ *
+ * ## Differences
+ * - removed references to myDarkMatter in favor of dm_model_
+ * - use our A' definition instead of DMG4's
+ * - kill parent lepton and produce new one for easier extraction of kinematics
+ */
 void DMG4Model::GenerateChange(
     G4ParticleChange &particleChange, const G4Track &track,
     const G4Step &step) {
-  const G4double incidentE = track.GetKineticEnergy();
+  const G4double incidentE = track.GetTotalEnergy();
   G4ThreeVector incidentDir = track.GetMomentumDirection();
 
   G4double XAcc=0., angles[2];

@@ -63,9 +63,7 @@ void APrimePhysics::ConstructProcess() {
     std::cout << "[ APrimePhysics ] : Connecting dark brem to " 
       << particle_def->GetParticleName() << " "
       << particle_def->GetPDGEncoding() << std::endl;
-    G4int ret = particle_def->GetProcessManager()->AddProcess(
-        new G4eDarkBremsstrahlung(parameters_),
-        -1,-1,1000);
+    G4int ret = particle_def->GetProcessManager()->AddDiscreteProcess(new G4eDarkBremsstrahlung(parameters_),1);
     if (ret < 0) {
       EXCEPTION_RAISE("DarkBremReg","Particle process manager returned non-zero status "
           +std::to_string(ret)
