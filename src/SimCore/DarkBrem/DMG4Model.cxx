@@ -48,6 +48,7 @@ void DMG4Model::GenerateChange(
     const G4Step &step) {
   const G4double incidentE = track.GetTotalEnergy();
   G4ThreeVector incidentDir = track.GetMomentumDirection();
+  const G4double incidentKinE = track.GetKineticEnergy();
 
   G4double XAcc=0., angles[2];
   if(dm_model_->GetParentPDGID() == 11)
@@ -57,13 +58,15 @@ void DMG4Model::GenerateChange(
       XAcc = dm_model_->SimulateEmission(incidentE/GeV, angles);
     }
   if(dm_model_->GetParentPDGID() == 13) {
-    //XAcc = dm_model_->SimulateEmission(incidentE/GeV, angles);
-    XAcc = dm_model_->SimulateEmissionByMuon(incidentE/GeV, angles); // angles are for the recoil muon
+    // 2-dim sampling, angles are for the recoil muon
+    //XAcc = dm_model_->SimulateEmissionByMuon(incidentE/GeV, angles);
+    // 2-step sampling, angles are for the recoil muon
+    XAcc = dm_model_->SimulateEmissionByMuon2(incidentE/GeV, angles); 
   }
 
   // Check if it failed? In this case XAcc = 0
 
-  G4double recoilE = incidentE * (1. - XAcc),
+  G4double recoilE = incidentKinE - incidentE * XAcc,
            recoilTheta = 0.,
            recoilPhi = 0.;
   G4double DMTheta = angles[0], DMPhi = angles[1];
