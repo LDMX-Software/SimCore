@@ -73,6 +73,7 @@ G4eDarkBremsstrahlung::G4eDarkBremsstrahlung(
   only_one_per_event_ = params.getParameter<bool>("only_one_per_event");
   cache_xsec_ = params.getParameter<bool>("cache_xsec");
   ap_mass_ = params.getParameter<double>("ap_mass");
+  muons_ = params.getParameter<bool>("muons");
 
   auto model{params.getParameter<framework::config::Parameters>("model")};
   auto model_name{model.getParameter<std::string>("name")};
@@ -95,7 +96,8 @@ G4eDarkBremsstrahlung::G4eDarkBremsstrahlung(
 }
 
 G4bool G4eDarkBremsstrahlung::IsApplicable(const G4ParticleDefinition& p) {
-  return &p == G4Electron::Definition() or &p == G4MuonMinus::Definition() or &p == G4MuonPlus::Definition();
+  if (muons_) return &p == G4MuonMinus::Definition() or &p == G4MuonPlus::Definition();
+  else return &p == G4Electron::Definition();
 }
 
 void G4eDarkBremsstrahlung::PrintInfo() {
@@ -198,6 +200,11 @@ G4double G4eDarkBremsstrahlung::GetMeanFreePath(const G4Track& track, G4double,
     SIGMA += NbOfAtomsPerVolume[i] * element_xsec;
   }
   SIGMA *= global_bias_;
+  /*
+  std::cout << "G4eDBrem : sigma = " << SIGMA 
+    << " initIntLenLeft = " << theInitialNumberOfInteractionLength
+    << " nIntLenLeft = " << theNumberOfInteractionLengthLeft << std::endl;
+    */
   return SIGMA > DBL_MIN ? 1. / SIGMA : DBL_MAX;
 }
 }  // namespace darkbrem

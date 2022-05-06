@@ -63,7 +63,9 @@ void APrimePhysics::ConstructProcess() {
     std::cout << "[ APrimePhysics ] : Connecting dark brem to " 
       << particle_def->GetParticleName() << " "
       << particle_def->GetPDGEncoding() << std::endl;
-    G4int ret = particle_def->GetProcessManager()->AddDiscreteProcess(new G4eDarkBremsstrahlung(parameters_),1);
+    auto proc = new G4eDarkBremsstrahlung(parameters_);
+    G4int ret = particle_def->GetProcessManager()->AddDiscreteProcess(proc);
+    //G4int ret = particle_def->GetProcessManager()->AddProcess(proc,-1,1,1);
     if (ret < 0) {
       EXCEPTION_RAISE("DarkBremReg","Particle process manager returned non-zero status "
           +std::to_string(ret)
@@ -72,6 +74,12 @@ void APrimePhysics::ConstructProcess() {
       std::cout << "[ APrimePhysics ] : successfully put dark brem in index " 
         << ret << " of process table." << std::endl;
     }
+    /**
+     * have our custom dark brem process go first in any process ordering
+     */
+    particle_def->GetProcessManager()->SetProcessOrderingToFirst(proc,
+        G4ProcessVectorDoItIndex::idxAll);
+    std::cout << "[ APrimePhysics ] : set dark brem process ordering to first" << std::endl;
   }
 }
 

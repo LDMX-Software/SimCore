@@ -90,11 +90,6 @@ void RunManager::setupPhysics() {
       std::cout << "[ RunManager ]: Biasing operator '" << bop->GetName()
                 << "' set to bias '" << bop->getParticleToBias() << "'" << std::endl;
       biasingPhysics->Bias(bop->getParticleToBias());
-      if (bop->getParticleToBias() == "mu-") {
-        std::cout << "[ RunManager ]: Biasing operator '" << bop->GetName()
-                  << "' set to bias 'mu+'" << std::endl;
-        biasingPhysics->Bias("mu+");
-      }
     }
 
     // Register the physics constructor to the physics list:
@@ -148,8 +143,48 @@ void RunManager::Initialize() {
   for (const auto& [key, act] : actions) {
     std::visit([this](auto&& arg) { this->SetUserAction(arg); }, act);
   }
-  G4Electron::Definition()->GetProcessManager()->DumpInfo();
-  G4MuonMinus::Definition()->GetProcessManager()->DumpInfo();
+
+  std::cout << "[ RunManager ] Biasing Operators:";
+  for (const G4VBiasingOperator* bop : G4VBiasingOperator::GetBiasingOperators()) {
+    std::cout << "  " << bop->GetName();
+  }
+  std::cout << std::endl;
+
+  auto print_proc_table = [](G4ProcessManager* pman) {
+    const G4ProcessVector& pvec{*(pman->GetProcessList())};
+    for (std::size_t i_proc{0}; i_proc < pvec.size(); i_proc++) {
+      const G4VProcess* proc{pvec[i_proc]};
+      std::cout << "  " << proc->GetProcessName();
+      std::cout << " " << pman->GetProcessOrdering(const_cast<G4VProcess*>(proc), 
+          G4ProcessVectorDoItIndex::idxAlongStep);
+      std::cout << " " << pman->GetProcessOrdering(const_cast<G4VProcess*>(proc), 
+          G4ProcessVectorDoItIndex::idxPostStep);
+      std::cout << " " << pman->GetProcessOrdering(const_cast<G4VProcess*>(proc), 
+          G4ProcessVectorDoItIndex::idxAtRest);
+      auto bp{dynamic_cast<const G4BiasingProcessInterface*>(proc)};
+      if (bp) {
+        std::cout << "  biased ";
+        auto bop{bp->GetCurrentBiasingOperator()};
+        if (bop) {
+          std::cout << "with " << bop->GetName();
+        } else {
+          std::cout << "no operator";
+        }
+        if (bp->GetIsFirstPostStepGPILInterface(false)) {
+          std::cout << " is first GPIL";
+        } else {
+          std::cout << " is NOT first GPIL";
+        }
+      }
+      std::cout << std::endl;
+    } 
+  };
+
+  std::cout << "[ RunManager ] : lepton process tables" << std::endl;
+  std::cout << " MUONS" << std::endl;
+  print_proc_table(G4MuonMinus::Definition()->GetProcessManager());
+  std::cout << " ELECTRONS" << std::endl;
+  print_proc_table(G4Electron::Definition()->GetProcessManager());
 }
 
 void RunManager::TerminateOneEvent() {

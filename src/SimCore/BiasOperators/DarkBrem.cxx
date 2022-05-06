@@ -21,6 +21,7 @@ G4VBiasingOperation* DarkBrem::ProposeOccurenceBiasingOperation(
     const G4Track* track, const G4BiasingProcessInterface* callingProcess) {
   std::string currentProcess =
       callingProcess->GetWrappedProcess()->GetProcessName();
+  std::cout << "Biasing " << currentProcess << std::endl;
   if (currentProcess.compare(this->getProcessToBias()) == 0) {
     // bias only the primary particle if we don't want to bias all particles
     if (not bias_all_ and track->GetParentID() != 0) return 0;
@@ -31,11 +32,11 @@ G4VBiasingOperation* DarkBrem::ProposeOccurenceBiasingOperation(
     double dbXsecUnbiased = 1. / interactionLength;
     double dbXsecBiased = dbXsecUnbiased * factor_;
 
-    if (G4RunManager::GetRunManager()->GetVerboseLevel() > 1) {
+//    if (G4RunManager::GetRunManager()->GetVerboseLevel() > 1) {
       std::cout << "[ DarkBremXsecBiasingOperator ]: "
                 << " Unbiased DBrem xsec: " << dbXsecUnbiased
                 << " -> Biased xsec: " << dbXsecBiased << std::endl;
-    }
+//    }
 
     return BiasedXsec(dbXsecBiased);
   } else

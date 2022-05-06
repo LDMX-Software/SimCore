@@ -359,6 +359,11 @@ class G4eDarkBremsstrahlung : public G4VDiscreteProcess {
   bool cache_xsec_;
 
   /**
+   * Are we dark-brem off muons or electrons?
+   */
+  bool muons_;
+
+  /**
    * The model that we are using in this run.
    *
    * Shared with the chaching class.
