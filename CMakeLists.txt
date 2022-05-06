@@ -37,39 +37,11 @@ endif()
 # Configure Geant4
 setup_geant4_target()
 
-# Create an imported DMG4 target if it hasn't been done yet.
-if(NOT TARGET DMG4::Interface)
-  find_path(
-    dmg4_include_dir
-    NAMES DarkMatter.hh
-    PATHS $ENV{LDMX_BASE}/dmg4/install/include /usr/local/include ${DMG4_ROOT}/include)
-
-  if (NOT dmg4_include_dir)
-    message(FATAL_ERROR "DMG4 installation not found. Give the path as
-      '-DDMG4_ROOT=<path-to-install>'.")
-    return()
-  endif()
-
-  get_filename_component(DMG4_INSTALL_PREFIX ${dmg4_include_dir} DIRECTORY)
-  message(STATUS "Found DMG4: ${DMG4_INSTALL_PREFIX}")
-
-  file(GLOB DMG4_LINK_LIBRARIES CONFIGURE_DEPENDES "${DMG4_INSTALL_PREFIX}/lib/lib*.so")
-
-  # Create the target
-  add_library(DMG4::Interface INTERFACE IMPORTED GLOBAL)
-
-  # Set the target properties
-  set_target_properties(
-    DMG4::Interface
-    PROPERTIES INTERFACE_LINK_LIBRARIES "${DMG4_LINK_LIBRARIES}"
-               INTERFACE_INCLUDE_DIRECTORIES "${DMG4_INSTALL_PREFIX}/include")
-endif()
-
 # Custom A' Physics module (add-on to Geant4)
 setup_library(module SimCore
               name DarkBrem
               dependencies Geant4::Interface
-                           DMG4::Interface
+                           DMG4 UtilsDM DarkMatter
                            ROOT::Physics
                            Framework::Configure
                            Framework::Framework
@@ -136,7 +108,7 @@ if(INSTALL_EXAMPLE_DB_LIBRARIES)
   # Link to the Framework library
   target_link_libraries(print-dark-brem-xsec-table 
                         PRIVATE Geant4::Interface 
-                                SimCore::SimCore 
+                                SimCore::DarkBrem
                                 Framework::Framework)
   
   # Install the fire executable

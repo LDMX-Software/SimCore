@@ -7,11 +7,6 @@
 #include <algorithm>
 #include <memory>
 
-/*~~~~~~~~~~~*/
-/*   Event   */
-/*~~~~~~~~~~~*/
-#include "Recon/Event/EventConstants.h"
-
 /*~~~~~~~~~~~~~~~*/
 /*   Framework   */
 /*~~~~~~~~~~~~~~~*/
@@ -154,7 +149,7 @@ void RootPersistencyManager::writeHitsCollections(
       G4CalorimeterHitsCollection *calHitsColl =
           dynamic_cast<G4CalorimeterHitsCollection *>(hc);
       std::vector<ldmx::SimCalorimeterHit> outputColl;
-      if (collName == ldmx::EventConstants::ECAL_SIM_HITS) {
+      if (collName == "EcalSimHits") {
         // Write ECal G4CalorimeterHit collection to output SimCalorimeterHit
         // collection using helper class.
         ecalHitIO_.writeHitsCollection(calHitsColl, outputColl);

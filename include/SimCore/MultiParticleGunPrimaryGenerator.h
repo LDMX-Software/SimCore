@@ -39,7 +39,6 @@
 //-------------//
 #include "Framework/Configure/Parameters.h"
 #include "Framework/EventHeader.h"
-#include "Recon/Event/EventConstants.h"
 #include "SimCore/PrimaryGenerator.h"
 #include "SimCore/UserPrimaryParticleInformation.h"
 
