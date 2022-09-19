@@ -6,14 +6,30 @@ project(
   SimCore
   VERSION 2.0.0
   DESCRIPTION "Core classes needed to run the Simulator."
-  LANGUAGES CXX)
+  LANGUAGES C CXX)
 
 find_package(fire REQUIRED)
+if (NOT TARGET Geant4::Interface) 
+  find_package(Geant4 REQUIRED gdml ui_all vis_all)
+  set(G4_DEF_TEMP "")
+  foreach(def ${Geant4_DEFINITIONS})
+    string(REPLACE "-D" "" def ${def})
+    list(APPEND G4_DEF_TEMP ${def})
+  endforeach()
+  add_library(Geant4::Interface INTERFACE IMPORTED GLOBAL)
+  set_target_properties(Geant4::Interface PROPERTIES
+    INTERFACE_LINK_LIBRARIES "${Geant4_LIBRARIES}"
+    INTERFACE_COMPILE_OPTIONS "${Geant4_Flags}"
+    INTERFACE_COMPILE_DEFINITIONS "${G4_DEF_TEMP}"
+    INTERFACE_INCLUDE_DIRECTORIES "${Geant4_INCLUDE_DIRS}")
+  unset(G4_DEF_TEMP)
+  message(STATUS "Geant4 ${Geant4_VERSION} found")
+endif()
 
 add_library(SimCore_Event SHARED
-  src/SimCore/SimCalorimeterHit.cxx
-  src/SimCore/SimTrackerHit.cxx
-  src/SimCore/SimParticle.cxx)
+  src/SimCore/Event/SimCalorimeterHit.cxx
+  src/SimCore/Event/SimTrackerHit.cxx
+  src/SimCore/Event/SimParticle.cxx)
 target_link_libraries(SimCore_Event PUBLIC fire::io)
 if (fire_USE_ROOT)
   target_include_directories(SimCore_Event PUBLIC
@@ -27,9 +43,6 @@ if (fire_USE_ROOT)
     MODULE SimCore_Event)
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libSimCore_Event_rdict.pcm DESTINATION lib)
 endif()
-
-# Configure Geant4
-setup_geant4_target()
 
 # reading LHE files
 add_library(SimCore_LHE SHARED
@@ -142,7 +155,7 @@ if(INSTALL_EXAMPLE_DB_LIBRARIES)
   # Add compiled tests
   configure_file(${PROJECT_SOURCE_DIR}/test/DarkBremProcessTest.cxx.in 
     ${PROJECT_SOURCE_DIR}/test/DarkBremProcessTest.cxx)
-  setup_test(dependencies SimCore::SimCore Geant4::Interface)
+  #setup_test(dependencies SimCore::SimCore Geant4::Interface)
 
   # Configure the executable so it knows the installation path of the db vertex libraries
   configure_file(${PROJECT_SOURCE_DIR}/src/SimCore/DarkBrem/print_dark_brem_xsec_table.cxx.in
@@ -161,7 +174,7 @@ if(INSTALL_EXAMPLE_DB_LIBRARIES)
     DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 endif()
 
-setup_python(package_name ${PYTHON_PACKAGE_NAME}/SimCore)
+#setup_python(package_name ${PYTHON_PACKAGE_NAME}/SimCore)
 
 # add visualization executable
 add_executable(g4-vis src/SimCore/g4_vis.cxx)
