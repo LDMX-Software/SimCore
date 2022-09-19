@@ -4,96 +4,121 @@ cmake_minimum_required(VERSION 3.12)
 # Set the project name
 project(
   SimCore
-  VERSION 1.0.0
+  VERSION 2.0.0
   DESCRIPTION "Core classes needed to run the Simulator."
   LANGUAGES CXX)
 
-# Search and configure ROOT
-find_package(ROOT CONFIG REQUIRED)
+find_package(fire REQUIRED)
 
-# Search for Boost
-find_package(Boost REQUIRED
-             COMPONENTS log)
-
-option(BUILD_EVENT_ONLY "Build the event library." ON)
-if(BUILD_EVENT_ONLY)
-
-  register_event_object(module_path "SimCore/Event" namespace "ldmx" 
-                        class "SimCalorimeterHit" type "collection")
-  register_event_object(module_path "SimCore/Event" namespace "ldmx"
-                        class "SimTrackerHit" type "collection")
-  register_event_object(module_path "SimCore/Event" namespace "ldmx"
-                        class "SimParticle" type "map" key "int")
-
-  # Generate the files needed to build the event classes.
-  setup_library(module SimCore name Event
-                dependencies ROOT::Core
-                register_target)
-
-  return()
-
+add_library(SimCore_Event SHARED
+  src/SimCore/SimCalorimeterHit.cxx
+  src/SimCore/SimTrackerHit.cxx
+  src/SimCore/SimParticle.cxx)
+target_link_libraries(SimCore_Event PUBLIC fire::io)
+if (fire_USE_ROOT)
+  target_include_directories(SimCore_Event PUBLIC
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+    "$<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>")
+  root_generate_dictionary(SimCore_EventDict
+    include/SimCore/Event/SimCalorimeterHit.h
+    include/SimCore/Event/SimTrackerHit.h
+    include/SimCore/Event/SimParticle.h
+    LINKDEF include/SimCore/Event/LinkDef.h
+    MODULE SimCore_Event)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libSimCore_Event_rdict.pcm DESTINATION lib)
 endif()
 
 # Configure Geant4
 setup_geant4_target()
 
-# Set the LHE Reading Library
-setup_library(module SimCore 
-              name LHE
-              dependencies Framework::Exception
-                           Geant4::Interface)
+# reading LHE files
+add_library(SimCore_LHE SHARED
+  src/SimCore/LHE/LHEEvent.cxx
+  src/SimCore/LHE/LHEParticle.cxx
+  src/SimCore/LHE/LHEReader.cxx)
+target_link_libraries(SimCore_LHE PUBLIC Geant4::Interface fire::exception)
+target_include_directories(SimCore_LHE PUBLIC include)
 
-# Library of our interactions with G4
-setup_library(module SimCore
-              name G4User
-              dependencies Framework::Framework
-                           Geant4::Interface)
+# we are a Geant4 User library
+add_library(SimCore_G4User SHARED
+  src/SimCore/G4User/EventAction.cxx
+  src/SimCore/G4User/PrimaryGeneratorAction.cxx
+  src/SimCore/G4User/RunAction.cxx
+  src/SimCore/G4User/StackingAction.cxx
+  src/SimCore/G4User/SteppingAction.cxx
+  src/SimCore/G4User/TrackingAction.cxx)
+target_link_libraries(SimCore_G4User PUBLIC Geant4::Interface fire::framework)
 
-setup_library(module SimCore
-              name DarkBrem
-              dependencies Geant4::Interface
-                           ROOT::Physics
-                           Framework::Configure
-                           Framework::Framework
-                           Boost::log)
+# special custom dark brem
+add_library(SimCore_DarkBrem SHARED
+  src/SimCore/DarkBrem/APrimePhysics.cxx
+  src/SimCore/DarkBrem/DarkBremVertexLibraryModel.cxx
+  src/SimCore/DarkBrem/G4APrime.cxx
+  src/SimCore/DarkBrem/G4eDarkBremsstrahlung.cxx)
+target_link_libraries(SimCore_DarkBrem PUBLIC Geant4::Interface fire::configure fire::framework ROOT::Physics)
 
-# Get a list of all of the source files.
-file(GLOB SRC_FILES CONFIGURE_DEPDENDS ${PROJECT_SOURCE_DIR}/src/SimCore/Geo/[a-zA-Z]*.cxx
-                                       ${PROJECT_SOURCE_DIR}/src/SimCore/[a-zA-Z]*.cxx)
+# simulator process and its supporting classes
+add_library(SimCore_SimCore SHARED
+  src/SimCore/Geo/AuxInfoReader.cxx
+  src/SimCore/Geo/GDMLParser.cxx
+  src/SimCore/Geo/ParserFactory.cxx
+  src/SimCore/DetectorConstruction.cxx
+  src/SimCore/G4Session.cxx
+  src/SimCore/GammaPhysics.cxx
+  src/SimCore/MagneticFieldMap3D.cxx
+  src/SimCore/ParallelWorld.cxx
+  src/SimCore/PrimaryGenerator.cxx
+  src/SimCore/RunManager.cxx
+  src/SimCore/SensitiveDetector.cxx
+  src/SimCore/Simulator.cxx
+  src/SimCore/TrackMap.cxx
+  src/SimCore/UserAction.cxx
+  src/SimCore/UserEventInformation.cxx
+  src/SimCore/UserRegionInformation.cxx
+  src/SimCore/UserTrackInformation.cxx
+  src/SimCore/XsecBiasingOperator.cxx)
+target_link_libraries(SimCore_SimCore PUBLIC fire::framework DetDescr::DetDescr
+                                             SimCore_Event SimCore_DarkBrem SimCore_G4User)
 
-# Setup the library
-setup_library(module SimCore
-              dependencies Geant4::Interface
-                           ROOT::Physics
-                           Framework::Configure
-                           Framework::Framework
-                           SimCore::DarkBrem
-                           SimCore::G4User
-                           DetDescr::DetDescr
-                           Boost::log
-                           "${registered_targets}"
-              sources ${SRC_FILES})
 
-# Setup the biasing operators library
-setup_library(module SimCore
-              name BiasOperators
-              dependencies SimCore::SimCore)
+add_library(SimCore_BiasOperators SHARED
+  src/SimCore/BiasOperators/DarkBrem.cxx
+  src/SimCore/BiasOperators/ElectroNuclear.cxx
+  src/SimCore/BiasOperators/GammaToMuPair.cxx
+  src/SimCore/BiasOperators/K0LongInelastic.cxx
+  src/SimCore/BiasOperators/NeutronInelastic.cxx
+  src/SimCore/BiasOperators/PhotoNuclear.cxx)
+target_link_libraries(SimCore_BiasOperators PUBLIC SimCore_SimCore)
 
-# Primary Generators library
-setup_library(module SimCore
-              name Generators
-              dependencies SimCore::SimCore SimCore::LHE)
+add_library(SimCore_Generators SHARED
+  src/SimCore/Generators/GeneralParticleSource.cxx
+  src/SimCore/Generators/LHEPrimaryGenerator.cxx
+  src/SimCore/Generators/MultiParticleGunPrimaryGenerator.cxx
+  src/SimCore/Generators/ParticleGun.cxx
+  src/SimCore/Generators/RootCompleteReSim.cxx
+  src/SimCore/Generators/RootSimFromEcalSP.cxx)
+target_link_libraries(SimCore_Generators PUBLIC SimCore_SimCore SimCore_LHE)
 
-# Sensitive Detectors library
-setup_library(module SimCore
-              name SDs
-              dependencies SimCore::SimCore)
+add_library(SimCore_SDs SHARED
+  src/SimCore/SDs/EcalSD.cxx
+  src/SimCore/SDs/HcalSD.cxx
+  src/SimCore/SDs/ScoringPlaneSD.cxx
+  src/SimCore/SDs/TrackerSD.cxx
+  src/SimCore/SDs/TrackerSD.cxx)
+target_link_libraries(SimCore_SDs PUBLIC SimCore_SimCore)
 
 # Set some target properties
-set_target_properties(SimCore
+set_target_properties(
+  SimCore_LHE SimCore_G4User SimCore_SimCore SimCore_DarkBrem
+  SimCore_BiasOperators SimCore_Generators SimCore_SDs
                       PROPERTIES CXX_STANDARD 17
                       CXX_STANDARD_REQUIRED YES
                       CXX_EXTENSIONS NO)
+install(TARGETS
+  SimCore_LHE SimCore_G4User SimCore_SimCore SimCore_DarkBrem
+  SimCore_BiasOperators SimCore_Generators SimCore_SDs
+  LIBRARY DESTINATION lib
+  INCLUDES DESTINATION include)
 
 # Unpack the example dark brem vertex library (or libraries)
 file(GLOB vertex_libraries data/*.tar.gz)
@@ -139,6 +164,6 @@ endif()
 setup_python(package_name ${PYTHON_PACKAGE_NAME}/SimCore)
 
 # add visualization executable
-add_executable(g4-vis ${PROJECT_SOURCE_DIR}/src/SimCore/g4_vis.cxx)
+add_executable(g4-vis src/SimCore/g4_vis.cxx)
 target_link_libraries(g4-vis PRIVATE Geant4::Interface SimCore::SimCore)
-install(TARGETS g4-vis DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+install(TARGETS g4-vis DESTINATION bin)
