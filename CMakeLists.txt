@@ -8,31 +8,8 @@ project(
   DESCRIPTION "Core classes needed to run the Simulator."
   LANGUAGES CXX)
 
-# Search and configure ROOT
-find_package(ROOT CONFIG REQUIRED)
-
-# Search for Boost
-find_package(Boost REQUIRED
-             COMPONENTS log)
-
-option(BUILD_EVENT_ONLY "Build the event library." ON)
-if(BUILD_EVENT_ONLY)
-
-  register_event_object(module_path "SimCore/Event" namespace "ldmx" 
-                        class "SimCalorimeterHit" type "collection")
-  register_event_object(module_path "SimCore/Event" namespace "ldmx"
-                        class "SimTrackerHit" type "collection")
-  register_event_object(module_path "SimCore/Event" namespace "ldmx"
-                        class "SimParticle" type "map" key "int")
-
-  # Generate the files needed to build the event classes.
-  setup_library(module SimCore name Event
-                dependencies ROOT::Core fire::io
-                register_target)
-
-  return()
-
-endif()
+setup_event_library(module SimCore name Event
+  linkdef include/SimCore/Event/LinkDef.h)
 
 # Configure Geant4
 setup_geant4_target()
@@ -69,9 +46,9 @@ setup_library(module SimCore
                            Framework::Framework
                            SimCore::DarkBrem
                            SimCore::G4User
+                           SimCore::Event
                            DetDescr::DetDescr
                            Boost::log
-                           "${registered_targets}"
               sources ${SRC_FILES})
 
 # Setup the biasing operators library
