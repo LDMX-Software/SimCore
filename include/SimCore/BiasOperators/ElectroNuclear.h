@@ -45,9 +45,9 @@ class ElectroNuclear : public XsecBiasingOperator {
    * @param[in,out] header RunHeader to record to
    */
   virtual void RecordConfig(ldmx::RunHeader& header) const {
-    header.setStringParameter("BiasOperator::ElectroNuclear::Volume", volume_);
-    header.setFloatParameter("BiasOperator::ElectroNuclear::Factor", factor_);
-    header.setFloatParameter("BiasOperator::ElectroNuclear::Threshold",
+    header.set("BiasOperator::ElectroNuclear::Volume", volume_);
+    header.set<float>("BiasOperator::ElectroNuclear::Factor", factor_);
+    header.set<float>("BiasOperator::ElectroNuclear::Threshold",
                              threshold_);
   }
 

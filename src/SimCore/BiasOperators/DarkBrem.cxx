@@ -42,9 +42,9 @@ G4VBiasingOperation* DarkBrem::ProposeOccurenceBiasingOperation(
 }
 
 void DarkBrem::RecordConfig(ldmx::RunHeader& h) const {
-  h.setIntParameter("BiasOperator::DarkBrem::Bias All Electrons", bias_all_);
-  h.setFloatParameter("BiasOperator::DarkBrem::Factor", factor_);
-  h.setStringParameter("BiasOperator::DarkBrem::Volume", volume_);
+  h.set<int>("BiasOperator::DarkBrem::Bias All Electrons", bias_all_);
+  h.set<float>("BiasOperator::DarkBrem::Factor", factor_);
+  h.set("BiasOperator::DarkBrem::Volume", volume_);
 }
 
 }  // namespace biasoperators

@@ -9,14 +9,14 @@
 #define SIMCORE_PARTICLE_GUN_H
 
 //------------//
-//   Geant4   //
-//------------//
-#include "G4ParticleGun.hh"
-
-//------------//
 //   LDMX     //
 //------------//
 #include "SimCore/PrimaryGenerator.h"
+
+//------------//
+//   Geant4   //
+//------------//
+#include "G4ParticleGun.hh"
 
 // Forward declarations
 class G4Event;

@@ -45,9 +45,9 @@ class NeutronInelastic : public XsecBiasingOperator {
    * @param[in,out] header RunHeader to record to
    */
   virtual void RecordConfig(ldmx::RunHeader& header) const {
-    header.setStringParameter("BiasOperator::NeutronInelastic::Volume", volume_);
-    header.setFloatParameter("BiasOperator::NeutronInelastic::Factor", factor_);
-    header.setFloatParameter("BiasOperator::NeutronInelastic::Threshold",
+    header.set("BiasOperator::NeutronInelastic::Volume", volume_);
+    header.set<float>("BiasOperator::NeutronInelastic::Factor", factor_);
+    header.set<float>("BiasOperator::NeutronInelastic::Threshold",
                              threshold_);
   }
 

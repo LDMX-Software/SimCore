@@ -107,8 +107,8 @@ void LHEPrimaryGenerator::GeneratePrimaryVertex(G4Event* anEvent) {
 }
 
 void LHEPrimaryGenerator::RecordConfig(const std::string& id, ldmx::RunHeader& rh) {
-  rh.setStringParameter(id+" Class", "simcore::generators::LHEPrimaryGenerator");
-  rh.setStringParameter(id+" LHE File", file_path_);
+  rh.set<std::string>(id+" Class", "simcore::generators::LHEPrimaryGenerator");
+  rh.set(id+" LHE File", file_path_);
 }
 
 }  // namespace generators

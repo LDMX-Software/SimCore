@@ -4,7 +4,6 @@
  * @author Nhan Tran, Fermilab
  * @author Omar Moreno, SLAC National Accelerator Laboratory
  * @author Tom Eichlersmith, University of Minnesota
- */
 
 #include "SimCore/Generators/RootSimFromEcalSP.h"
 
@@ -133,3 +132,4 @@ void RootSimFromEcalSP::RecordConfig(const std::string& id, ldmx::RunHeader& rh)
 }  // namespace simcore
 
 DECLARE_GENERATOR(simcore::generators::RootSimFromEcalSP)
+ */

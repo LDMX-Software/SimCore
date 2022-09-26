@@ -8,14 +8,14 @@
 #define SIMCORE_GENERALPARTICLESOURCE_H
 
 //------------//
-//   Geant4   //
-//------------//
-#include "G4GeneralParticleSource.hh"
-
-//------------//
 //   LDMX     //
 //------------//
 #include "SimCore/PrimaryGenerator.h"
+
+//------------//
+//   Geant4   //
+//------------//
+#include "G4GeneralParticleSource.hh"
 
 // Forward declarations
 class G4Event;

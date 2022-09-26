@@ -87,16 +87,16 @@ void ParticleGun::GeneratePrimaryVertex(G4Event* event) {
 }
 
 void ParticleGun::RecordConfig(const std::string& id, ldmx::RunHeader& rh) {
-  rh.setStringParameter(id + " Class", "simcore::generators::ParticleGun");
-  rh.setFloatParameter(id + " Time [ns]", theGun_.GetParticleTime());
-  rh.setFloatParameter(id + " Energy [GeV]", theGun_.GetParticleEnergy()/GeV);
-  rh.setStringParameter(id + " Particle", theGun_.GetParticleDefinition()->GetParticleName());
-  rh.setFloatParameter(id + " X [mm]", theGun_.GetParticlePosition().x());
-  rh.setFloatParameter(id + " Y [mm]", theGun_.GetParticlePosition().y());
-  rh.setFloatParameter(id + " Z [mm]", theGun_.GetParticlePosition().z());
-  rh.setFloatParameter(id + " Direction X", theGun_.GetParticleMomentumDirection().x());
-  rh.setFloatParameter(id + " Direction Y", theGun_.GetParticleMomentumDirection().y());
-  rh.setFloatParameter(id + " Direction Z", theGun_.GetParticleMomentumDirection().z());
+  rh.set<std::string>(id + " Class", "simcore::generators::ParticleGun");
+  rh.set<float>(id + " Time [ns]", theGun_.GetParticleTime());
+  rh.set<float>(id + " Energy [GeV]", theGun_.GetParticleEnergy()/GeV);
+  rh.set<std::string>(id + " Particle", theGun_.GetParticleDefinition()->GetParticleName());
+  rh.set<float>(id + " X [mm]", theGun_.GetParticlePosition().x());
+  rh.set<float>(id + " Y [mm]", theGun_.GetParticlePosition().y());
+  rh.set<float>(id + " Z [mm]", theGun_.GetParticlePosition().z());
+  rh.set<float>(id + " Direction X", theGun_.GetParticleMomentumDirection().x());
+  rh.set<float>(id + " Direction Y", theGun_.GetParticleMomentumDirection().y());
+  rh.set<float>(id + " Direction Z", theGun_.GetParticleMomentumDirection().z());
 }
 
 }  // namespace generators

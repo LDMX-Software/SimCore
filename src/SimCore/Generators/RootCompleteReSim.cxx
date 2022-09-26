@@ -4,7 +4,6 @@
  * @author Nhan Tran, Fermilab
  * @author Omar Moreno, SLAC National Accelerator Laboratory
  * @author Tom Eichlersmith, University of Minnesota
- */
 
 #include "SimCore/Generators/RootCompleteReSim.h"
 
@@ -109,3 +108,4 @@ void RootCompleteReSim::RecordConfig(const std::string& id, ldmx::RunHeader& rh)
 }  // namespace simcore
 
 DECLARE_GENERATOR(simcore::generators::RootCompleteReSim)
+ */

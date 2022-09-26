@@ -15,16 +15,6 @@
 #include <iostream>
 #include <string>
 
-//------------//
-//   Geant4   //
-//------------//
-#include "G4Event.hh"
-#include "G4IonTable.hh"
-#include "G4PhysicalConstants.hh"
-#include "G4RunManager.hh"
-#include "G4SystemOfUnits.hh"
-#include "G4VPrimaryGenerator.hh"
-
 //----------//
 //   ROOT   //
 //----------//
@@ -37,9 +27,18 @@
 //-------------//
 //   LDMX-SW   //
 //-------------//
-#include "Framework/EventHeader.h"
 #include "SimCore/PrimaryGenerator.h"
 #include "SimCore/UserPrimaryParticleInformation.h"
+
+//------------//
+//   Geant4   //
+//------------//
+#include "G4Event.hh"
+#include "G4IonTable.hh"
+#include "G4PhysicalConstants.hh"
+#include "G4RunManager.hh"
+#include "G4SystemOfUnits.hh"
+#include "G4VPrimaryGenerator.hh"
 
 namespace simcore {
 namespace generators {

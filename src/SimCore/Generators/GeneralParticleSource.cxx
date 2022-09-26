@@ -44,10 +44,10 @@ void GeneralParticleSource::GeneratePrimaryVertex(G4Event* event) {
 }
 
 void GeneralParticleSource::RecordConfig(const std::string& id, ldmx::RunHeader& rh) {
-  rh.setStringParameter(id+" Class", "simcore::generators::GeneralParticleSource");
+  rh.set<std::string>(id+" Class", "simcore::generators::GeneralParticleSource");
   std::string init_prefix{id+" Init Cmd "};
   for (std::size_t i{0}; i < init_commands_.size(); i++) {
-    rh.setStringParameter(init_prefix+std::to_string(i), init_commands_.at(i));
+    rh.set(init_prefix+std::to_string(i), init_commands_.at(i));
   }
 }
 

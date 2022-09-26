@@ -37,12 +37,12 @@ class PhotoNuclear : public XsecBiasingOperator {
 
   /// record the configuration into the run header
   virtual void RecordConfig(ldmx::RunHeader& h) const {
-    h.setStringParameter("BiasOperators::PhotoNuclear::Volume", volume_);
-    h.setFloatParameter("BiasOperators::PhotoNuclear::Threshold", threshold_);
-    h.setFloatParameter("BiasOperators::PhotoNuclear::Factor", factor_);
-    h.setIntParameter("BiasOperators::PhotoNuclear::Bias Conv Down",
+    h.set("BiasOperators::PhotoNuclear::Volume", volume_);
+    h.set<float>("BiasOperators::PhotoNuclear::Threshold", threshold_);
+    h.set<float>("BiasOperators::PhotoNuclear::Factor", factor_);
+    h.set<int>("BiasOperators::PhotoNuclear::Bias Conv Down",
                       down_bias_conv_);
-    h.setIntParameter("BiasOperators::PhotoNuclear::Only Children Of Primary",
+    h.set<int>("BiasOperators::PhotoNuclear::Only Children Of Primary",
                       only_children_of_primary_);
   }
 

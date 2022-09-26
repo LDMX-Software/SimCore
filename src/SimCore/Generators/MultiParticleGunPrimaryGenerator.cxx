@@ -74,16 +74,16 @@ void MultiParticleGunPrimaryGenerator::GeneratePrimaryVertex(G4Event* anEvent) {
 }
 
 void MultiParticleGunPrimaryGenerator::RecordConfig(const std::string& id, ldmx::RunHeader& rh) {
-  rh.setStringParameter(id + " Class", "simcore::generators::MultiParticleGunPrimaryGenerator");
-  rh.setIntParameter(id + " Poisson Enabled", mpgEnablePoisson_);
-  rh.setFloatParameter(id + " N Particles", mpgNParticles_);
-  rh.setIntParameter(id + " PDG ID", mpgPdgID_);
-  rh.setFloatParameter(id + " Vertex X [mm]", mpgVertex_.x());
-  rh.setFloatParameter(id + " Vertex Y [mm]", mpgVertex_.y());
-  rh.setFloatParameter(id + " Vertex Z [mm]", mpgVertex_.z());
-  rh.setFloatParameter(id + " Momentum X [MeV]", mpgMomentum_.x());
-  rh.setFloatParameter(id + " Momentum Y [MeV]", mpgMomentum_.y());
-  rh.setFloatParameter(id + " Momentum Z [MeV]", mpgMomentum_.z());
+  rh.set<std::string>(id + " Class", "simcore::generators::MultiParticleGunPrimaryGenerator");
+  rh.set<int>(id + " Poisson Enabled", mpgEnablePoisson_);
+  rh.set<float>(id + " N Particles", mpgNParticles_);
+  rh.set(id + " PDG ID", mpgPdgID_);
+  rh.set<float>(id + " Vertex X [mm]", mpgVertex_.x());
+  rh.set<float>(id + " Vertex Y [mm]", mpgVertex_.y());
+  rh.set<float>(id + " Vertex Z [mm]", mpgVertex_.z());
+  rh.set<float>(id + " Momentum X [MeV]", mpgMomentum_.x());
+  rh.set<float>(id + " Momentum Y [MeV]", mpgMomentum_.y());
+  rh.set<float>(id + " Momentum Z [MeV]", mpgMomentum_.z());
 }
 
 }  // namespace generators
