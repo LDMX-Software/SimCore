@@ -1,4 +1,3 @@
-#include "G4Electron.hh"
 #include "catch.hpp"
 
 //----------//
@@ -6,8 +5,10 @@
 //----------//
 #include "Framework/Configure/Parameters.h"
 #include "Framework/Logger.h"
-#include "SimCore/DarkBrem/G4APrime.h"
 #include "SimCore/DarkBrem/G4eDarkBremsstrahlung.h"
+#include "SimCore/DarkBrem/G4APrime.h"
+
+#include "G4Electron.hh"
 
 namespace simcore {
 namespace darkbrem {
@@ -108,7 +109,7 @@ void secondary_generation(simcore::darkbrem::G4eDarkBremsstrahlung& process,
 TEST_CASE("Custom Geant4 Dark Brem Process",
           "[SimCore][signal][functionality]") {
   // open logging but turn everything off
-  framework::logging::open(framework::logging::level::fatal, framework::logging::level::fatal,
+  fire::logging::open(fire::logging::level::fatal, fire::logging::level::fatal,
                       "");
 
   double ap_mass = 10.;  // MeV - A' mass to use for functionality testing
@@ -215,5 +216,5 @@ TEST_CASE("Custom Geant4 Dark Brem Process",
 
   }  // specific dark brem vertex library model test
 
-  framework::logging::close();
+  fire::logging::close();
 }  // dark brem process test
