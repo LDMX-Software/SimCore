@@ -14,16 +14,16 @@
 #include <map>
 #include <string>
 
+/*~~~~~~~~~~~~~~~*/
+/*   Framework   */
+/*~~~~~~~~~~~~~~~*/
+#include "Framework/Configure/Parameters.h"
+
 //------------//
 //   Geant4   //
 //------------//
 #include "G4PhysListFactory.hh"
 #include "G4RunManager.hh"
-
-/*~~~~~~~~~~~~~~~*/
-/*   Framework   */
-/*~~~~~~~~~~~~~~~*/
-#include "Framework/Configure/Parameters.h"
 
 namespace simcore {
 

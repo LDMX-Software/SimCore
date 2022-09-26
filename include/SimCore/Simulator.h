@@ -20,7 +20,6 @@
 /*   Framework   */
 /*~~~~~~~~~~~~~~~*/
 #include "Framework/Configure/Parameters.h"
-#include "Framework/EventDef.h"
 #include "Framework/EventProcessor.h"
 
 #include "SimCore/RunManager.h"
@@ -96,14 +95,6 @@ class Simulator : public framework::Producer {
    * @param event The event to process.
    */
   virtual void produce(framework::Event& event) final override;
-
-  /**
-   * Callback for the EventProcessor to take any necessary action
-   * when a file is closed.
-   *
-   * @param eventFile The intput/output file.
-   */
-  void onFileClose(framework::EventFile& eventFile) final override;
 
   /**
    * Initialization of simulation

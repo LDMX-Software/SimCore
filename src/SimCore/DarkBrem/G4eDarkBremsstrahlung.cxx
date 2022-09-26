@@ -7,7 +7,8 @@
 
 #include "SimCore/DarkBrem/G4eDarkBremsstrahlung.h"
 
-#include "Framework/RunHeader.h"
+#include "fire/RunHeader.h"
+
 #include "G4Electron.hh"      //for electron definition
 #include "G4EventManager.hh"  //for EventID number
 #include "G4ProcessTable.hh"  //for deactivating dark brem process
@@ -15,6 +16,9 @@
 #include "G4RunManager.hh"    //for VerboseLevel
 #include "SimCore/DarkBrem/DarkBremVertexLibraryModel.h"
 #include "SimCore/DarkBrem/G4APrime.h"
+
+#include "Framework/Exception/Exception.h"
+#include "Framework/Logger.h"
 
 namespace simcore {
 namespace darkbrem {
@@ -98,8 +102,8 @@ void G4eDarkBremsstrahlung::PrintInfo() {
 }
 
 void G4eDarkBremsstrahlung::RecordConfig(ldmx::RunHeader& h) const {
-  h.setIntParameter("Only One DB Per Event", only_one_per_event_);
-  h.setFloatParameter("A' Mass [MeV]", ap_mass_);
+  h.set<int>("Only One DB Per Event", only_one_per_event_);
+  h.set<float>("A' Mass [MeV]", ap_mass_);
   model_->RecordConfig(h);
 }
 

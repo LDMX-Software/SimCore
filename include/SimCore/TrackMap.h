@@ -4,14 +4,14 @@
 // STL
 #include <unordered_map>
 
-// Geant4
-#include "G4Event.hh"
-#include "G4Track.hh"
-
 // LDMX
 #include "SimCore/Event/SimParticle.h"
 #include "SimCore/UserTrackInformation.h"
 #include "SimCore/UserPrimaryParticleInformation.h"
+
+// Geant4
+#include "G4Event.hh"
+#include "G4Track.hh"
 
 namespace simcore {
 

@@ -10,10 +10,8 @@
 /*~~~~~~~~~~~~~~~*/
 /*   Framework   */
 /*~~~~~~~~~~~~~~~*/
-#include "Framework/Process.h"
-#include "Framework/RandomNumberSeedService.h"
-#include "Framework/Version.h"  //for LDMX_INSTALL path
-#include "Framework/EventFile.h"
+#include "fire/RandomNumberSeedService.h"
+#include "fire/version/Version.h"
 
 /*~~~~~~~~~~~~~*/
 /*   SimCore   */
@@ -151,19 +149,19 @@ void Simulator::beforeNewRun(ldmx::RunHeader& header) {
 
   header.setDetectorName(detector->getDetectorName());
   header.setDescription(parameters_.getParameter<std::string>("description"));
-  header.setIntParameter(
+  header.set<int>(
       "Included Scoring Planes",
       !parameters_.getParameter<std::string>("scoringPlanes").empty());
-  header.setIntParameter(
+  header.set<int>(
       "Use Random Seed from Event Header",
       parameters_.getParameter<bool>("rootPrimaryGenUseSeed"));
 
   // lambda function for dumping 3-vectors into the run header
   auto threeVectorDump = [&header](const std::string& name,
                                    const std::vector<double>& vec) {
-    header.setFloatParameter(name + " X", vec.at(0));
-    header.setFloatParameter(name + " Y", vec.at(1));
-    header.setFloatParameter(name + " Z", vec.at(2));
+    header.set<float>(name + " X", vec.at(0));
+    header.set<float>(name + " Y", vec.at(1));
+    header.set<float>(name + " Z", vec.at(2));
   };
 
   auto beamSpotSmear{
@@ -176,7 +174,7 @@ void Simulator::beforeNewRun(ldmx::RunHeader& header) {
                                     const std::vector<std::string>& vec) {
     int index = 0;
     for (auto const& val : vec) {
-      header.setStringParameter(name + " " + std::to_string(++index), val);
+      header.set(name + " " + std::to_string(++index), val);
     }
   };
 
@@ -231,18 +229,18 @@ void Simulator::beforeNewRun(ldmx::RunHeader& header) {
   if (G4RunManagerKernel::GetRunManagerKernel()) {
     G4String g4Version{
         G4RunManagerKernel::GetRunManagerKernel()->GetVersionString()};
-    header.setStringParameter("Geant4 revision", g4Version);
+    header.set<std::string>("Geant4 revision", g4Version);
   } else {
     ldmx_log(warn) << "Unable to access G4 RunManager Kernel. Will not store "
                       "G4 Version string.";
   }
 
-  header.setStringParameter("ldmx-sw revision", GIT_SHA1);
+  header.set("fire revision", std::string(fire::version::GIT_SHA1));
 }
 
 void Simulator::onNewRun(const ldmx::RunHeader& rh) {
-  const framework::RandomNumberSeedService& rseed = getCondition<framework::RandomNumberSeedService>(
-      framework::RandomNumberSeedService::CONDITIONS_OBJECT_NAME);
+  const auto& rseed = getCondition<fire::RandomNumberSeedService>(
+      fire::RandomNumberSeedService::CONDITIONS_OBJECT_NAME);
   std::vector<int> seeds;
   seeds.push_back(rseed.getSeed("Simulator[0]"));
   seeds.push_back(rseed.getSeed("Simulator[1]"));
@@ -254,7 +252,7 @@ void Simulator::onNewRun(const ldmx::RunHeader& rh) {
 void Simulator::produce(framework::Event& event) {
   // Generate and process a Geant4 event.
   numEventsBegan_++;
-  runManager_->ProcessOneEvent(event.getEventHeader().getEventNumber());
+  runManager_->ProcessOneEvent(event.getEventNumber());
 
   // If a Geant4 event has been aborted, skip the rest of the processing
   // sequence. This will immediately force the simulation to move on to
@@ -277,17 +275,17 @@ void Simulator::produce(framework::Event& event) {
         ->GetUserInformation());
   auto& event_header = event.getEventHeader();
   event_header.setWeight(event_info->getWeight());
-  event_header.setFloatParameter("total_photonuclear_energy",
-                                event_info->getPNEnergy());
-  event_header.setFloatParameter("total_electronuclear_energy",
-                                event_info->getENEnergy());
+  event_header.set<float>("total_photonuclear_energy",
+                          event_info->getPNEnergy());
+  event_header.set<float>("total_electronuclear_energy",
+                          event_info->getENEnergy());
 
   // Save the state of the random engine to an output stream. A string
   // is then extracted and saved to the event header.
   std::ostringstream stream;
   G4Random::saveFullState(stream);
   // std::cout << stream.str() << std::endl;
-  event_header.setStringParameter("eventSeed", stream.str());
+  event_header.set("eventSeed", stream.str());
 
   // track storage
   TrackMap& tracks{g4user::TrackingAction::get()->getTrackMap()};
@@ -341,25 +339,26 @@ void Simulator::onProcessStart() {
   return;
 }
 
-void Simulator::onFileClose(framework::EventFile& file) {
-  // End the current run and print out some basic statistics if verbose
-  // level > 0.
-  runManager_->TerminateEventLoop();
-
-  // Pass the **real** number of events to the persistency manager
-  auto rh = file.getRunHeader(run_);
-  rh.setIntParameter("Event Count", numEventsCompleted_);
-  rh.setIntParameter("Events Began", numEventsBegan_);
-
-  // Persist any remaining events, call the end of run action and
-  // terminate the Geant4 kernel.
-  runManager_->RunTermination();
-}
-
 void Simulator::onProcessEnd() {
   std::cout << "[ Simulator ] : "
             << "Started " << numEventsBegan_ << " events to produce "
             << numEventsCompleted_ << " events." << std::endl;
+  // End the current run and print out some basic statistics if verbose
+  // level > 0.
+  runManager_->TerminateEventLoop();
+
+  // Persist any remaining events, call the end of run action and
+  // terminate the Geant4 kernel.
+  runManager_->RunTermination();
+
+  /*
+  // Pass the **real** number of events to the persistency manager
+  // fire needs to have a callback at end of processing for updating
+  // run headers
+  auto rh = file.getRunHeader(run_);
+  rh.set("Event Count", numEventsCompleted_);
+  rh.set("Events Began", numEventsBegan_);
+  */
 
   // Delete Run Manager
   // From Geant4 Basic Example B01:

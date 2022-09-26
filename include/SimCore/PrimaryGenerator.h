@@ -11,18 +11,18 @@
 /*~~~~~~~~~~~~~~~~*/
 #include <string>
 
-/*~~~~~~~~~~~~*/
-/*   Geant4   */
-/*~~~~~~~~~~~~*/
-#include "G4VPrimaryGenerator.hh"
-
 /*~~~~~~~~~~~~~~~*/
 /*   Framework   */
 /*~~~~~~~~~~~~~~~*/
 #include "Framework/Configure/Parameters.h"
-#include "Framework/RunHeader.h"
+#include "fire/RunHeader.h"
 
 #include "SimCore/Factory.h"
+
+/*~~~~~~~~~~~~*/
+/*   Geant4   */
+/*~~~~~~~~~~~~*/
+#include "G4VPrimaryGenerator.hh"
 
 // Forward Declarations
 class G4Event;

@@ -1,13 +1,13 @@
 #ifndef SIMCORE_DETECTORCONSTRUCTION_H
 #define SIMCORE_DETECTORCONSTRUCTION_H
 
+//---< Framework >---//
+#include "Framework/Configure/Parameters.h"
+
 //---< Geant4 >---//
 #include "G4LogicalVolume.hh"
 #include "G4LogicalVolumeStore.hh"
 #include "G4VUserDetectorConstruction.hh"
-
-//---< Framework >---//
-#include "Framework/Configure/Parameters.h"
 
 //---< SimCore >---//
 #include "SimCore/Geo/Parser.h"

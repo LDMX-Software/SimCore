@@ -8,12 +8,12 @@
 #ifndef SIMCORE_DARKBREM_APRIMEPHYSICS_H_
 #define SIMCORE_DARKBREM_APRIMEPHYSICS_H_
 
-// Geant4
-#include "G4VPhysicsConstructor.hh"
-
 // LDMX
 #include "Framework/Configure/Parameters.h"
 #include "SimCore/DarkBrem/G4eDarkBremsstrahlung.h"
+
+// Geant4
+#include "G4VPhysicsConstructor.hh"
 
 namespace simcore {
 

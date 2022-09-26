@@ -13,15 +13,15 @@
 #include <algorithm>
 #include <memory>
 
-/*~~~~~~~~~~~~*/
-/*   Geant4   */
-/*~~~~~~~~~~~~*/
-#include "G4VUserPrimaryGeneratorAction.hh"
-
 /*~~~~~~~~~~~~~~~*/
 /*   Framework   */
 /*~~~~~~~~~~~~~~~*/
 #include "Framework/Configure/Parameters.h"
+
+/*~~~~~~~~~~~~*/
+/*   Geant4   */
+/*~~~~~~~~~~~~*/
+#include "G4VUserPrimaryGeneratorAction.hh"
 
 // Forward declarations
 class G4Event;

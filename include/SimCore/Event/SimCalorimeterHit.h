@@ -9,6 +9,7 @@
 
 // ROOT
 #include "TObject.h"  //For ClassDef
+#include <fire/io/Data.h>
 
 // LDMX
 #include "SimCore/Event/SimParticle.h"
@@ -80,7 +81,7 @@ class SimCalorimeterHit {
   /**
    * Clear the data in the object.
    */
-  void Clear();
+  void clear();
 
   /**
    * Print out the object.
@@ -251,6 +252,9 @@ class SimCalorimeterHit {
    */
   unsigned nContribs_{0};
 
+  friend class fire::io::Data<SimCalorimeterHit>;
+  void attach(fire::io::Data<SimCalorimeterHit>& d);
+  fire_class_version(1);
   /**
    * ROOT class definition.
    */

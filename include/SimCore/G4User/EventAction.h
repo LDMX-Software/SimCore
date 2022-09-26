@@ -12,15 +12,15 @@
 /*~~~~~~~~~~~~~~~~*/
 #include <vector>
 
-/*~~~~~~~~~~~~*/
-/*   Geant4   */
-/*~~~~~~~~~~~~*/
-#include "G4UserEventAction.hh"
-
 /*~~~~~~~~~~~~~*/
 /*   SimCore   */
 /*~~~~~~~~~~~~~*/
 #include "SimCore/UserAction.h"
+
+/*~~~~~~~~~~~~*/
+/*   Geant4   */
+/*~~~~~~~~~~~~*/
+#include "G4UserEventAction.hh"
 
 // Forward declarations
 class G4Event;

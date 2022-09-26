@@ -7,6 +7,8 @@
 #ifndef SIMCORE_MAGNETICFIELDSTORE_H_
 #define SIMCORE_MAGNETICFIELDSTORE_H_
 
+#include <map>
+
 // Geant4
 #include "G4MagneticField.hh"
 

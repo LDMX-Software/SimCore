@@ -1,14 +1,14 @@
+#include "Framework/Configure/Parameters.h"
+#include "Framework/EventProcessor.h"
+#include "SimCore/DetectorConstruction.h"
+#include "SimCore/Geo/ParserFactory.h"
+
 #include "G4GDMLParser.hh"
 #include "G4GeometryManager.hh"
 #include "G4PhysListFactory.hh"
 #include "G4RunManager.hh"
 #include "G4UIExecutive.hh"
 #include "G4VisExecutive.hh"
-
-#include "Framework/Configure/Parameters.h"
-#include "Framework/EventProcessor.h"
-#include "SimCore/DetectorConstruction.h"
-#include "SimCore/Geo/ParserFactory.h"
 
 static void printUsage() {
   std::cout << "usage: g4-vis {detector.gdml}" << std::endl;

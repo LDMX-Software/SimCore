@@ -1,8 +1,9 @@
 #ifndef SIMCORE_SENSITIVEDETECTOR_H_
 #define SIMCORE_SENSITIVEDETECTOR_H_
 
+#include "fire/RunHeader.h"
+
 #include "Framework/Configure/Parameters.h"
-#include "Framework/RunHeader.h"
 
 #include "SimCore/Factory.h"
 #include "SimCore/ConditionsInterface.h"

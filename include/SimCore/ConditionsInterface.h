@@ -10,6 +10,7 @@
 
 // LDMX
 #include "Framework/EventProcessor.h"
+#include "Framework/Exception/Exception.h"
 
 namespace simcore {
 

@@ -1,15 +1,15 @@
 #ifndef SIMCORE_GEO_GDMLPARSER_H
 #define SIMCORE_GEO_GDMLPARSER_H
 
-//---< Geant4 >---//
-#include "G4GDMLParser.hh"
-
 //---< Framework >---//
 #include "Framework/Configure/Parameters.h"
 
 //---< SimCore >---//
 #include "SimCore/Geo/AuxInfoReader.h"
 #include "SimCore/Geo/Parser.h"
+
+//---< Geant4 >---//
+#include "G4GDMLParser.hh"
 
 // Forward Declarations
 class G4VPhysicalVolume;

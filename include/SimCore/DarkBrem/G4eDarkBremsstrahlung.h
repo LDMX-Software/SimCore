@@ -8,9 +8,10 @@
 #ifndef SIMCORE_DARKBREM_G4EDARKBREMSSTRAHLUNG_H_
 #define SIMCORE_DARKBREM_G4EDARKBREMSSTRAHLUNG_H_
 
+#include "fire/logging/Logger.h"
+#include "fire/RunHeader.h"
+
 #include "Framework/Configure/Parameters.h"
-#include "Framework/Logger.h"
-#include "Framework/RunHeader.h"
 
 // Geant
 #include "G4VDiscreteProcess.hh"
@@ -42,8 +43,7 @@ class G4eDarkBremsstrahlungModel {
    * Names the logger after the name for this model.
    */
   G4eDarkBremsstrahlungModel(const framework::config::Parameters& p) {
-    theLog_ =
-        framework::logging::makeLogger(p.getParameter<std::string>("name"));
+    theLog_ = fire::logging::makeLogger(p.getParameter<std::string>("name"));
   }
 
   /// Destructor, nothing on purpose
@@ -94,7 +94,7 @@ class G4eDarkBremsstrahlungModel {
 
  protected:
   /// The logging apparatus for this model
-  framework::logging::logger theLog_;
+  fire::logging::logger theLog_;
 
 };  // G4eDarkBremsstrahlungModel
 
@@ -358,8 +358,8 @@ class G4eDarkBremsstrahlung : public G4VDiscreteProcess {
   ElementXsecCache element_xsec_cache_;
 
   /// Enable logging for this process
-  framework::logging::logger theLog_ =
-      framework::logging::makeLogger("DarkBremProcess");
+  fire::logging::logger theLog_ =
+      fire::logging::makeLogger("DarkBremProcess");
 
 };  // G4eDarkBremsstrahlung
 

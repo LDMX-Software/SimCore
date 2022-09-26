@@ -10,17 +10,17 @@
 //---------------//
 #include <string>
 
+//-------------//
+//   ldmx-sw   //
+//-------------//
+#include "SimCore/Geo/AuxInfoReader.h"
+
 //------------//
 //   Geant4   //
 //------------//
 #include "G4GDMLParser.hh"
 #include "G4String.hh"
 #include "G4VUserParallelWorld.hh"
-
-//-------------//
-//   ldmx-sw   //
-//-------------//
-#include "SimCore/Geo/AuxInfoReader.h"
 
 namespace simcore {
 

@@ -59,10 +59,10 @@ void DarkBremVertexLibraryModel::PrintInfo() const {
 }
 
 void DarkBremVertexLibraryModel::RecordConfig(ldmx::RunHeader &h) const {
-  h.setFloatParameter("Minimum Threshold to DB [GeV]", threshold_);
-  h.setFloatParameter("DB Xsec Epsilon", epsilon_);
-  h.setStringParameter("Vertex Scaling Method", method_name_);
-  h.setStringParameter("Vertex Library", library_path_);
+  h.set<float>("Minimum Threshold to DB [GeV]", threshold_);
+  h.set<float>("DB Xsec Epsilon", epsilon_);
+  h.set("Vertex Scaling Method", method_name_);
+  h.set("Vertex Library", library_path_);
 }
 
 G4double DarkBremVertexLibraryModel::ComputeCrossSectionPerAtom(

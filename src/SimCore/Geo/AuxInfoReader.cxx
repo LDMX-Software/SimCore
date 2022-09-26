@@ -1,7 +1,7 @@
-#include "SimCore/Geo/AuxInfoReader.h"
 
 // LDMX
 #include "Framework/Exception/Exception.h"
+#include "SimCore/Geo/AuxInfoReader.h"
 #include "SimCore/MagneticFieldMap3D.h"
 #include "SimCore/MagneticFieldStore.h"
 #include "SimCore/UserRegionInformation.h"

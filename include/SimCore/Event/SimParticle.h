@@ -5,6 +5,7 @@
 /*   ROOT   */
 /*~~~~~~~~~~*/
 #include "TObject.h"
+#include <fire/io/Data.h>
 
 /*~~~~~~~~~~~~~~~~*/
 /*   C++ StdLib   */
@@ -51,7 +52,7 @@ class SimParticle {
   ~SimParticle();
 
   /// Reset an instance of this class by clearing all of its data.
-  void Clear();
+  void clear();
 
   /// Print a string representation of this object.
   void Print() const;
@@ -382,6 +383,8 @@ class SimParticle {
   /// Map containing the process types.
   static ProcessTypeMap PROCESS_MAP;
 
+  friend fire::io::Data<SimParticle>;
+  void attach(fire::io::Data<SimParticle>& d);
   ClassDef(SimParticle, 7);
 
 };  // SimParticle

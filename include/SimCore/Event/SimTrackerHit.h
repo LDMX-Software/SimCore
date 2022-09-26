@@ -11,6 +11,7 @@
 
 // ROOT
 #include "TObject.h"  //For ClassDef
+#include <fire/io/Data.h>
 
 // STL
 #include <iostream>
@@ -41,7 +42,7 @@ class SimTrackerHit {
   /**
    * Reset the SimTrackerHit object.
    */
-  void Clear();
+  void clear();
 
   /**
    * Get the detector ID of the hit.
@@ -267,6 +268,8 @@ class SimTrackerHit {
    */
   int pdgID_{0};
 
+  friend fire::io::Data<SimTrackerHit>;
+  void attach(fire::io::Data<SimTrackerHit>& d);
   /**
    * The ROOT class definition.
    */

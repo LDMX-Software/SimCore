@@ -2,7 +2,7 @@
 #define SIMCORE_XSECBIASINGOPERATOR_H_
 
 #include "Framework/Configure/Parameters.h"
-#include "Framework/RunHeader.h"
+#include "fire/RunHeader.h"
 
 #include "SimCore/Factory.h"
 

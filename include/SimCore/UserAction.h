@@ -10,12 +10,6 @@
 #include <string>
 #include <vector>
 
-/*~~~~~~~~~~~~*/
-/*   Geant4   */
-/*~~~~~~~~~~~~*/
-#include "G4EventManager.hh"
-#include "G4UserStackingAction.hh"
-
 /*~~~~~~~~~~~~~~~*/
 /*   Framework   */
 /*~~~~~~~~~~~~~~~*/
@@ -23,6 +17,12 @@
 #include "SimCore/UserEventInformation.h"
 #include "SimCore/Event/SimParticle.h"
 #include "SimCore/Factory.h"
+
+/*~~~~~~~~~~~~*/
+/*   Geant4   */
+/*~~~~~~~~~~~~*/
+#include "G4EventManager.hh"
+#include "G4UserStackingAction.hh"
 
 // Forward Declarations
 class G4Event;

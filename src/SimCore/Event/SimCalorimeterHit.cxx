@@ -14,7 +14,7 @@ SimCalorimeterHit::SimCalorimeterHit() {}
 
 SimCalorimeterHit::~SimCalorimeterHit() {}
 
-void SimCalorimeterHit::Clear() {
+void SimCalorimeterHit::clear() {
   incidentIDContribs_.clear();
   trackIDContribs_.clear();
   pdgCodeContribs_.clear();
@@ -81,5 +81,20 @@ void SimCalorimeterHit::updateContrib(int i, float edep, float time) {
     this->timeContribs_[i] = time;
   }
   edep_ += edep;
+}
+
+void SimCalorimeterHit::attach(fire::io::Data<SimCalorimeterHit>& d) {
+  d.attach("id", id_);
+  d.attach("edep", edep_);
+  d.attach("x", x_);
+  d.attach("y", y_);
+  d.attach("z", z_);
+  d.attach("time", time_);
+  d.attach("trackIDContribs", trackIDContribs_);
+  d.attach("incidentIDContribs", incidentIDContribs_);
+  d.attach("pdgCodeContribs", pdgCodeContribs_);
+  d.attach("edepContribs", edepContribs_);
+  d.attach("timeContribs", timeContribs_);
+  d.attach("nContribs", nContribs_);
 }
 } // namespace ldmx

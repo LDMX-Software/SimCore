@@ -4,8 +4,6 @@
  * @author Omar Moreno, SLAC National Accelerator Laboratory
  */
 
-#include "SimCore/RunManager.h"
-
 //-------------//
 //   ldmx-sw   //
 //-------------//
@@ -22,6 +20,8 @@
 #include "SimCore/G4User/RunAction.h"
 #include "SimCore/G4User/StackingAction.h"
 #include "SimCore/G4User/TrackingAction.h"
+
+#include "SimCore/RunManager.h"
 
 //------------//
 //   Geant4   //

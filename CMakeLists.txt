@@ -27,7 +27,7 @@ if(BUILD_EVENT_ONLY)
 
   # Generate the files needed to build the event classes.
   setup_library(module SimCore name Event
-                dependencies ROOT::Core
+                dependencies ROOT::Core fire::io
                 register_target)
 
   return()

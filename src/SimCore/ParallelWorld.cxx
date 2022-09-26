@@ -1,7 +1,6 @@
+#include "Framework/Configure/Parameters.h"
 
 #include "SimCore/ParallelWorld.h"
-
-#include "Framework/Configure/Parameters.h"
 
 namespace simcore {
 

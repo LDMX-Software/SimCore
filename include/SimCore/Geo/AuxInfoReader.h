@@ -2,9 +2,6 @@
 #ifndef SIMCORE_GEO_AUXINFOREADER_H
 #define SIMCORE_GEO_AUXINFOREADER_H
 
-//---< Geant4 >---//
-#include "G4GDMLParser.hh"
-
 //---< DetDescr >---//
 #include "DetDescr/DetectorHeader.h"
 
@@ -13,6 +10,9 @@
 
 //---< SimCore >---//
 #include "SimCore/ConditionsInterface.h"
+
+//---< Geant4 >---//
+#include "G4GDMLParser.hh"
 
 namespace simcore::geo {
 

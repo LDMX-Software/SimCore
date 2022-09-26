@@ -4,13 +4,6 @@
  * @author Omar Moreno, SLAC National Accelerator Laboratory
  */
 
-#include "SimCore/G4User/PrimaryGeneratorAction.h"
-
-/*~~~~~~~~~~~~*/
-/*   Geant4   */
-/*~~~~~~~~~~~~*/
-#include "G4Event.hh"
-#include "G4RunManager.hh"  // Needed for CLHEP
 
 /*~~~~~~~~~~~~~*/
 /*   SimCore   */
@@ -19,10 +12,18 @@
 #include "SimCore/UserEventInformation.h"
 #include "SimCore/UserPrimaryParticleInformation.h"
 
+#include "SimCore/G4User/PrimaryGeneratorAction.h"
+
 /*~~~~~~~~~~*/
 /*   ROOT   */
 /*~~~~~~~~~~*/
 #include "TRandom3.h"
+
+/*~~~~~~~~~~~~*/
+/*   Geant4   */
+/*~~~~~~~~~~~~*/
+#include "G4Event.hh"
+#include "G4RunManager.hh"  // Needed for CLHEP
 
 namespace simcore::g4user {
 
