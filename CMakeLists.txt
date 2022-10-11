@@ -8,8 +8,11 @@ project(
   DESCRIPTION "Core classes needed to run the Simulator."
   LANGUAGES CXX)
 
-setup_event_library(module SimCore name Event
-  linkdef include/SimCore/Event/LinkDef.h)
+if (BUILD_EVENT_ONLY)
+  setup_event_library(module SimCore name Event
+    linkdef include/SimCore/Event/LinkDef.h)
+  return()
+endif()
 
 # Configure Geant4
 setup_geant4_target()
