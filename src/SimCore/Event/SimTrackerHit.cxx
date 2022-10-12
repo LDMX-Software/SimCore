@@ -50,21 +50,4 @@ void SimTrackerHit::setMomentum(const float px, const float py,
   this->pz_ = pz;
 }
 
-void SimTrackerHit::attach(fire::io::Data<SimTrackerHit>& d) {
-  d.attach("id", id_);
-  d.attach("layerID", layerID_);
-  d.attach("moduleID", moduleID_);
-  d.attach("edep", edep_);
-  d.attach("time", time_);
-  d.attach("px", px_);
-  d.attach("py", py_);
-  d.attach("pz", pz_);
-  d.attach("energy", energy_);
-  d.attach("x", x_);
-  d.attach("y", y_);
-  d.attach("z", z_);
-  d.attach("pathLength", pathLength_);
-  d.attach("trackID", trackID_);
-  d.attach("pdgID", pdgID_);
-}
 } // namespace ldmx

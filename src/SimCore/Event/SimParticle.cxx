@@ -100,28 +100,4 @@ SimParticle::ProcessType SimParticle::findProcessType(std::string processName) {
   }
 }
 
-void SimParticle::attach(fire::io::Data<SimParticle>& d) {
-  d.attach("vertexVolume", vertexVolume_);
-  d.attach("processType", processType_);
-  d.attach("parents", parents_);
-  d.attach("daughters", daughters_);
-  d.attach("charge", charge_);
-  d.attach("mass", mass_);
-  d.attach("endpx", endpx_);
-  d.attach("endpy", endpy_);
-  d.attach("endpz", endpz_);
-  d.attach("px", px_);
-  d.attach("py", pz_);
-  d.attach("pz", pz_);
-  d.attach("endX", endX_);
-  d.attach("endY", endY_);
-  d.attach("endZ", endZ_);
-  d.attach("x", x_);
-  d.attach("y", z_);
-  d.attach("z", z_);
-  d.attach("time", time_);
-  d.attach("energy", energy_);
-  d.attach("pdgID", pdgID_);
-  d.attach("genStatus", genStatus_);
-}
 } // namespace ldmx

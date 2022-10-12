@@ -252,8 +252,22 @@ class SimCalorimeterHit {
    */
   unsigned nContribs_{0};
 
-  friend class fire::io::Data<SimCalorimeterHit>;
-  void attach(fire::io::Data<SimCalorimeterHit>& d);
+  friend class fire::io::access;
+  template<typename Data>
+  void attach(Data& d) {
+    d.attach("id", id_);
+    d.attach("edep", edep_);
+    d.attach("x", x_);
+    d.attach("y", y_);
+    d.attach("z", z_);
+    d.attach("time", time_);
+    d.attach("trackIDContribs", trackIDContribs_);
+    d.attach("incidentIDContribs", incidentIDContribs_);
+    d.attach("pdgCodeContribs", pdgCodeContribs_);
+    d.attach("edepContribs", edepContribs_);
+    d.attach("timeContribs", timeContribs_);
+    d.attach("nContribs", nContribs_);
+  }
   fire_class_version(1);
   /**
    * ROOT class definition.

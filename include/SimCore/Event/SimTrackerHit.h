@@ -11,7 +11,7 @@
 
 // ROOT
 #include "TObject.h"  //For ClassDef
-#include <fire/io/Data.h>
+#include <fire/io/Access.h>
 
 // STL
 #include <iostream>
@@ -268,8 +268,24 @@ class SimTrackerHit {
    */
   int pdgID_{0};
 
-  friend fire::io::Data<SimTrackerHit>;
-  void attach(fire::io::Data<SimTrackerHit>& d);
+  friend fire::io::access;
+  template<typename Data> void attach(Data& d) {
+    d.attach("id", id_);
+    d.attach("layerID", layerID_);
+    d.attach("moduleID", moduleID_);
+    d.attach("edep", edep_);
+    d.attach("time", time_);
+    d.attach("px", px_);
+    d.attach("py", py_);
+    d.attach("pz", pz_);
+    d.attach("energy", energy_);
+    d.attach("x", x_);
+    d.attach("y", y_);
+    d.attach("z", z_);
+    d.attach("pathLength", pathLength_);
+    d.attach("trackID", trackID_);
+    d.attach("pdgID", pdgID_);
+  }
   /**
    * The ROOT class definition.
    */
