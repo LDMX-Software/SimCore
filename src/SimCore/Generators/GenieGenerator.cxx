@@ -43,6 +43,7 @@
 
 // Geant4
 #include "G4Event.hh"
+#include "G4PhysicalConstants.hh"
 
 // ROOT
 #include <TParticle.h>
@@ -220,7 +221,8 @@ void GenieGenerator::GeneratePrimaryVertex(G4Event* event)
 
       G4PrimaryParticle* primary = new G4PrimaryParticle();
       primary->SetPDGcode(p->Pdg());
-      primary->Set4Momentum(p->Px(), p->Py(), p->Pz(), p->E());
+      using CLHEP::GeV;
+      primary->Set4Momentum(p->Px()*GeV, p->Py()*GeV, p->Pz()*GeV, p->E()*GeV);
       primary->SetProperTime(time_);
 
       UserPrimaryParticleInformation* primaryInfo =
