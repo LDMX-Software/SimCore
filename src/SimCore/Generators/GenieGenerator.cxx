@@ -218,7 +218,7 @@ void GenieGenerator::GeneratePrimaryVertex(G4Event* event)
       if (p->Status()!=1)
 	continue;
 
-      std::cout << "\tAdding particle " << p->Pdg() << " with status " << p->Status() << " energy " << p->E() << " ..." << std::endl;
+      //std::cout << "\tAdding particle " << p->Pdg() << " with status " << p->Status() << " energy " << p->E() << " ..." << std::endl;
 
       G4PrimaryParticle* primary = new G4PrimaryParticle();
       primary->SetPDGcode(p->Pdg());
