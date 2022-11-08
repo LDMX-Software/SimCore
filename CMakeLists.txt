@@ -15,6 +15,8 @@ find_package(ROOT CONFIG REQUIRED)
 find_package(Boost REQUIRED
              COMPONENTS log)
 
+include_directories( /usr/local/include/GENIE )
+
 option(BUILD_EVENT_ONLY "Build the event library." ON)
 if(BUILD_EVENT_ONLY)
 
@@ -36,6 +38,9 @@ endif()
 
 # Configure Geant4
 setup_geant4_target()
+
+#Configure Genie
+setup_genie_target()
 
 # Set the LHE Reading Library
 setup_library(module SimCore 
@@ -82,7 +87,7 @@ setup_library(module SimCore
 # Primary Generators library
 setup_library(module SimCore
               name Generators
-              dependencies SimCore::SimCore SimCore::LHE)
+              dependencies SimCore::SimCore SimCore::LHE ${GENIE_LIBS})
 
 # Sensitive Detectors library
 setup_library(module SimCore
