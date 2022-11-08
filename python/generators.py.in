@@ -242,6 +242,7 @@ class genie(simcfg.PrimaryGenerator) :
                      direction = [ 0.0, 0.0, 1.0 ],
                      tune = 'default',
                      spline_file = '',
+                     seed = 1,
                      verbosity=False ) :
         super().__init__( name , "simcore::generators::GenieGenerator" )
 
@@ -253,6 +254,7 @@ class genie(simcfg.PrimaryGenerator) :
         self.direction = direction
         self.tune = tune
         self.spline_file = spline_file
+        self.seed = seed
         self.verbosity = verbosity
 
 def single_4gev_e_upstream_tagger() :

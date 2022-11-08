@@ -77,6 +77,7 @@ class GenieGenerator : public simcore::PrimaryGenerator {
 
   std::string tune_;
   std::string spline_file_;
+  int seed_;
 
   
   

@@ -71,6 +71,7 @@ void GenieGenerator::fillConfig(const framework::config::Parameters& p)
 
   tune_        = p.getParameter<std::string>("tune");
   spline_file_ = p.getParameter<std::string>("spline_file");
+  seed_        = p.getParameter<int>("seed");
 
 
   for(size_t i=0; i<position_.size(); ++i)
@@ -140,16 +141,22 @@ bool GenieGenerator::validateConfig()
 
 void GenieGenerator::initializeGENIE()
 {
+  char *inarr[3] = {const_cast<char*>(""),
+		    const_cast<char*>("--event-generator-list"),
+		    const_cast<char*>("EM")};
+  genie::RunOpt::Instance()->ReadFromCommandLine(3,inarr);
+  
   genie::RunOpt::Instance()->SetTuneName(tune_);
   if ( ! genie::RunOpt::Instance()->Tune() ) {
     EXCEPTION_RAISE("ConfigurationException","No TuneId in RunOption.");
   }
   genie::RunOpt::Instance()->BuildTune();
 
+  genie::utils::app_init::RandGen(seed_);
   genie::utils::app_init::XSecTable(spline_file_, false);
   genie::GHepRecord::SetPrintLevel(1);
 
-  evg_driver_.SetEventGeneratorList(genie::RunOpt::Instance()->EventGeneratorList());
+  evg_driver_.SetEventGeneratorList("EM");
   evg_driver_.SetUnphysEventMask(*genie::RunOpt::Instance()->UnphysEventMask());
   
 }
@@ -159,8 +166,6 @@ GenieGenerator::GenieGenerator(const std::string& name,
 			       const framework::config::Parameters& p)
     : PrimaryGenerator(name, p)
 {
-
-  std::cout << "Constructing GenieGenerator" << std::endl;
   
   fillConfig(p);
 
@@ -174,9 +179,7 @@ GenieGenerator::GenieGenerator(const std::string& name,
 GenieGenerator::~GenieGenerator() {}
   
 void GenieGenerator::GeneratePrimaryVertex(G4Event* event)
-{
-  std::cout << "Starting event ..." << std::endl;
-  
+{  
   //for now, just the first. later picking a target from list
   genie::InitialState initial_state(targets_.front(),11);
   evg_driver_.Configure(initial_state);
@@ -192,12 +195,10 @@ void GenieGenerator::GeneratePrimaryVertex(G4Event* event)
   TLorentzVector e_p4;
   initial_e.Momentum(e_p4);
 
-  std::cout << "Run GENIE ..." << std::endl;
-  
   //GENIE magic
-  genie::EventRecord *genie_event = evg_driver_.GenerateEvent(e_p4);
-
-  std::cout << "GENIE done..." << std::endl;
+  genie::EventRecord *genie_event = NULL;
+  while(!genie_event)
+    genie_event = evg_driver_.GenerateEvent(e_p4);
 
   //setup the primary vertex now
   G4PrimaryVertex* vertex = new G4PrimaryVertex();
@@ -217,13 +218,12 @@ void GenieGenerator::GeneratePrimaryVertex(G4Event* event)
       if (p->Status()!=1)
 	continue;
 
-      std::cout << "Adding particle " << p->Pdg() << " with status " << p->Status() << " energy " << p->E() << " ..." << std::endl;
+      std::cout << "\tAdding particle " << p->Pdg() << " with status " << p->Status() << " energy " << p->E() << " ..." << std::endl;
 
       G4PrimaryParticle* primary = new G4PrimaryParticle();
       primary->SetPDGcode(p->Pdg());
-      using CLHEP::GeV;
-      primary->Set4Momentum(p->Px()*GeV, p->Py()*GeV, p->Pz()*GeV, p->E()*GeV);
-      primary->SetProperTime(time_);
+      primary->Set4Momentum(p->Px()*CLHEP::GeV, p->Py()*CLHEP::GeV, p->Pz()*CLHEP::GeV, p->E()*CLHEP::GeV);
+      primary->SetProperTime(time_*CLHEP::ns);
 
       UserPrimaryParticleInformation* primaryInfo =
 	new UserPrimaryParticleInformation();
@@ -233,12 +233,10 @@ void GenieGenerator::GeneratePrimaryVertex(G4Event* event)
       vertex->SetPrimary(primary);
     }
 
-  std::cout << "Add vertex to event." << std::endl;
-  
   //add the vertex to the event
   event->AddPrimaryVertex(vertex);
 
-  std::cout << "Finished?" << std::endl;
+  delete genie_event;
   
 }
 
