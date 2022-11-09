@@ -243,7 +243,8 @@ class genie(simcfg.PrimaryGenerator) :
                      tune = 'default',
                      spline_file = '',
                      seed = 1,
-                     verbosity=False ) :
+                     message_threshold_file = "/usr/local/GENIE/Generator/config/Messenger.xml",
+                     verbosity=0 ) :
         super().__init__( name , "simcore::generators::GenieGenerator" )
 
         self.energy = energy
@@ -255,6 +256,7 @@ class genie(simcfg.PrimaryGenerator) :
         self.tune = tune
         self.spline_file = spline_file
         self.seed = seed
+        self.message_threshold_file = message_threshold_file
         self.verbosity = verbosity
 
 def single_4gev_e_upstream_tagger() :

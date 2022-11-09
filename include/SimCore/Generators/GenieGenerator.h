@@ -79,7 +79,9 @@ class GenieGenerator : public simcore::PrimaryGenerator {
   std::string spline_file_;
   int seed_;
 
-  
+  std::string message_threshold_file_;
+
+  size_t n_events_generated_;
   
   void fillConfig(const framework::config::Parameters&);     ///fill the configuration
   bool validateConfig(); ///simple validation check on configuration params

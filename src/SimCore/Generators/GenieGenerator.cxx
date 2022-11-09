@@ -19,11 +19,13 @@
 #include "Framework/Conventions/XmlParserStatus.h"
 #include "Framework/Conventions/GBuild.h"
 #include "Framework/Conventions/Controls.h"
+#include "Framework/Conventions/Units.h"
 #include "Framework/EventGen/EventRecord.h"
 #include "Framework/EventGen/GFluxI.h"
 #include "Framework/EventGen/GEVGDriver.h"
 #include "Framework/EventGen/GMCJDriver.h"
 #include "Framework/EventGen/GMCJMonitor.h"
+#include "Framework/EventGen/InteractionList.h"
 #include "Framework/Interaction/Interaction.h"
 #include "Framework/Messenger/Messenger.h"
 #include "Framework/Ntuple/NtpWriter.h"
@@ -66,16 +68,17 @@ void GenieGenerator::fillConfig(const framework::config::Parameters& p)
   abundances_  = p.getParameter< std::vector<double> >("abundances");
 
   time_        = p.getParameter<double>("time");// * ns;
-  position_    = p.getParameter< std::vector<double> >("position");
+  position_    = p.getParameter< std::vector<double> >("position"); // mm
   direction_   = p.getParameter< std::vector<double> >("direction");
 
   tune_        = p.getParameter<std::string>("tune");
   spline_file_ = p.getParameter<std::string>("spline_file");
   seed_        = p.getParameter<int>("seed");
 
+  message_threshold_file_ = p.getParameter<std::string>("message_threshold_file");
 
-  for(size_t i=0; i<position_.size(); ++i)
-    position_[i] = position_[i];// * mm;
+  verbosity_   = p.getParameter<int>("verbosity");
+  
 }
 
 bool GenieGenerator::validateConfig()
@@ -141,22 +144,35 @@ bool GenieGenerator::validateConfig()
 
 void GenieGenerator::initializeGENIE()
 {
-  char *inarr[3] = {const_cast<char*>(""),
-		    const_cast<char*>("--event-generator-list"),
-		    const_cast<char*>("EM")};
-  genie::RunOpt::Instance()->ReadFromCommandLine(3,inarr);
-  
+  //initialize some RunOpt by hacking the command line interface
+  {
+    char *inarr[3] = {const_cast<char*>(""),
+		      const_cast<char*>("--event-generator-list"),
+		      const_cast<char*>("EM")};
+    genie::RunOpt::Instance()->ReadFromCommandLine(3,inarr);
+  }
+
+  //set message thresholds
+  genie::utils::app_init::MesgThresholds(message_threshold_file_);
+
+  //set tune info
   genie::RunOpt::Instance()->SetTuneName(tune_);
   if ( ! genie::RunOpt::Instance()->Tune() ) {
     EXCEPTION_RAISE("ConfigurationException","No TuneId in RunOption.");
   }
   genie::RunOpt::Instance()->BuildTune();
 
+  //set random seed
   genie::utils::app_init::RandGen(seed_);
-  genie::utils::app_init::XSecTable(spline_file_, false);
-  genie::GHepRecord::SetPrintLevel(1);
 
-  evg_driver_.SetEventGeneratorList("EM");
+  //give it the splint file and require it
+  genie::utils::app_init::XSecTable(spline_file_, true);
+
+  //set GHEP print level (needed?)
+  genie::GHepRecord::SetPrintLevel(0);
+
+  //setup for event driver
+  evg_driver_.SetEventGeneratorList(genie::RunOpt::Instance()->EventGeneratorList());
   evg_driver_.SetUnphysEventMask(*genie::RunOpt::Instance()->UnphysEventMask());
   
 }
@@ -172,6 +188,7 @@ GenieGenerator::GenieGenerator(const std::string& name,
   if(!validateConfig())
     EXCEPTION_RAISE("ConfigurationException","Configuration not valid.");
 
+  n_events_generated_ = 0;
   initializeGENIE();
   
 }
@@ -183,6 +200,7 @@ void GenieGenerator::GeneratePrimaryVertex(G4Event* event)
   //for now, just the first. later picking a target from list
   genie::InitialState initial_state(targets_.front(),11);
   evg_driver_.Configure(initial_state);
+  evg_driver_.UseSplines();
 
   //setup the initial election
   TParticle initial_e;
@@ -195,6 +213,14 @@ void GenieGenerator::GeneratePrimaryVertex(G4Event* event)
   TLorentzVector e_p4;
   initial_e.Momentum(e_p4);
 
+  //print total xsec
+  if(n_events_generated_==0 && verbosity_>=1){
+    double total_xsec = evg_driver_.XSecSum(e_p4);
+    std::cout << "Total XSEC is : " << total_xsec/genie::units::millibarn << " mb" << std::endl;
+  }
+
+
+  
   //GENIE magic
   genie::EventRecord *genie_event = NULL;
   while(!genie_event)
@@ -210,6 +236,13 @@ void GenieGenerator::GeneratePrimaryVertex(G4Event* event)
   //loop over the entries and add to the G4Event
   int nentries = genie_event->GetEntries();
 
+  if(verbosity_>=1){
+    std::cout << "---------- "
+	      << "Generated Event " << n_events_generated_+1
+	      << " ----------"
+	      << std::endl;
+  }
+  
   for(int i_p=0; i_p<nentries; ++i_p)
     {
       genie::GHepParticle *p = (genie::GHepParticle*)(*genie_event)[i_p];
@@ -218,7 +251,8 @@ void GenieGenerator::GeneratePrimaryVertex(G4Event* event)
       if (p->Status()!=1)
 	continue;
 
-      //std::cout << "\tAdding particle " << p->Pdg() << " with status " << p->Status() << " energy " << p->E() << " ..." << std::endl;
+      if(verbosity_>=1)
+	std::cout << "\tAdding particle " << p->Pdg() << " with status " << p->Status() << " energy " << p->E() << " ..." << std::endl;
 
       G4PrimaryParticle* primary = new G4PrimaryParticle();
       primary->SetPDGcode(p->Pdg());
@@ -236,6 +270,7 @@ void GenieGenerator::GeneratePrimaryVertex(G4Event* event)
   //add the vertex to the event
   event->AddPrimaryVertex(vertex);
 
+  ++n_events_generated_;
   delete genie_event;
   
 }
