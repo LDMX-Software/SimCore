@@ -7,6 +7,13 @@
 #ifndef SIMCORE_GENIE_GENERATOR_H
 #define SIMCORE_GENIE_GENERATOR_H
 
+//----------//
+//   ROOT   //
+//----------//
+#include "TRandom.h"
+#include "TRandomGen.h"
+
+
 //------------//
 //   GENIE   //
 //------------//
@@ -46,6 +53,7 @@ class GenieGenerator : public simcore::PrimaryGenerator {
    *  time      : time to shoot at (ns)
    *  direction : direction to shoot in (unitless three-vector)
    *  tune      : name of GENIE tune
+   *  seed      : seed for random generator
    */
   GenieGenerator(const std::string& name, const framework::config::Parameters& parameters);
 
@@ -67,6 +75,8 @@ class GenieGenerator : public simcore::PrimaryGenerator {
    */
   genie::GEVGDriver evg_driver_;
 
+  TRandomRanlux48 random_;
+  
   int verbosity_;
   double energy_;
   std::vector<int> targets_;
@@ -81,7 +91,10 @@ class GenieGenerator : public simcore::PrimaryGenerator {
 
   std::string message_threshold_file_;
 
+  std::vector<double> abundance_integral_;
   size_t n_events_generated_;
+  std::vector<size_t> n_events_by_target_;
+  std::vector<double> xsec_by_target_;
   
   void fillConfig(const framework::config::Parameters&);     ///fill the configuration
   bool validateConfig(); ///simple validation check on configuration params

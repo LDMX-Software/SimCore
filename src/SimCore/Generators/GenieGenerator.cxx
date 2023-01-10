@@ -55,6 +55,7 @@
 // standard
 #include <iostream>
 #include <sstream>
+#include <algorithm>
 
 namespace simcore {
 namespace generators {
@@ -110,20 +111,34 @@ bool GenieGenerator::validateConfig()
 
 
   //normalize abundances
-  float abundance_sum=0;
-  for( auto a : abundances_)
+  double abundance_sum=0;
+  for( auto a : abundances_){
     abundance_sum+=a;
-
+  }
+  std::cout << abundance_sum << std::endl;
+  
   if( std::abs(abundance_sum)<1e-6)
     {
       std::cout << "abundances list sums to zero? " << abundance_sum << std::endl;
       ret=false;
     }
   
-  for(size_t i_a; i_a<abundances_.size(); ++i_a)
+
+  abundance_integral_.resize(abundances_.size());
+  double abundance_total = 0;
+  for(size_t i_a; i_a<abundances_.size(); ++i_a){
     abundances_[i_a] = abundances_[i_a]/abundance_sum;
+    abundance_total += abundances_[i_a];
+    abundance_integral_[i_a] = abundance_total;
 
+    if(verbosity_>0)
+      std::cout << "Target=" << targets_[i_a]
+		<< ", Abundance=" << abundances_[i_a]
+		<< ", Abundance Sum=" << abundance_integral_[i_a]
+		<< std::endl;
+  }
 
+  
   double dir_total_sq=0;
   for( auto d : direction_)
     dir_total_sq += d*d;
@@ -138,6 +153,9 @@ bool GenieGenerator::validateConfig()
   for(size_t i_d; i_d<direction_.size(); ++i_d)
     direction_[i_d] = direction_[i_d]/std::sqrt(dir_total_sq);
   
+
+  xsec_by_target_.resize(targets_.size(),-999.);
+  n_events_by_target_.resize(targets_.size(),0);
   
   return ret;
 }
@@ -190,15 +208,53 @@ GenieGenerator::GenieGenerator(const std::string& name,
 
   n_events_generated_ = 0;
   initializeGENIE();
+
+  random_.SetSeed(seed_);
   
 }
 
-GenieGenerator::~GenieGenerator() {}
+GenieGenerator::~GenieGenerator()
+{
+  std::cout << "--- GENIE Generation Summary BEGIN ---" << std::endl;
+  double total_xsec = 0;
+  for(size_t i_t=0; i_t<targets_.size(); ++i_t)
+    {
+      std::cout << "Target=" << targets_[i_t]
+		<< "\tAbundance=" << abundances_[i_t]
+		<< "\tXSEC=" << xsec_by_target_[i_t]/genie::units::millibarn << " mb"
+		<< "\tEvents=" << n_events_by_target_[i_t]
+		<< std::endl;
+      if(n_events_by_target_[i_t]>0)
+	total_xsec += xsec_by_target_[i_t]*abundances_[i_t];
+    }
+
+  std::cout << "Total events generated = " << n_events_generated_ << std::endl;
+  std::cout << "Total XSEC = " << total_xsec / genie::units::millibarn << " mb" << std::endl;
+
+  std::cout << "--- GENIE Generation Summary *END* ---" << std::endl;
+}
   
 void GenieGenerator::GeneratePrimaryVertex(G4Event* event)
-{  
+{
+
   //for now, just the first. later picking a target from list
-  genie::InitialState initial_state(targets_.front(),11);
+  auto nucl_target_i = 0;
+
+  if(targets_.size()>0)
+    {
+      double rand_uniform = random_.Uniform();
+
+      nucl_target_i = std::distance(abundance_integral_.begin(),
+				    std::lower_bound(abundance_integral_.begin(),
+						     abundance_integral_.end(),
+						     rand_uniform) );
+      if(verbosity_>=1)
+	std::cout << "Random number = " << rand_uniform
+		  << ", target picked " << targets_.at(nucl_target_i) << std::endl;
+      
+    }
+
+  genie::InitialState initial_state(targets_.at(nucl_target_i),11);
   evg_driver_.Configure(initial_state);
   evg_driver_.UseSplines();
 
@@ -213,12 +269,11 @@ void GenieGenerator::GeneratePrimaryVertex(G4Event* event)
   TLorentzVector e_p4;
   initial_e.Momentum(e_p4);
 
-  //print total xsec
-  if(n_events_generated_==0 && verbosity_>=1){
-    double total_xsec = evg_driver_.XSecSum(e_p4);
-    std::cout << "Total XSEC is : " << total_xsec/genie::units::millibarn << " mb" << std::endl;
-  }
-
+  //calculate total xsec
+  if( n_events_by_target_[nucl_target_i]==0)
+    xsec_by_target_[nucl_target_i] = evg_driver_.XSecSum(e_p4);
+  
+  n_events_by_target_[nucl_target_i]+=1;
 
   
   //GENIE magic
