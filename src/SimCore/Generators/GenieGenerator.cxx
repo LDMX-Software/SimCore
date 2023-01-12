@@ -115,7 +115,6 @@ bool GenieGenerator::validateConfig()
   for( auto a : abundances_){
     abundance_sum+=a;
   }
-  std::cout << abundance_sum << std::endl;
   
   if( std::abs(abundance_sum)<1e-6)
     {
