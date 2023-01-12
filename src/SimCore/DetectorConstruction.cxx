@@ -23,9 +23,10 @@ namespace logical_volume_tests {
 static bool isInEcal(G4LogicalVolume* vol, const std::string& vol_to_bias) {
   G4String volumeName = vol->GetName();
   return ((volumeName.contains("Si") || volumeName.contains("W") ||
-           volumeName.contains("PCB") || volumeName.contains("CFMix") ||
-           volumeName.contains("Al")) &&
-          volumeName.contains("volume"));
+           volumeName.contains("PCB") || volumeName.contains("strongback") ||
+           volumeName.contains("Glue") || volumeName.contains("CFMix") ||
+           volumeName.contains("Al") || volumeName.contains("C")
+          ) && volumeName.contains("volume"));
 }
 
 /**
@@ -38,9 +39,8 @@ static bool isInEcal(G4LogicalVolume* vol, const std::string& vol_to_bias) {
  */
 static bool isInHcal(G4LogicalVolume* vol, const std::string& vol_to_bias) {
   G4String volumeName = vol->GetName();
-  return ((volumeName.contains("abso2") || volumeName.contains("abso3") ||
-           volumeName.contains("ScintBox") || volumeName.contains("absoBox")) &&
-          volumeName.contains("volume"));
+  return ((volumeName.contains("abso") || volumeName.contains("ScintBox") || volumeName.contains("scint")) 
+          && volumeName.contains("hcal") && volumeName.contains("olume"));
 }
 
 /**

@@ -29,6 +29,9 @@ class ScoringPlaneSD(simcfg.SensitiveDetector) :
     def target() :
         return ScoringPlaneSD('target')
 
+    def trigscint() :
+        return ScoringPlaneSD('trigScint')
+
     def magnet() :
         return ScoringPlaneSD('magnet')
 
@@ -133,6 +136,10 @@ class TrigScintSD(simcfg.SensitiveDetector) :
             coll = 'Trigger'+coll
 
         self.collection_name = coll
+
+
+    def testbeam() :
+        return TrigScintSD(1, 'PadUp', 'TS_plastic_bar_volume')
 
     def up() :
         return TrigScintSD(3, 'PadUp', 'trigger_pad_up_bar_volume')
