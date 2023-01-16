@@ -91,7 +91,7 @@ class GenieGenerator : public simcore::PrimaryGenerator {
 
   std::string message_threshold_file_;
 
-  std::vector<double> abundance_integral_;
+  std::vector<double> ev_weighting_integral_;
   size_t n_events_generated_;
   std::vector<size_t> n_events_by_target_;
   std::vector<double> xsec_by_target_;
@@ -100,6 +100,7 @@ class GenieGenerator : public simcore::PrimaryGenerator {
   bool validateConfig(); ///simple validation check on configuration params
 
   void initializeGENIE(); ///GENIE initialization
+  void calculateTotalXS(); ///GENIE initialization
   
 };  // ParticleGun
 

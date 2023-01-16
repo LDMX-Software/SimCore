@@ -122,18 +122,18 @@ bool GenieGenerator::validateConfig()
       ret=false;
     }
   
+  if( std::abs(abundance_sum-1.0)>2e-2)
+    {
+      std::cout << "abundances list sums is not unity (" << abundance_sum << " instead.)" << std::endl;
+      std::cout << "Will renormalize abundances to unity!" << std::endl;
+    }
 
-  abundance_integral_.resize(abundances_.size());
-  double abundance_total = 0;
   for(size_t i_a; i_a<abundances_.size(); ++i_a){
     abundances_[i_a] = abundances_[i_a]/abundance_sum;
-    abundance_total += abundances_[i_a];
-    abundance_integral_[i_a] = abundance_total;
 
     if(verbosity_>0)
       std::cout << "Target=" << targets_[i_a]
 		<< ", Abundance=" << abundances_[i_a]
-		<< ", Abundance Sum=" << abundance_integral_[i_a]
 		<< std::endl;
   }
 
@@ -194,6 +194,50 @@ void GenieGenerator::initializeGENIE()
   
 }
 
+void GenieGenerator::calculateTotalXS()
+{
+  //initializing...
+  double total_xsec = 0;
+  ev_weighting_integral_.resize(targets_.size(),0.0);
+  
+  //calculate the total xsec per target...
+  for(size_t i_t=0; i_t<targets_.size(); ++i_t){
+    
+    genie::InitialState initial_state(targets_[i_t],11);
+    evg_driver_.Configure(initial_state);
+    evg_driver_.UseSplines();
+    
+    //setup the initial election
+    TParticle initial_e;
+    initial_e.SetPdgCode(11);
+    auto elec_i_p = std::sqrt(energy_*energy_ - initial_e.GetMass()*initial_e.GetMass());
+    initial_e.SetMomentum(elec_i_p*direction_[0],
+			  elec_i_p*direction_[1],
+			  elec_i_p*direction_[2],
+			  energy_);
+    TLorentzVector e_p4;
+    initial_e.Momentum(e_p4);
+    
+    
+    xsec_by_target_[i_t] = evg_driver_.XSecSum(e_p4);
+    total_xsec += xsec_by_target_[i_t]*abundances_[i_t];
+
+    ev_weighting_integral_[i_t] = total_xsec;
+    
+    //print...
+    std::cout << "Target=" << targets_[i_t]
+	      << "\tAbundance=" << abundances_[i_t]
+	      << "\tXSEC=" << xsec_by_target_[i_t]/genie::units::millibarn << " mb"
+	      << std::endl;
+
+  }
+  std::cout << "Total XSEC = " << total_xsec / genie::units::millibarn << " mb" << std::endl;
+
+  //renormalize our weighting integral
+  for(size_t i_t=0; i_t<ev_weighting_integral_.size(); ++i_t)
+    ev_weighting_integral_[i_t] = ev_weighting_integral_[i_t]/total_xsec;
+}
+  
   
 GenieGenerator::GenieGenerator(const std::string& name,
 			       const framework::config::Parameters& p)
@@ -207,6 +251,7 @@ GenieGenerator::GenieGenerator(const std::string& name,
 
   n_events_generated_ = 0;
   initializeGENIE();
+  calculateTotalXS();
 
   random_.SetSeed(seed_);
   
@@ -243,9 +288,9 @@ void GenieGenerator::GeneratePrimaryVertex(G4Event* event)
     {
       double rand_uniform = random_.Uniform();
 
-      nucl_target_i = std::distance(abundance_integral_.begin(),
-				    std::lower_bound(abundance_integral_.begin(),
-						     abundance_integral_.end(),
+      nucl_target_i = std::distance(ev_weighting_integral_.begin(),
+				    std::lower_bound(ev_weighting_integral_.begin(),
+						     ev_weighting_integral_.end(),
 						     rand_uniform) );
       if(verbosity_>=1)
 	std::cout << "Random number = " << rand_uniform
