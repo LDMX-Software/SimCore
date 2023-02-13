@@ -61,13 +61,6 @@ setup_library(module SimCore
 file(GLOB SRC_FILES CONFIGURE_DEPDENDS ${PROJECT_SOURCE_DIR}/src/SimCore/Geo/[a-zA-Z]*.cxx
                                        ${PROJECT_SOURCE_DIR}/src/SimCore/[a-zA-Z]*.cxx)
 
-if (BUILD_FLUKA_INTERFACE)
-  # TODO: Can this be done in a nicer fashion?
-  add_compile_definitions("G4_USE_FLUKA=1")
-  set(FLUKA_LIBRARIES LDMXFluka::LDMXFluka
-    LDMXFluka::fluka_no_random)
-endif()
-
 # Setup the library
 setup_library(module SimCore
               dependencies Geant4::Interface
@@ -78,7 +71,6 @@ setup_library(module SimCore
                            SimCore::G4User
                            DetDescr::DetDescr
                            Boost::log
-                           ${FLUKA_LIBRARIES}
                            "${registered_targets}"
               sources ${SRC_FILES})
 
