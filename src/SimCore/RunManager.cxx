@@ -62,7 +62,7 @@ void RunManager::setupPhysics() {
     pList->RegisterPhysics(new G4ParallelWorldPhysics("ldmxParallelWorld"));
   }
 
-  pList->RegisterPhysics(new GammaPhysics);
+  pList->RegisterPhysics(new GammaPhysics{"GammaPhysics", parameters_});
   pList->RegisterPhysics(new darkbrem::APrimePhysics(
       parameters_.getParameter<framework::config::Parameters>("dark_brem")));
 
