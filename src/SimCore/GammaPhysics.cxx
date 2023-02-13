@@ -7,10 +7,13 @@
 
 #include "SimCore/GammaPhysics.h"
 
+#include "Framework/Exception/Exception.h"
+#include "G4CrossSectionDataSetRegistry.hh"
+#include "G4HadronInelasticProcess.hh"
+#include "G4PhotoNuclearCrossSection.hh"
+#include "SimCore/BertiniNothingHardModel.h"
+#include "SimCore/PhotonuclearModel.h"
 namespace simcore {
-
-GammaPhysics::GammaPhysics(const G4String& name)
-    : G4VPhysicsConstructor(name) {}
 
 GammaPhysics::~GammaPhysics() {}
 
