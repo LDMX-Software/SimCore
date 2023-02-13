@@ -59,6 +59,13 @@ void GammaPhysics::ConstructProcess() {
 
   auto processManager{GetGammaProcessManager()};
 
+  auto pn = PhotonuclearModel::Factory::get().make(
+      modelParameters.getParameter<std::string>("class_name"),
+      modelParameters.getParameter<std::string>("instance_name"),
+      modelParameters);
+  pn->removeExistingModel(processManager);
+  pn->ConstructModel(processManager);
+
   SetPhotonNuclearAsFirstProcess();
   AddGammaMuMu();
 }
