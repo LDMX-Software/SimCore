@@ -15,7 +15,10 @@
 #include "G4ProcessManager.hh"
 #include "G4VPhysicsConstructor.hh"
 #include "G4VProcess.hh"
-
+/*~~~~~~~~~~~~~~~*/
+/*   Framework   */
+/*~~~~~~~~~~~~~~~*/
+#include "Framework/Configure/Parameters.h"
 namespace simcore {
 
 /**

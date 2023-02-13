@@ -82,6 +82,10 @@ setup_library(module SimCore
                            "${registered_targets}"
               sources ${SRC_FILES})
 
+  setup_library(module SimCore
+    name PhotonuclearModels
+    dependencies SimCore::SimCore
+    )
 # Setup the biasing operators library
 setup_library(module SimCore
               name BiasOperators
