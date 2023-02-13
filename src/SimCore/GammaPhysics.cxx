@@ -20,35 +20,43 @@ GammaPhysics::~GammaPhysics() {}
   ((subInstanceManager.offset[g4vpcInstanceID])._aParticleIterator)
 #endif
 
-void GammaPhysics::ConstructProcess() {
-  aParticleIterator->reset();
-
-  // Loop through all of the particles and find the "gamma".
-  while ((*aParticleIterator)()) {
-    G4ParticleDefinition* particle = aParticleIterator->value();
-    G4ProcessManager* pmanager = particle->GetProcessManager();
-    G4String particleName = particle->GetParticleName();
-
-    if (particleName == "gamma") {
-      // Get the process list associated with the gamma.
-      G4ProcessVector* vProcess = pmanager->GetProcessList();
-
-      // Search the list for the process "photoNuclear".  When found,
-      // change the calling order so photonNuclear is called before
-      // EM processes. The biasing operator needs the photonNuclear
-      // process to be called first because the cross-section is
-      // needed to bias down other process.
-      for (int iProcess = 0; iProcess < vProcess->size(); ++iProcess) {
-        G4String processName = (*vProcess)[iProcess]->GetProcessName();
-        if (processName == "photonNuclear") {
-          pmanager->SetProcessOrderingToFirst((*vProcess)[iProcess],
-                                              G4ProcessVectorDoItIndex::idxAll);
-        }
-      }
-
-      // Add the gamma -> mumu to the physics list.
-      pmanager->AddDiscreteProcess(&gammaConvProcess);
+void GammaPhysics::SetPhotonNuclearAsFirstProcess() const {
+  auto processManager{GetGammaProcessManager()};
+  const auto processes{processManager->GetProcessList()};
+  for (int i{0}; i < processes->size(); ++i) {
+    const auto process{(*processes)[i]};
+    const auto processName{process->GetProcessName()};
+    if (processName == "photonNuclear") {
+      processManager->SetProcessOrderingToFirst(
+          process, G4ProcessVectorDoItIndex::idxAll);
     }
   }
+}
+
+G4ProcessManager* GammaPhysics::GetGammaProcessManager() const {
+  aParticleIterator->reset();
+
+  while ((*aParticleIterator)()) {
+    auto particle{aParticleIterator->value()};
+    G4String particleName = particle->GetParticleName();
+    if (particleName == "gamma") {
+      return aParticleIterator->value()->GetProcessManager();
+    }
+  }
+}
+void GammaPhysics::AddGammaMuMu() {
+  auto processManager{GetGammaProcessManager()};
+
+  // Add the gamma -> mumu to the physics list.
+  processManager->AddDiscreteProcess(&gammaConvProcess);
+}
+
+void GammaPhysics::ConstructProcess() {
+  // aParticleIterator->reset();
+
+  auto processManager{GetGammaProcessManager()};
+
+  SetPhotonNuclearAsFirstProcess();
+  AddGammaMuMu();
 }
 }  // namespace simcore

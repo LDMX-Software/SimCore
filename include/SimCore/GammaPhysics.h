@@ -36,7 +36,11 @@ class GammaPhysics : public G4VPhysicsConstructor {
    * Class constructor.
    * @param name The name of the physics.
    */
-  GammaPhysics(const G4String& name = "GammaPhysics");
+  GammaPhysics(const G4String& name,
+               const framework::config::Parameters& parameters)
+      : G4VPhysicsConstructor(name),
+        modelParameters{parameters.getParameter<framework::config::Parameters>(
+            "photonuclear_model")} {}
 
   /**
    * Class destructor.
@@ -54,10 +58,14 @@ class GammaPhysics : public G4VPhysicsConstructor {
   void ConstructProcess();
 
  private:
+  void SetPhotonNuclearAsFirstProcess() const;
+  G4ProcessManager* GetGammaProcessManager() const;
+  void AddGammaMuMu();
   /**
    * The gamma to muons process.
    */
   G4GammaConversionToMuons gammaConvProcess;
+  framework::config::Parameters modelParameters;
 };
 
 }  // namespace simcore
