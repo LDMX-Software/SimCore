@@ -9,19 +9,18 @@
 //-------------//
 //   ldmx-sw   //
 //-------------//
-#include "SimCore/DarkBrem/APrimePhysics.h"
-#include "SimCore/DarkBrem/G4eDarkBremsstrahlung.h"  //for process name
+#include "G4DarkBreM/G4DarkBremsstrahlung.h"  //for process name
+#include "SimCore/APrimePhysics.h"
 #include "SimCore/DetectorConstruction.h"
+#include "SimCore/G4User/EventAction.h"
+#include "SimCore/G4User/PrimaryGeneratorAction.h"
+#include "SimCore/G4User/RunAction.h"
+#include "SimCore/G4User/StackingAction.h"
+#include "SimCore/G4User/SteppingAction.h"
+#include "SimCore/G4User/TrackingAction.h"
 #include "SimCore/GammaPhysics.h"
 #include "SimCore/ParallelWorld.h"
 #include "SimCore/XsecBiasingOperator.h"
-
-#include "SimCore/G4User/PrimaryGeneratorAction.h"
-#include "SimCore/G4User/SteppingAction.h"
-#include "SimCore/G4User/EventAction.h"
-#include "SimCore/G4User/RunAction.h"
-#include "SimCore/G4User/StackingAction.h"
-#include "SimCore/G4User/TrackingAction.h"
 
 //------------//
 //   Geant4   //
@@ -63,7 +62,7 @@ void RunManager::setupPhysics() {
   }
 
   pList->RegisterPhysics(new GammaPhysics{"GammaPhysics", parameters_});
-  pList->RegisterPhysics(new darkbrem::APrimePhysics(
+  (new APrimePhysics(
       parameters_.getParameter<framework::config::Parameters>("dark_brem")));
 
   auto biasing_operators{
@@ -86,7 +85,8 @@ void RunManager::setupPhysics() {
     // specify which particles are going to be biased
     //  this will put a biasing interface wrapper around *all* processes
     //  associated with these particles
-    simcore::XsecBiasingOperator::Factory::get().apply([biasingPhysics](auto bop) {
+    simcore::XsecBiasingOperator::Factory::get().apply([biasingPhysics](
+                                                           auto bop) {
       std::cout << "[ RunManager ]: Biasing operator '" << bop->GetName()
                 << "' set to bias " << bop->getParticleToBias() << std::endl;
       biasingPhysics->Bias(bop->getParticleToBias());
@@ -156,7 +156,7 @@ void RunManager::Initialize() {
       } else if (type == simcore::TYPE::STACKING) {
         stacking_action->registerAction(ua.get());
       } else {
-        EXCEPTION_RAISE("ActionType","Action type does not exist.");
+        EXCEPTION_RAISE("ActionType", "Action type does not exist.");
       }
     }
   }
@@ -166,33 +166,27 @@ void RunManager::TerminateOneEvent() {
   // have geant4 do its own thing
   G4RunManager::TerminateOneEvent();
 
-  // reset dark brem process (if needed)
-  G4ProcessTable* ptable = G4ProcessTable::GetProcessTable();
-  G4int verbosity = ptable->GetVerboseLevel();
+  // go through the processes attached to the electron and
+  // reactivate any process that contains the G4DarkBremmstrahlung name
+  // this covers both cases where the process is biased and not
+  static auto reactivate_dark_brem = [](G4ProcessManager* pman) {
+    for (std::size_t i_proc{0}; i_proc < pman->GetProcessList()->size();
+         i_proc++) {
+      G4VProcess* p{(*(pman->GetProcessList()))[i_proc]};
+      if (p->GetProcessName().contains(G4DarkBremsstrahlung::PROCESS_NAME)) {
+        pman->SetProcessActivation(p, true);
+        break;
+      }
+    }
+  };
 
-  // Only one of these processes should be in the table
-  //  (i.e. either the Dark Brem is biased or its not)
-  // BUT we want to be able to cover both options without
-  // the user having to configure it, so we set both
-  // of these processes to active (by passing 'true')
-  // while the table is silenced. If the table isn't silenced,
-  // the process that isn't in the table will cause the table
-  // to throw a "not found" warning.
-  std::vector<G4String> dark_brem_processes = {
-      darkbrem::G4eDarkBremsstrahlung::PROCESS_NAME,
-      "biasWrapper(" + darkbrem::G4eDarkBremsstrahlung::PROCESS_NAME + ")"};
-  ptable->SetVerboseLevel(
-      0);  // silent ptable while searching for process that may/may not exist
-  for (auto const& name : dark_brem_processes)
-    ptable->SetProcessActivation(name, true);
-  ptable->SetVerboseLevel(verbosity);
+  reactivate_dark_brem(G4Electron::Definition()->GetProcessManager());
 
   if (this->GetVerboseLevel() > 1) {
     std::cout << "[ RunManager ] : "
               << "Reset the dark brem process (if it was activated)."
               << std::endl;
   }
-  ptable->SetVerboseLevel(verbosity);
 }
 
 DetectorConstruction* RunManager::getDetectorConstruction() {
