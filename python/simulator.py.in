@@ -73,6 +73,7 @@ class simulator(Producer):
         # Optional Parameters (with helpful defaults)
         self.scoringPlanes = ''
         self.beamSpotSmear = [ ]
+        self.beamSpotDistribution = "uniform"
         self.time_shift_primaries = True
         self.preInitCommands = [ ]
         self.postInitCommands = [ ]

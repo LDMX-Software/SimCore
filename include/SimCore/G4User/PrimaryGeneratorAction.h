@@ -87,6 +87,13 @@ class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
    */
   bool useBeamspot_{false};
 
+  /** Distribution used in the beamspot smearing
+   * May be either:
+   * 1. "uniform" (default)
+   * 2. "gaussian"
+   */
+  std::string beamspotDistribution_{"uniform"};
+
   /** Extent of the beamspot in x. */
   double beamspotXSize_{0};
 

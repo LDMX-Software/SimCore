@@ -37,6 +37,15 @@ PrimaryGeneratorAction::PrimaryGeneratorAction(
     beamspotXSize_ = beamSpot[0];
     beamspotYSize_ = beamSpot[1];
     beamspotZSize_ = beamSpot[2];
+
+    std::string beamspotDistribution = parameters.getParameter<std::string>("beamSpotDistribution", {});
+    if(!beamspotDistribution.empty()){
+      beamspotDistribution_ = beamspotDistribution;
+
+      if(!(beamspotDistribution_ == "uniform" or beamspotDistribution_ == "gaussian")){
+        EXCEPTION_RAISE("Misconfig","Invalid beamspot smearing distribution name");
+      }
+    }
   }
 
   time_shift_primaries_ = parameters.getParameter<bool>("time_shift_primaries");
@@ -118,17 +127,29 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* event) {
         double x0_i = primary_vertex->GetX0();
         double y0_i = primary_vertex->GetY0();
         double z0_i = primary_vertex->GetZ0();
-        /*
-         * G4UniformRand returns a number in [0,1]
-         *  - we shift this range so that it is [-0.5,0.5]
-         *  - multiply by the width to get [-0.5*size,0.5*size]
-         *  - add the initial point (in case its off center) to get
-         *    [init-0.5*size, init+0.5*size]
-         */
-        double x0_f = beamspotXSize_ * (G4UniformRand() - 0.5) + x0_i;
-        double y0_f = beamspotYSize_ * (G4UniformRand() - 0.5) + y0_i;
-        double z0_f = beamspotZSize_ * (G4UniformRand() - 0.5) + z0_i;
-        primary_vertex->SetPosition(x0_f, y0_f, z0_f);
+        if(beamspotDistribution_ == "uniform"){
+          /*
+           * G4UniformRand returns a number in [0,1]
+           *  - we shift this range so that it is [-0.5,0.5]
+           *  - multiply by the width to get [-0.5*size,0.5*size]
+           *  - add the initial point (in case its off center) to get
+           *    [init-0.5*size, init+0.5*size]
+           */
+          double x0_f = beamspotXSize_ * (G4UniformRand() - 0.5) + x0_i;
+          double y0_f = beamspotYSize_ * (G4UniformRand() - 0.5) + y0_i;
+          double z0_f = beamspotZSize_ * (G4UniformRand() - 0.5) + z0_i;
+          primary_vertex->SetPosition(x0_f, y0_f, z0_f);
+        }
+        if(beamspotDistribution_ == "gaussian"){
+          /*
+           * G4RandGauss::shoot(double mean, double stdDev)
+           *  - The beamspotSize variables are reinterpreted as the standard deviation here
+           */
+          double x0_f = G4RandGauss::shoot(0.0, beamspotXSize_) + x0_i;
+          double y0_f = G4RandGauss::shoot(0.0, beamspotYSize_) + y0_i;
+          double z0_f = G4RandGauss::shoot(0.0, beamspotZSize_) + z0_i;
+          primary_vertex->SetPosition(x0_f, y0_f, z0_f);
+        }
       }
 
       // shift so that t=0 coincides with primaries arriving at (or coming from)
