@@ -42,10 +42,11 @@
 #include "Framework/Utils/SystemUtils.h"
 #include "Framework/Utils/CmdLnArgParser.h"
 
-
 // Geant4
 #include "G4Event.hh"
 #include "G4PhysicalConstants.hh"
+#include "Randomize.hh"
+
 
 // ROOT
 #include <TParticle.h>
@@ -71,10 +72,10 @@ void GenieGenerator::fillConfig(const framework::config::Parameters& p)
   time_        = p.getParameter<double>("time");// * ns;
   position_    = p.getParameter< std::vector<double> >("position"); // mm
   direction_   = p.getParameter< std::vector<double> >("direction");
+  target_thickness_ = p.getParameter<double>("target_thickness"); //mm
 
   tune_        = p.getParameter<std::string>("tune");
   spline_file_ = p.getParameter<std::string>("spline_file");
-  seed_        = p.getParameter<int>("seed");
 
   message_threshold_file_ = p.getParameter<std::string>("message_threshold_file");
 
@@ -109,6 +110,13 @@ bool GenieGenerator::validateConfig()
       ret=false;
     }
 
+  if(target_thickness_ < 0)
+    {
+      std::cout << "target thickness cannot be less than 0. " << target_thickness_
+		<< std::endl;
+      std::cout << "Taking absolute value." << std::endl;
+      target_thickness_ = std::abs(target_thickness_);
+    }
 
   //normalize abundances
   double abundance_sum=0;
@@ -179,9 +187,14 @@ void GenieGenerator::initializeGENIE()
   }
   genie::RunOpt::Instance()->BuildTune();
 
+  /*
   //set random seed
-  genie::utils::app_init::RandGen(seed_);
-
+  auto seed = G4Random::getTheEngine()->getSeed();
+  if(verbosity_>=1)
+    std::cout << "Initializing GENIE with seed " << seed << std::endl;
+  genie::utils::app_init::RandGen(seed);
+  */
+  
   //give it the splint file and require it
   genie::utils::app_init::XSecTable(spline_file_, true);
 
@@ -197,7 +210,7 @@ void GenieGenerator::initializeGENIE()
 void GenieGenerator::calculateTotalXS()
 {
   //initializing...
-  double total_xsec = 0;
+  xsec_total_ = 0;
   ev_weighting_integral_.resize(targets_.size(),0.0);
   
   //calculate the total xsec per target...
@@ -220,9 +233,9 @@ void GenieGenerator::calculateTotalXS()
     
     
     xsec_by_target_[i_t] = evg_driver_.XSecSum(e_p4);
-    total_xsec += xsec_by_target_[i_t]*abundances_[i_t];
+    xsec_total_ += xsec_by_target_[i_t]*abundances_[i_t];
 
-    ev_weighting_integral_[i_t] = total_xsec;
+    ev_weighting_integral_[i_t] = xsec_total_; //running sum
     
     //print...
     std::cout << "Target=" << targets_[i_t]
@@ -231,11 +244,12 @@ void GenieGenerator::calculateTotalXS()
 	      << std::endl;
 
   }
-  std::cout << "Total XSEC = " << total_xsec / genie::units::millibarn << " mb" << std::endl;
+  std::cout << "Total XSEC = " << xsec_total_ / genie::units::millibarn << " mb" << std::endl;
 
   //renormalize our weighting integral
   for(size_t i_t=0; i_t<ev_weighting_integral_.size(); ++i_t)
-    ev_weighting_integral_[i_t] = ev_weighting_integral_[i_t]/total_xsec;
+    ev_weighting_integral_[i_t] = ev_weighting_integral_[i_t]/xsec_total_;
+
 }
   
   
@@ -252,8 +266,6 @@ GenieGenerator::GenieGenerator(const std::string& name,
   n_events_generated_ = 0;
   initializeGENIE();
   calculateTotalXS();
-
-  random_.SetSeed(seed_);
   
 }
 
@@ -281,12 +293,20 @@ GenieGenerator::~GenieGenerator()
 void GenieGenerator::GeneratePrimaryVertex(G4Event* event)
 {
 
-  //for now, just the first. later picking a target from list
+  if( n_events_generated_==0){
+    //set random seed
+    //have to do this here since seeds aren't properly set until we know the run number
+    auto seed = G4Random::getTheEngine()->getSeed();
+    if(verbosity_>=1)
+      std::cout << "Initializing GENIE with seed " << seed << std::endl;
+    genie::utils::app_init::RandGen(seed);
+  }
+  
   auto nucl_target_i = 0;
 
   if(targets_.size()>0)
     {
-      double rand_uniform = random_.Uniform();
+      double rand_uniform = G4Random::getTheGenerator()->flat();
 
       nucl_target_i = std::distance(ev_weighting_integral_.begin(),
 				    std::lower_bound(ev_weighting_integral_.begin(),
@@ -298,6 +318,12 @@ void GenieGenerator::GeneratePrimaryVertex(G4Event* event)
       
     }
 
+  auto z_pos = position_[2] + (G4Random::getTheGenerator()->flat()-0.5)*target_thickness_;
+  if(verbosity_>=1)
+    std::cout << "Generating interaction at (x,y,z)="
+	      << "(" << position_[0] << "," << position_[1] << "," << z_pos << ")"
+	      << std::endl;
+  
   genie::InitialState initial_state(targets_.at(nucl_target_i),11);
   evg_driver_.Configure(initial_state);
   evg_driver_.UseSplines();
@@ -329,7 +355,7 @@ void GenieGenerator::GeneratePrimaryVertex(G4Event* event)
   G4PrimaryVertex* vertex = new G4PrimaryVertex();
   vertex->SetPosition(position_[0],
 		      position_[1],
-		      position_[2]);
+		      z_pos);
   vertex->SetWeight(genie_event->Weight());
   
   //loop over the entries and add to the G4Event

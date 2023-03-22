@@ -236,26 +236,26 @@ class genie(simcfg.PrimaryGenerator) :
     def __init__(self,name,
                      energy=4.0,
                      targets = [],
+                     target_thickness = 0.3504,
                      abundances = [],
                      time = 0.0,
                      position = [ 0.0, 0.0, 0.0 ],
                      direction = [ 0.0, 0.0, 1.0 ],
                      tune = 'default',
                      spline_file = '',
-                     seed = 1,
                      message_threshold_file = "/usr/local/GENIE/Generator/config/Messenger.xml",
                      verbosity=0 ) :
         super().__init__( name , "simcore::generators::GenieGenerator" )
 
         self.energy = energy
         self.targets = targets
+        self.target_thickness = target_thickness
         self.abundances = abundances
         self.time = time
         self.position = position
         self.direction = direction
         self.tune = tune
         self.spline_file = spline_file
-        self.seed = seed
         self.message_threshold_file = message_threshold_file
         self.verbosity = verbosity
 
