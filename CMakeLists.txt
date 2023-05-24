@@ -39,6 +39,7 @@ setup_geant4_target()
 
 # include dark brem simulation
 add_subdirectory(G4DarkBreM)
+add_subdirectory(G4Py8)
 
 # Set the LHE Reading Library
 setup_library(module SimCore 
@@ -66,6 +67,7 @@ setup_library(module SimCore
                            G4DarkBreM
                            DetDescr::DetDescr
                            Boost::log
+                           G4Py8
                            "${registered_targets}"
               sources ${SRC_FILES})
 
