@@ -1,3 +1,6 @@
 [submodule "G4DarkBreM"]
 	path = G4DarkBreM
 	url = https://github.com/tomeichlersmith/G4DarkBreM.git
+[submodule "G4Py8"]
+	path = G4Py8
+	url = git@gitlab.com:EinarElen/G4Py8
