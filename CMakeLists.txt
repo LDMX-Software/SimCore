@@ -45,6 +45,10 @@ setup_genie_target()
 # include dark brem simulation
 add_subdirectory(G4DarkBreM)
 
+setup_library(module SimCore
+  name PhotoNuclearModels
+  dependencies SimCore::SimCore)
+
 # Set the LHE Reading Library
 setup_library(module SimCore 
               name LHE
