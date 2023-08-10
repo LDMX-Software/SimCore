@@ -2,7 +2,6 @@
 #define SIMCORE_USEREVENTINFORMATION_H
 
 #include "G4VUserEventInformation.hh"
-
 namespace simcore {
 
 /**
@@ -11,10 +10,10 @@ namespace simcore {
 class UserEventInformation : public G4VUserEventInformation {
  public:
   /// Constructor
-  UserEventInformation();
+  UserEventInformation() = default;
 
   /// Destructor
-  ~UserEventInformation();
+  virtual ~UserEventInformation() = default;
 
   /// Print the information associated with the track
   void Print() const final override;

@@ -3,7 +3,6 @@
 
 #include "Framework/Configure/Parameters.h"
 #include "Framework/RunHeader.h"
-
 #include "SimCore/Factory.h"
 
 //------------//
@@ -14,8 +13,8 @@
 #include "G4BiasingProcessSharedData.hh"
 #include "G4Electron.hh"
 #include "G4Gamma.hh"
-#include "G4Neutron.hh"
 #include "G4KaonZeroLong.hh"
+#include "G4Neutron.hh"
 #include "G4ParticleDefinition.hh"
 #include "G4ParticleTable.hh"
 #include "G4ProcessManager.hh"
@@ -55,13 +54,13 @@ class XsecBiasingOperator : public G4VBiasingOperator {
   /**
    * The BiasingOperator factory
    */
-  using Factory = ::simcore::Factory<XsecBiasingOperator,
-                                     std::shared_ptr<XsecBiasingOperator>,
-                                     std::string,
-                                     const framework::config::Parameters&>;
+  using Factory =
+      ::simcore::Factory<XsecBiasingOperator,
+                         std::shared_ptr<XsecBiasingOperator>, std::string,
+                         const framework::config::Parameters&>;
 
   /** Destructor */
-  virtual ~XsecBiasingOperator();
+  virtual ~XsecBiasingOperator() = default;
 
   /**
    * Propose a biasing operation for the current track and calling process.
@@ -186,9 +185,9 @@ class XsecBiasingOperator : public G4VBiasingOperator {
  * Defines a builder for the declared class
  * and then registers the class as a biasing operator.
  */
-#define DECLARE_XSECBIASINGOPERATOR(CLASS)                                    \
-  namespace {                                                                 \
-    auto v = ::simcore::XsecBiasingOperator::Factory::get().declare<CLASS>(); \
+#define DECLARE_XSECBIASINGOPERATOR(CLASS)                                  \
+  namespace {                                                               \
+  auto v = ::simcore::XsecBiasingOperator::Factory::get().declare<CLASS>(); \
   }
 
 #endif  // SIMCORE_XSECBIASINGOPERATOR_H_

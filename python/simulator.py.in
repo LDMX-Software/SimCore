@@ -83,6 +83,7 @@ class simulator(Producer):
         self.validate_detector = False
         self.verbosity = 0
 
+
         #Dark Brem stuff
         from LDMX.SimCore import dark_brem
         self.dark_brem = dark_brem.DarkBrem()
@@ -133,3 +134,40 @@ class simulator(Producer):
                 sds.ScoringPlaneSD.tracker(),
                 sds.ScoringPlaneSD.magnet()
                 ])
+
+    def resimulate(self, which_events = None):
+        """Create a resimulator based on the simulator configuration.
+
+        This is intended to ensure that a resimulator has the same configuration
+        as the simulation that was used to generate the input file. If you
+        require any changes to the simulation configuration, such as loading a
+        modified geometry, you can make those changes after creating the
+        resiulator.
+
+
+        Parameters
+        ----------
+            which_events : list of event numbers, optional
+            Which events from the input files to resimulate. If None,
+            resimulate all events.
+
+            Events that are not present in any of the input files will be
+            ignored.
+
+            For multiple input files, if an event number is present within more
+            than one input file all versions will be resimulated.
+
+        """
+        resimulator = self
+        resimulator.className = 'simcore::ReSimulator'
+        if which_events is None:
+            resimulator.resimulate_all_events = True
+            resimulator.events_to_resimulate = [ ]
+        elif isinstance(which_events, list):
+            resimulator.resimulate_all_events = False
+            resimulator.events_to_resimulate = which_events
+            if len(which_events) == 0:
+                raise ValueError('which_events must contain at least one element if provided')
+        else:
+            raise ValueError('which_events must be a list if provided')
+        return resimulator

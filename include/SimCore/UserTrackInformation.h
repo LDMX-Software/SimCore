@@ -2,8 +2,8 @@
 #define SIMCORE_USERTRACKINFORMATION_H
 
 #include "G4ThreeVector.hh"
-#include "G4VUserTrackInformation.hh"
 #include "G4Track.hh"
+#include "G4VUserTrackInformation.hh"
 
 namespace simcore {
 
@@ -18,11 +18,12 @@ class UserTrackInformation : public G4VUserTrackInformation {
   /// Constructor
   UserTrackInformation() = default;
 
+  virtual ~UserTrackInformation() = default;
   /**
    * get
    *
    * A static helper function for getting the track information
-   * from the passed G4Track. If the track doesn't have an 
+   * from the passed G4Track. If the track doesn't have an
    * information attached, a new one is created.
    *
    * @note The return value of this pointer is never NULL.

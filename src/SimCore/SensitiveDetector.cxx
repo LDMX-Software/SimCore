@@ -1,11 +1,10 @@
 #include "SimCore/SensitiveDetector.h"
 
-#include "G4SDManager.hh"
+#include "Framework/Exception/Exception.h"
 #include "G4ChargedGeantino.hh"
 #include "G4Geantino.hh"
+#include "G4SDManager.hh"
 #include "G4Step.hh"
-
-#include "Framework/Exception/Exception.h"
 
 namespace simcore {
 
@@ -16,8 +15,6 @@ SensitiveDetector::SensitiveDetector(
   // register us with the manager
   G4SDManager::GetSDMpointer()->AddNewDetector(this);
 }
-
-SensitiveDetector::~SensitiveDetector() {}
 
 bool SensitiveDetector::isGeantino(const G4Step* step) const {
   auto particle_def{step->GetTrack()->GetDefinition()};

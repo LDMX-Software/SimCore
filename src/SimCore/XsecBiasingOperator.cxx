@@ -8,8 +8,6 @@ XsecBiasingOperator::XsecBiasingOperator(
     std::string name, const framework::config::Parameters& parameters)
     : G4VBiasingOperator(name) {}
 
-XsecBiasingOperator::~XsecBiasingOperator() {}
-
 void XsecBiasingOperator::StartRun() {
   if (this->getParticleToBias().compare("gamma") == 0) {
     processManager_ = G4Gamma::GammaDefinition()->GetProcessManager();
@@ -18,7 +16,8 @@ void XsecBiasingOperator::StartRun() {
   } else if (this->getParticleToBias().compare("neutron") == 0) {
     processManager_ = G4Neutron::NeutronDefinition()->GetProcessManager();
   } else if (this->getParticleToBias().compare("kaon0L") == 0) {
-    processManager_ = G4KaonZeroLong::KaonZeroLongDefinition()->GetProcessManager();
+    processManager_ =
+        G4KaonZeroLong::KaonZeroLongDefinition()->GetProcessManager();
   } else {
     EXCEPTION_RAISE("BiasSetup", "Invalid particle type '" +
                                      this->getParticleToBias() + "'.");
