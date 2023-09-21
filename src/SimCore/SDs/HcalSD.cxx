@@ -26,36 +26,34 @@ HcalSD::HcalSD(const std::string& name, simcore::ConditionsInterface& ci,
       p.getParameter<std::vector<std::string>>("gdml_identifiers")};
 }
 
-HcalSD::~HcalSD() {}
-
 ldmx::HcalID HcalSD::decodeCopyNumber(const std::uint32_t copyNumber,
-				      const G4ThreeVector& localPosition,
-				      const G4Box* scint) {
+                                      const G4ThreeVector& localPosition,
+                                      const G4Box* scint) {
   const unsigned int version{copyNumber / 0x01000000};
   if (version != 0) {
-    typedef ldmx::PackedIndex<256, 256, 256> Index;
-    return ldmx::HcalID{Index(copyNumber).field2(), Index(copyNumber).field1(), Index(copyNumber).field0()};
-  } else {
-    const auto& geometry = getCondition<ldmx::HcalGeometry>(
-							    ldmx::HcalGeometry::CONDITIONS_OBJECT_NAME);
-    unsigned int stripID = 0;
-    const unsigned int section = copyNumber / 1000;
-    const unsigned int layer = copyNumber % 1000;
-    
-    // 5cm wide bars are HARD-CODED
-    if (section == ldmx::HcalID::BACK) {
-      if (geometry.backLayerIsHorizontal(layer)) {
-        stripID = int((localPosition.y() + scint->GetYHalfLength()) / 50.0);
-      } else {
-        stripID = int((localPosition.x() + scint->GetXHalfLength()) / 50.0);
-      }
-    } else {
-      stripID = int((localPosition.z() + scint->GetZHalfLength()) / 50.0);
-    }
-    return ldmx::HcalID{section, layer, stripID};
+    using Index = ldmx::PackedIndex<256, 256, 256>;
+    return ldmx::HcalID{Index(copyNumber).field2(), Index(copyNumber).field1(),
+                        Index(copyNumber).field0()};
   }
+  const auto& geometry = getCondition<ldmx::HcalGeometry>(
+      ldmx::HcalGeometry::CONDITIONS_OBJECT_NAME);
+  unsigned int stripID = 0;
+  const unsigned int section = copyNumber / 1000;
+  const unsigned int layer = copyNumber % 1000;
+
+  // 5cm wide bars are HARD-CODED
+  if (section == ldmx::HcalID::BACK) {
+    if (geometry.backLayerIsHorizontal(layer)) {
+      stripID = int((localPosition.y() + scint->GetYHalfLength()) / 50.0);
+    } else {
+      stripID = int((localPosition.x() + scint->GetXHalfLength()) / 50.0);
+    }
+  } else {
+    stripID = int((localPosition.z() + scint->GetZHalfLength()) / 50.0);
+  }
+  return ldmx::HcalID{section, layer, stripID};
 }
-  
+
 G4bool HcalSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
   // Get the edep from the step.
   G4double edep = aStep->GetTotalEnergyDeposit();
@@ -161,15 +159,15 @@ G4bool HcalSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
   const G4Track* track = aStep->GetTrack();
   int track_id = track->GetTrackID();
   hit.addContrib(getTrackMap().findIncident(track_id), track_id,
-                 track->GetParticleDefinition()->GetPDGEncoding(),
-                 edep, track->GetGlobalTime());
+                 track->GetParticleDefinition()->GetPDGEncoding(), edep,
+                 track->GetGlobalTime());
   //
   // Pre/post step details for scintillator response simulation
 
   // Convert back to mm
   hit.setPathLength(stepLength * CLHEP::cm / CLHEP::mm);
   hit.setVelocity(track->GetVelocity());
-  const auto &geometry = getCondition<ldmx::HcalGeometry>(
+  const auto& geometry = getCondition<ldmx::HcalGeometry>(
       ldmx::HcalGeometry::CONDITIONS_OBJECT_NAME);
   // Convert pre/post step position from global coordinates to coordinates
   // within the scintillator bar

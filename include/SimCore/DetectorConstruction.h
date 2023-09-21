@@ -46,7 +46,7 @@ class DetectorConstruction : public G4VUserDetectorConstruction {
   /**
    * Class destructor.
    */
-  ~DetectorConstruction() = default;
+  virtual ~DetectorConstruction() = default;
 
   /**
    * Construct the detector.
@@ -72,7 +72,7 @@ class DetectorConstruction : public G4VUserDetectorConstruction {
   framework::config::Parameters parameters_;
 
   /// interface to conditions to be passed to SDs
-  simcore::ConditionsInterface& conditions_interface_;
+  simcore::ConditionsInterface &conditions_interface_;
 };  // DetectorConstruction
 }  // namespace simcore
 

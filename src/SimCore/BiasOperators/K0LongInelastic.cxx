@@ -4,7 +4,8 @@
 namespace simcore {
 namespace biasoperators {
 
-K0LongInelastic::K0LongInelastic(std::string name, const framework::config::Parameters& p)
+K0LongInelastic::K0LongInelastic(std::string name,
+                                 const framework::config::Parameters& p)
     : XsecBiasingOperator(name, p) {
   volume_ = p.getParameter<std::string>("volume");
   factor_ = p.getParameter<double>("factor");
@@ -13,8 +14,9 @@ K0LongInelastic::K0LongInelastic(std::string name, const framework::config::Para
 
 G4VBiasingOperation* K0LongInelastic::ProposeOccurenceBiasingOperation(
     const G4Track* track, const G4BiasingProcessInterface* callingProcess) {
-
-  if (track->GetKineticEnergy() < threshold_) return 0;
+  if (track->GetKineticEnergy() < threshold_) {
+    return nullptr;
+  };
 
   std::string currentProcess =
       callingProcess->GetWrappedProcess()->GetProcessName();
@@ -27,8 +29,8 @@ G4VBiasingOperation* K0LongInelastic::ProposeOccurenceBiasingOperation(
     double k0LongInXsecBiased = k0LongInXsecUnbiased * factor_;
 
     return BiasedXsec(k0LongInXsecBiased);
-  } else
-    return 0;
+  }
+  return nullptr;
 }
 
 }  // namespace biasoperators

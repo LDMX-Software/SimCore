@@ -9,9 +9,10 @@
 
 namespace simcore {
 
-GammaPhysics::~GammaPhysics() {}
-
 // needed for GEANT4 10.3.0 and later
+//
+// TODO: I (Einar) don't think this really is necessary if we change
+// GetGammaProcessManager below
 #ifndef aParticleIterator
 #define aParticleIterator \
   ((subInstanceManager.offset[g4vpcInstanceID])._aParticleIterator)
@@ -33,6 +34,9 @@ G4ProcessManager* GammaPhysics::GetGammaProcessManager() const {
       return particle->GetProcessManager();
     }
   }
+  EXCEPTION_RAISE("GammaPhysics",
+                  "Was unable to access the process manager for photons, "
+                  "something is very wrong!");
 }
 
 void GammaPhysics::SetPhotonNuclearAsFirstProcess() const {

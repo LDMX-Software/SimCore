@@ -2,7 +2,6 @@
 #define SIMCORE_USEREVENTINFORMATION_H
 
 #include "G4VUserEventInformation.hh"
-
 namespace simcore {
 
 /**
@@ -11,10 +10,10 @@ namespace simcore {
 class UserEventInformation : public G4VUserEventInformation {
  public:
   /// Constructor
-  UserEventInformation();
+  UserEventInformation() = default;
 
   /// Destructor
-  ~UserEventInformation();
+  virtual ~UserEventInformation() = default;
 
   /// Print the information associated with the track
   void Print() const final override;
@@ -24,6 +23,23 @@ class UserEventInformation : public G4VUserEventInformation {
 
   /// Decrease the number of brem candidates in an event.
   void decBremCandidateCount() { bremCandidateCount_ -= 1; }
+
+  /**
+   * Set the Z of the element in which the dark brem ocurred
+   *
+   * @param[in] z atomic Z of element in which the dark brem ocurred
+   */
+  void setDarkBremMaterialZ(double z) { db_material_z_ = z; }
+
+  /**
+   * Get the Z of the element in which the dark brem ocurred
+   *
+   * @note This will return -1 if no dark brem ocurred within
+   * this event.
+   *
+   * @param[in] z atomic Z of element in which the dark brem ocurred
+   */
+  double getDarkBremMaterialZ() const { return db_material_z_; }
 
   /**
    * Set the event weight.
@@ -141,6 +157,14 @@ class UserEventInformation : public G4VUserEventInformation {
    * Was the most recent step a electron-nuclear interaction?
    */
   bool last_step_en_{false};
+
+  /**
+   * atomic Z of the element in which dark brem occurred (-1 if didn't happen)
+   *
+   * The default is -1. and so will provide unphysical results if the
+   * dark brem did not occur within the event in question.
+   */
+  double db_material_z_{-1.};
 };
 }  // namespace simcore
 

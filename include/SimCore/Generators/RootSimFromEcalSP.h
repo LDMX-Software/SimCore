@@ -56,7 +56,8 @@ class RootSimFromEcalSP : public PrimaryGenerator {
    * collection for Ecal Scoring Plane hits ecalSPHitsPassName : name of pass
    * for Ecal Scoring Plane hits
    */
-  RootSimFromEcalSP(const std::string& name, const framework::config::Parameters& parameters);
+  RootSimFromEcalSP(const std::string& name,
+                    const framework::config::Parameters& parameters);
 
   /**
    * Class destructor.
@@ -67,9 +68,10 @@ class RootSimFromEcalSP : public PrimaryGenerator {
    * Generate vertices in the Geant4 event.
    * @param anEvent The Geant4 event.
    */
-  void GeneratePrimaryVertex(G4Event* anEvent);
+  void GeneratePrimaryVertex(G4Event* anEvent) final override;
 
   void RecordConfig(const std::string& id, ldmx::RunHeader& rh) final override;
+
  private:
   /**
    * The cutoff time

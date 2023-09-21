@@ -2,7 +2,6 @@
 #define SIMCORE_TRACKERSD_H
 
 #include "DetDescr/TrackerID.h"
-
 #include "SimCore/Event/SimTrackerHit.h"
 #include "SimCore/SensitiveDetector.h"
 
@@ -20,12 +19,11 @@ class TrackerSD : public SensitiveDetector {
    * @param[in] ci conditions interface handle
    * @param[in] p parameters to configure sensitive detector
    */
-  TrackerSD(const std::string& name,
-            simcore::ConditionsInterface& ci,
+  TrackerSD(const std::string& name, simcore::ConditionsInterface& ci,
             const framework::config::Parameters& p);
 
   /// Destructor
-  ~TrackerSD();
+  virtual ~TrackerSD() = default;
 
   /**
    * Should the input logical volume be attached to
@@ -34,7 +32,8 @@ class TrackerSD : public SensitiveDetector {
    * @note This is dependent on the naming convention in the GDML!
    */
   virtual bool isSensDet(G4LogicalVolume* volume) const final override {
-    return (volume->GetName().contains("Sensor") and volume->GetName().contains(subsystem_));
+    return (volume->GetName().contains("Sensor") and
+            volume->GetName().contains(subsystem_));
   }
 
   /**
@@ -43,7 +42,7 @@ class TrackerSD : public SensitiveDetector {
    * @param step The step information
    * @param history The readout history.
    */
-  G4bool ProcessHits(G4Step* step, G4TouchableHistory* history);
+  G4bool ProcessHits(G4Step* step, G4TouchableHistory* history) override;
 
   /**
    * Add the hits to the event and then reset the container
@@ -52,9 +51,7 @@ class TrackerSD : public SensitiveDetector {
     event.add(collection_name_, hits_);
   }
 
-  virtual void EndOfEvent() final override {
-    hits_.clear();
-  }
+  virtual void OnFinishedEvent() final override { hits_.clear(); }
 
  private:
   /// The name of the subsystem we are apart of

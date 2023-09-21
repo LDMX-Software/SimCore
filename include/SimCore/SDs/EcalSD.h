@@ -10,9 +10,9 @@
 
 // LDMX
 #include "DetDescr/EcalID.h"
-#include "SimCore/SensitiveDetector.h"
 #include "SimCore/Event/SimCalorimeterHit.h"
 #include "SimCore/G4User/TrackingAction.h"
+#include "SimCore/SensitiveDetector.h"
 #include "SimCore/TrackMap.h"
 
 // ROOT
@@ -38,14 +38,13 @@ class EcalSD : public SensitiveDetector {
    * @param theCollectionName The name of the hits collection.
    * @param subDetID The subdetector ID.
    */
-  EcalSD(const std::string& name,
-         simcore::ConditionsInterface& ci,
+  EcalSD(const std::string& name, simcore::ConditionsInterface& ci,
          const framework::config::Parameters& p);
 
   /**
    * Class destructor.
    */
-  virtual ~EcalSD();
+  virtual ~EcalSD() = default;
 
   /**
    * Should the input volume be consider apart of this sensitive detector?
@@ -65,7 +64,7 @@ class EcalSD : public SensitiveDetector {
    * @param aStep The step information.
    * @param ROhist The readout history.
    */
-  G4bool ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist);
+  G4bool ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) final override;
 
   /**
    * Add our hits to the event bus.
@@ -75,13 +74,11 @@ class EcalSD : public SensitiveDetector {
   /**
    * Clear the map of hits we have accumulated
    */
-  virtual void EndOfEvent() final override {
-    hits_.clear();
-  }
+  virtual void OnFinishedEvent() final override { hits_.clear(); }
 
  private:
   /// map of hits to add to the event (will be squashed)
-  std::map<ldmx::EcalID,ldmx::SimCalorimeterHit> hits_;
+  std::map<ldmx::EcalID, ldmx::SimCalorimeterHit> hits_;
   /// enable hit contribs
   bool enableHitContribs_;
   /// compress hit contribs
