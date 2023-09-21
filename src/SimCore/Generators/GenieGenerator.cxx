@@ -6,6 +6,7 @@
 
 #include "SimCore/Generators/GenieGenerator.h"
 #include "SimCore/UserPrimaryParticleInformation.h"
+#include "SimCore/GENIEEventInformation.h"
 
 // GENIE
 #include "Framework/Utils/AppInit.h"
@@ -351,7 +352,12 @@ void GenieGenerator::GeneratePrimaryVertex(G4Event* event)
   while(!genie_event)
     genie_event = evg_driver_.GenerateEvent(e_p4);
 
+  auto genie_info = new UserEventInformation;
+  genie_info->setGENIEEventRecord(genie_event);
+  event->SetUserInformation(genie_info);
+  
   //setup the primary vertex now
+  
   G4PrimaryVertex* vertex = new G4PrimaryVertex();
   vertex->SetPosition(position_[0],
 		      position_[1],
@@ -394,9 +400,9 @@ void GenieGenerator::GeneratePrimaryVertex(G4Event* event)
 
   //add the vertex to the event
   event->AddPrimaryVertex(vertex);
-
+  
   ++n_events_generated_;
-  delete genie_event;
+  //delete genie_event;
   
 }
 
