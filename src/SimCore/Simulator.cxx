@@ -27,6 +27,7 @@
 #include "SimCore/SensitiveDetector.h"
 #include "SimCore/UserEventInformation.h"
 #include "SimCore/XsecBiasingOperator.h"
+#include "SimCore/Event/GTruth.h"
 
 /*~~~~~~~~~~~~~~*/
 /*    Geant4    */
@@ -157,6 +158,17 @@ void Simulator::produce(framework::Event& event) {
 
   event_header.setStringParameter("eventSeed", stream.str());
 
+  PrimaryGenerator::Factory::get().apply([](auto gen){
+    std::cout << gen->Name() << std::endl;
+  });
+
+  auto event_info = static_cast<UserEventInformation*>(
+      runManager_->GetCurrentEvent()->GetUserInformation());
+  if(event_info->getGENIEEventRecord()){
+    event_info->getGENIEEventRecord()->Print();
+    //ldmx::SimGenieEventRecord ev_record(*(event_info->getGENIEEventRecord()));
+    //event.add("SimGenieEventRecord", ev_record);
+  }
   saveTracks(event);
 
   saveSDHits(event);

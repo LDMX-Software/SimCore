@@ -2,6 +2,9 @@
 #define SIMCORE_USEREVENTINFORMATION_H
 
 #include "G4VUserEventInformation.hh"
+
+#include "GENIE/Framework/EventGen/EventRecord.h"
+
 namespace simcore {
 
 /**
@@ -13,7 +16,8 @@ class UserEventInformation : public G4VUserEventInformation {
   UserEventInformation() = default;
 
   /// Destructor
-  virtual ~UserEventInformation() = default;
+  virtual ~UserEventInformation()
+  { if(genie_event_) delete genie_event_;}
 
   /// Print the information associated with the track
   void Print() const final override;
@@ -99,7 +103,10 @@ class UserEventInformation : public G4VUserEventInformation {
    * @returns true if it was
    */
   bool wasLastStepEN() const { return last_step_en_; }
-
+  
+  void setGENIEEventRecord(genie::EventRecord *event) { genie_event_ = event; }
+  genie::EventRecord* getGENIEEventRecord() { return genie_event_; }
+  
  private:
   /// Total number of brem candidates in the event
   int bremCandidateCount_{0};
@@ -140,6 +147,12 @@ class UserEventInformation : public G4VUserEventInformation {
    * Was the most recent step a electron-nuclear interaction?
    */
   bool last_step_en_{false};
+
+  /**
+   * Pointer for a GENIE event record.
+   */
+  genie::EventRecord* genie_event_{NULL};
+
 };
 }  // namespace simcore
 

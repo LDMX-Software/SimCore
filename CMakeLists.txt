@@ -15,6 +15,8 @@ find_package(ROOT CONFIG REQUIRED)
 find_package(Boost REQUIRED
              COMPONENTS log)
 
+#Configure Genie
+setup_genie_target()
 include_directories( /usr/local/include/GENIE )
 
 option(BUILD_EVENT_ONLY "Build the event library." ON)
@@ -26,11 +28,14 @@ if(BUILD_EVENT_ONLY)
                         class "SimTrackerHit" type "collection")
   register_event_object(module_path "SimCore/Event" namespace "ldmx"
                         class "SimParticle" type "map" key "int")
+  register_event_object(module_path "SimCore/Event" namespace "ldmx"
+                        class "GTruth")
 
   # Generate the files needed to build the event classes.
   setup_library(module SimCore name Event
-                dependencies ROOT::Core
-                register_target)
+                dependencies ROOT::Core ${GENIE_LIBS}
+                register_target
+		include )
 
   return()
 
@@ -69,6 +74,7 @@ file(GLOB SRC_FILES CONFIGURE_DEPDENDS ${PROJECT_SOURCE_DIR}/src/SimCore/Geo/[a-
 setup_library(module SimCore
               dependencies Geant4::Interface
                            ROOT::Physics
+			   ${GENIE_LIBS}
                            Framework::Configure
                            Framework::Framework
                            SimCore::G4User
@@ -86,7 +92,7 @@ setup_library(module SimCore
 # Primary Generators library
 setup_library(module SimCore
               name Generators
-              dependencies SimCore::SimCore SimCore::LHE ${GENIE_LIBS})
+              dependencies SimCore::SimCore SimCore::LHE)
 
 # Sensitive Detectors library
 setup_library(module SimCore
