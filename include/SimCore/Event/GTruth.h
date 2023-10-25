@@ -15,22 +15,32 @@
 #ifndef SIMCORE_EVENT__GTRUTH_H
 #define SIMCORE_EVENT__GTRUTH_H
 
+#include "TObject.h"
+
 #include <iostream>
-#include <TLorentzVector.h>
-#include "GENIE/Framework/EventGen/EventRecord.h"
+#include <map>
 
 namespace ldmx {
 
   class GTruth {
 
   public:
-      GTruth() = default;
 
-      //genie::EventRecord fgenieEventRecord;
-      
+    GTruth() {}
+    
+    void Clear() {}
+    void Print() const;
+    
     // genie::GHepRecord info
     // holds a genie::Interaction
-    TLorentzVector fVertex;
+
+    //TLorentzVector fVertex;
+    double fVertex_x;
+    double fVertex_y;
+    double fVertex_z;
+    double fVertex_t;
+    
+    
     // skipping TBits data members  EventFlags and EventMask
     double         fweight;       ///< event interaction weight (genie internal)
     double         fprobability;  ///< interaction probability
@@ -45,9 +55,19 @@ namespace ldmx {
     // genie:::InitialState info (sub-object to genie::Interactions)
     int            fProbePDG;
     // holds a genie::Target
-    TLorentzVector fProbeP4;
-    TLorentzVector fTgtP4;                                      // added version 13
 
+    //TLorentzVector fProbeP4;
+    double fProbe_px;
+    double fProbe_py;
+    double fProbe_pz;
+    double fProbe_e;
+
+    //TLorentzVector fTgtP4;                                      // added version 13
+    double fTgt_px;
+    double fTgt_py;
+    double fTgt_pz;
+    double fTgt_e;
+    
     // genie::Target info (sub-object to genie::InitialState)
     int            ftgtZ;
     int            ftgtA;
@@ -55,7 +75,12 @@ namespace ldmx {
     int            fHitNucPDG;    ///< hit nucleon PDG code     // added version 13
     int            fHitQrkPDG;    ///< hit quark PDG code       // added version 13
     bool           fIsSeaQuark;
-    TLorentzVector fHitNucP4;
+    //TLorentzVector fHitNucP4;
+    double fHitNuc_px;
+    double fHitNuc_py;
+    double fHitNuc_pz;
+    double fHitNuc_e;
+
     double         fHitNucPos;                                  // added version 12
 
     // genie::ProcessInfo (sub-object to genie::Interactions)
@@ -66,19 +91,29 @@ namespace ldmx {
 
     ///< these are for the internal (on shell) genie kinematics
     ///<   this list might be an incomplete transcription of map<KineVar_t,double>
-    double         fgQ2;
-    double         fgq2;
-    double         fgW;
-    double         fgT;
-    double         fgX;
-    double         fgY;
+    //double         fgQ2;
+    //double         fgq2;
+    //double         fgW;
+    //double         fgT;
+    //double         fgX;
+    //double         fgY;
+    std::map<int,double> fKV;
 
     ///< a common running variable to be recorded
-    double         fgWrun;
-
-    TLorentzVector fFSleptonP4;   ///< generated final state primary lepton (LAB frame) // added version 13
-    TLorentzVector fFShadSystP4;  ///< generated final state hadronic system (LAB frame)
-
+    //double         fgWrun;
+    
+    //TLorentzVector fFSleptonP4;   ///< generated final state primary lepton (LAB frame) // added version 13
+    double fFSlepton_px;
+    double fFSlepton_py;
+    double fFSlepton_pz;
+    double fFSlepton_e;    
+    
+    //TLorentzVector fFShadSystP4;  ///< generated final state hadronic system (LAB frame)
+    double fFShadSyst_px;
+    double fFShadSyst_py;
+    double fFShadSyst_pz;
+    double fFShadSyst_e;
+    
     // genie::XclsTag info (sub-object to genie::Interactions)
     bool           fIsCharm;      ///< did the interaction produce a charmed hadron?
     int            fCharmHadronPdg;                             // added version 13
@@ -95,8 +130,9 @@ namespace ldmx {
     int            fNumRhoMinus;   ///< number of pi minuses after reaction, before FSI
     int            fResNum;       ///< resonance number
     int            fDecayMode;                                  // added version 13
-
+    bool           fIsFinalQuarkEvent;
     int            fFinalQuarkPdg;
+    bool           fIsFinalLeptonEvent;
     int            fFinalLeptonPdg;
 
 

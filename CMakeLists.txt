@@ -15,8 +15,6 @@ find_package(ROOT CONFIG REQUIRED)
 find_package(Boost REQUIRED
              COMPONENTS log)
 
-#Configure Genie
-setup_genie_target()
 include_directories( /usr/local/include/GENIE )
 
 option(BUILD_EVENT_ONLY "Build the event library." ON)
@@ -30,6 +28,8 @@ if(BUILD_EVENT_ONLY)
                         class "SimParticle" type "map" key "int")
   register_event_object(module_path "SimCore/Event" namespace "ldmx"
                         class "GTruth")
+  register_event_object(module_path "SimCore/Event" namespace "ldmx"
+                        class "GHepParticle" type "collection")
 
   # Generate the files needed to build the event classes.
   setup_library(module SimCore name Event
@@ -81,6 +81,7 @@ setup_library(module SimCore
                            G4DarkBreM
                            DetDescr::DetDescr
                            Boost::log
+			   log4cpp
                            "${registered_targets}"
               sources ${SRC_FILES})
 
@@ -92,7 +93,7 @@ setup_library(module SimCore
 # Primary Generators library
 setup_library(module SimCore
               name Generators
-              dependencies SimCore::SimCore SimCore::LHE)
+              dependencies SimCore::SimCore SimCore::LHE ${GENIE_LIBS})
 
 # Sensitive Detectors library
 setup_library(module SimCore
