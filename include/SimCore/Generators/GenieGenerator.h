@@ -80,6 +80,7 @@ class GenieGenerator : public simcore::PrimaryGenerator {
   std::vector<int> targets_;
   std::vector<double> abundances_;
   std::vector<double> position_;
+  std::vector<double> beam_size_;
   double target_thickness_;
   double time_;
   std::vector<double> direction_;
