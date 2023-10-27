@@ -155,10 +155,10 @@ void Simulator::FillGHepParticles(const genie::EventRecord* record,
       my_particle.fFirstDaugher = particle->FirstDaughter();
       my_particle.fLastDaughter = particle->LastDaughter();
       
-      my_particle.fP_x = particle->P4()->X();
-      my_particle.fP_y = particle->P4()->Y();
-      my_particle.fP_z = particle->P4()->Z();
-      my_particle.fP_t = particle->P4()->T();
+      my_particle.fP_x = particle->P4()->Px();
+      my_particle.fP_y = particle->P4()->Py();
+      my_particle.fP_z = particle->P4()->Pz();
+      my_particle.fP_t = particle->P4()->E();
       
       my_particle.fX_x = particle->X4()->X();
       my_particle.fX_y = particle->X4()->Y();

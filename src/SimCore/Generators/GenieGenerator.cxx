@@ -72,6 +72,7 @@ void GenieGenerator::fillConfig(const framework::config::Parameters& p)
 
   time_        = p.getParameter<double>("time");// * ns;
   position_    = p.getParameter< std::vector<double> >("position"); // mm
+  beam_size_   = p.getParameter< std::vector<double> >("beam_size"); // mm
   direction_   = p.getParameter< std::vector<double> >("direction");
   target_thickness_ = p.getParameter<double>("target_thickness"); //mm
 
@@ -117,6 +118,30 @@ bool GenieGenerator::validateConfig()
 		<< std::endl;
       std::cout << "Taking absolute value." << std::endl;
       target_thickness_ = std::abs(target_thickness_);
+    }
+
+  if(beam_size_.size()!=2)
+    {
+      if (beam_size_.size()==0){
+	std::cout << "beam size not set. Using zero."
+		  << std::endl;
+	beam_size_.resize(2); beam_size_[0] = 0.0; beam_size_[1] = 0.0;
+      }
+      else{
+	std::cout << "beam size is set, but does not have size 2."
+		  << " " << beam_size_.size()
+		  << std::endl;
+	ret=false;
+      }
+    }
+  else if(beam_size_[0] < 0 || beam_size_[1] < 0 )
+    {
+      std::cout << "Beam size set as negative value? "
+		<< "(" << beam_size_[0] << "," << beam_size_[1] << ")"
+		<< std::endl;
+      std::cout << "Changing to positive." << std::endl;
+      beam_size_[0] = std::abs(beam_size_[0]);
+      beam_size_[1] = std::abs(beam_size_[1]);      
     }
 
   //normalize abundances
@@ -319,10 +344,12 @@ void GenieGenerator::GeneratePrimaryVertex(G4Event* event)
       
     }
 
+  auto x_pos = position_[0] + (G4Random::getTheGenerator()->flat()-0.5)*beam_size_[0];
+  auto y_pos = position_[1] + (G4Random::getTheGenerator()->flat()-0.5)*beam_size_[1];
   auto z_pos = position_[2] + (G4Random::getTheGenerator()->flat()-0.5)*target_thickness_;
   if(verbosity_>=1)
     std::cout << "Generating interaction at (x,y,z)="
-	      << "(" << position_[0] << "," << position_[1] << "," << z_pos << ")"
+	      << "(" << x_pos << "," << y_pos << "," << z_pos << ")"
 	      << std::endl;
   
   genie::InitialState initial_state(targets_.at(nucl_target_i),11);
@@ -332,13 +359,17 @@ void GenieGenerator::GeneratePrimaryVertex(G4Event* event)
   //setup the initial election
   TParticle initial_e;
   initial_e.SetPdgCode(11);
-  auto elec_i_p = std::sqrt(energy_*energy_ - initial_e.GetMass()*initial_e.GetMass());
+  double elec_i_p = std::sqrt(energy_*energy_ - (double)initial_e.GetMass()*(double)initial_e.GetMass());
   initial_e.SetMomentum(elec_i_p*direction_[0],
 			elec_i_p*direction_[1],
 			elec_i_p*direction_[2],
 			energy_);
   TLorentzVector e_p4;
   initial_e.Momentum(e_p4);
+  if(verbosity_>=1)
+    std::cout << "Generating interation with (px,py,pz,e)="
+	      << "(" << e_p4.Px() << "," << e_p4.Py() << "," << e_p4.Pz() << "," << e_p4.E() << ")"
+	      << std::endl;
 
   //calculate total xsec
   if( n_events_by_target_[nucl_target_i]==0)
@@ -359,8 +390,8 @@ void GenieGenerator::GeneratePrimaryVertex(G4Event* event)
   //setup the primary vertex now
   
   G4PrimaryVertex* vertex = new G4PrimaryVertex();
-  vertex->SetPosition(position_[0],
-		      position_[1],
+  vertex->SetPosition(x_pos,
+		      y_pos,
 		      z_pos);
   vertex->SetWeight(genie_event->Weight());
   

@@ -219,6 +219,10 @@ class genie(simcfg.PrimaryGenerator) :
         Unit vector direction of incoming electron
     tune: str
         Name of GENIE tune to use
+    target_thickness : double
+        Thickness of target to use for generation
+    beam_size : list of double
+        uniform beam size width to use
 
     Examples
     --------
@@ -240,6 +244,7 @@ class genie(simcfg.PrimaryGenerator) :
                      abundances = [],
                      time = 0.0,
                      position = [ 0.0, 0.0, 0.0 ],
+                     beam_size = [ 0.0, 0.0 ],
                      direction = [ 0.0, 0.0, 1.0 ],
                      tune = 'default',
                      spline_file = '',
@@ -253,6 +258,7 @@ class genie(simcfg.PrimaryGenerator) :
         self.abundances = abundances
         self.time = time
         self.position = position
+        self.beam_size = beam_size
         self.direction = direction
         self.tune = tune
         self.spline_file = spline_file
