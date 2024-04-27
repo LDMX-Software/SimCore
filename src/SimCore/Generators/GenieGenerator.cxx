@@ -6,7 +6,6 @@
 
 #include "SimCore/Generators/GenieGenerator.h"
 #include "SimCore/UserPrimaryParticleInformation.h"
-#include "SimCore/Event/GTruth.h"
 
 // GENIE
 #include "Framework/Utils/AppInit.h"
@@ -383,9 +382,11 @@ void GenieGenerator::GeneratePrimaryVertex(G4Event* event)
   while(!genie_event)
     genie_event = evg_driver_.GenerateEvent(e_p4);
 
-  auto genie_info = new UserEventInformation;
-  genie_info->setGENIEEventRecord(genie_event);
-  event->SetUserInformation(genie_info);
+  auto ev_info = new UserEventInformation;
+  auto hepmc3_genie = hepMC3Converter_.ConvertToHepMC3(*genie_event);
+  ldmx::HepMC3GenEvent hepmc3_ldmx_genie = (*hepmc3_genie);
+  ev_info->setHepMC3GenEvent(hepmc3_ldmx_genie);
+  event->SetUserInformation(ev_info);
   
   //setup the primary vertex now
   

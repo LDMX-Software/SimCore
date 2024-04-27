@@ -20,20 +20,21 @@ include_directories( /usr/local/include/GENIE )
 option(BUILD_EVENT_ONLY "Build the event library." ON)
 if(BUILD_EVENT_ONLY)
 
+  install(FILES /usr/local/lib/libHepMC3rootIO_rdict.pcm DESTINATION lib)
+
   register_event_object(module_path "SimCore/Event" namespace "ldmx" 
                         class "SimCalorimeterHit" type "collection")
   register_event_object(module_path "SimCore/Event" namespace "ldmx"
                         class "SimTrackerHit" type "collection")
   register_event_object(module_path "SimCore/Event" namespace "ldmx"
                         class "SimParticle" type "map" key "int")
+
   register_event_object(module_path "SimCore/Event" namespace "ldmx"
-                        class "GTruth")
-  register_event_object(module_path "SimCore/Event" namespace "ldmx"
-                        class "GHepParticle" type "collection")
+      class "HepMC3GenEvent")
 
   # Generate the files needed to build the event classes.
   setup_library(module SimCore name Event
-                dependencies ROOT::Core ${GENIE_LIBS}
+                dependencies ROOT::Core ${GENIE_LIBS} HepMC3
                 register_target
 		include )
 
@@ -93,7 +94,7 @@ setup_library(module SimCore
 # Primary Generators library
 setup_library(module SimCore
               name Generators
-              dependencies SimCore::SimCore SimCore::LHE ${GENIE_LIBS})
+              dependencies SimCore::SimCore SimCore::LHE ${GENIE_LIBS} HepMC3)
 
 # Sensitive Detectors library
 setup_library(module SimCore
@@ -112,6 +113,6 @@ setup_python(package_name ${PYTHON_PACKAGE_NAME}/SimCore)
 setup_test(config_dir test)
 
 # add visualization executable
-add_executable(g4-vis ${PROJECT_SOURCE_DIR}/src/SimCore/g4_vis.cxx)
-target_link_libraries(g4-vis PRIVATE Geant4::Interface SimCore::SimCore)
-install(TARGETS g4-vis DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+#add_executable(g4-vis ${PROJECT_SOURCE_DIR}/src/SimCore/g4_vis.cxx)
+#target_link_libraries(g4-vis PRIVATE Geant4::Interface SimCore::SimCore)
+#install(TARGETS g4-vis DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
