@@ -28,13 +28,15 @@ if(BUILD_EVENT_ONLY)
                         class "SimTrackerHit" type "collection")
   register_event_object(module_path "SimCore/Event" namespace "ldmx"
                         class "SimParticle" type "map" key "int")
+  register_event_object(module_path "SimCore/Event" namespace "ldmx"
+      class "EventWeights")
 
   register_event_object(module_path "SimCore/Event" namespace "ldmx"
-      class "HepMC3GenEvent")
+      class "HepMC3GenEvent" type "collection")
 
   # Generate the files needed to build the event classes.
   setup_library(module SimCore name Event
-                dependencies ROOT::Core ${GENIE_LIBS} HepMC3
+                dependencies ROOT::Core ${GENIE_LIBS} HepMC3 HepMC3rootIO
                 register_target
 		include )
 
@@ -75,14 +77,15 @@ file(GLOB SRC_FILES CONFIGURE_DEPDENDS ${PROJECT_SOURCE_DIR}/src/SimCore/Geo/[a-
 setup_library(module SimCore
               dependencies Geant4::Interface
                            ROOT::Physics
-			   ${GENIE_LIBS}
+                           HepMC3
+    	                     ${GENIE_LIBS}
                            Framework::Configure
                            Framework::Framework
                            SimCore::G4User
                            G4DarkBreM
                            DetDescr::DetDescr
                            Boost::log
-			   log4cpp
+                           log4cpp
                            "${registered_targets}"
               sources ${SRC_FILES})
 
@@ -94,7 +97,13 @@ setup_library(module SimCore
 # Primary Generators library
 setup_library(module SimCore
               name Generators
-              dependencies SimCore::SimCore SimCore::LHE ${GENIE_LIBS} HepMC3)
+              dependencies SimCore::SimCore SimCore::LHE ROOT::MathMore ${GENIE_LIBS} HepMC3)
+
+# Reweight Library
+setup_library(module SimCore
+    name Reweight
+    dependencies SimCore::SimCore SimCore::Generators Framework::Framework ${GENIE_LIBS} HepMC3)
+
 
 # Sensitive Detectors library
 setup_library(module SimCore
@@ -113,6 +122,6 @@ setup_python(package_name ${PYTHON_PACKAGE_NAME}/SimCore)
 setup_test(config_dir test)
 
 # add visualization executable
-#add_executable(g4-vis ${PROJECT_SOURCE_DIR}/src/SimCore/g4_vis.cxx)
-#target_link_libraries(g4-vis PRIVATE Geant4::Interface SimCore::SimCore)
-#install(TARGETS g4-vis DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+add_executable(g4-vis ${PROJECT_SOURCE_DIR}/src/SimCore/g4_vis.cxx)
+target_link_libraries(g4-vis PRIVATE Geant4::Interface SimCore::SimCore)
+install(TARGETS g4-vis DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)

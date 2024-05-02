@@ -20,6 +20,7 @@
 /*   GENIE     */
 /*~~~~~~~~~~~~~*/
 //#include "GENIE/Framework/EventGen/HepMC3Converter.h"
+#include "HepMC3/Print.h"
 
 /*~~~~~~~~~~~~~*/
 /*   SimCore   */
@@ -172,8 +173,12 @@ void Simulator::produce(framework::Event& event) {
   
   auto event_info = static_cast<UserEventInformation*>(
       runManager_->GetCurrentEvent()->GetUserInformation());
-  auto hepmc3_event = event_info->getHepMC3GenEvent();
-  event.add("SimHepMC3Event", hepmc3_event);
+  auto hepmc3_events = event_info->getHepMC3GenEvents();
+  for (auto & hepmc3ev : hepmc3_events) {
+      hepmc3ev.event_number = event.getEventHeader().getEventNumber();
+      hepmc3ev.Print();
+  }
+  event.add("SimHepMC3Events", hepmc3_events);
 
   saveTracks(event);
 

@@ -14,6 +14,7 @@
 #include "GENIE/Framework/Interaction/InitialState.h"
 #include "Framework/EventGen/EventRecord.h"
 #include "Framework/GHEP/GHepParticle.h"
+#include "HepMC3/Print.h"
 
 
 #include "Framework/Conventions/XmlParserStatus.h"
@@ -384,8 +385,9 @@ void GenieGenerator::GeneratePrimaryVertex(G4Event* event)
 
   auto ev_info = new UserEventInformation;
   auto hepmc3_genie = hepMC3Converter_.ConvertToHepMC3(*genie_event);
-  ldmx::HepMC3GenEvent hepmc3_ldmx_genie = (*hepmc3_genie);
-  ev_info->setHepMC3GenEvent(hepmc3_ldmx_genie);
+  ldmx::HepMC3GenEvent hepmc3_ldmx_genie;
+  hepmc3_genie->write_data(hepmc3_ldmx_genie);
+  ev_info->addHepMC3GenEvent(hepmc3_ldmx_genie);
   event->SetUserInformation(ev_info);
   
   //setup the primary vertex now
