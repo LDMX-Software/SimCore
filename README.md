@@ -1,3 +1,7 @@
+# :warning: Archived :warning:
+This repository is archived.
+v1.8.4 was merged into [ldmx-sw](https://github.com/LDMX-Software/ldmx-sw) as a subdirectory where development continues.
+
 # SimCore
 
 This repository is focused on integrating the 
